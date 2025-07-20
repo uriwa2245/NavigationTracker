@@ -1,0 +1,162 @@
+import { pgTable, text, serial, integer, boolean, timestamp, json } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+
+// Tools
+export const tools = pgTable("tools", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull().unique(),
+  name: text("name").notNull(),
+  brand: text("brand").notNull(),
+  serialNumber: text("serial_number"),
+  range: text("range"),
+  location: text("location").notNull(),
+  lastCalibration: timestamp("last_calibration"),
+  nextCalibration: timestamp("next_calibration"),
+  calibrationStatus: text("calibration_status"), // "passed", "failed", "overdue", "upcoming"
+  responsible: text("responsible"),
+  notes: text("notes"),
+  status: text("status").default("active"), // "active", "repair", "retired"
+});
+
+// Glassware
+export const glassware = pgTable("glassware", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull().unique(),
+  lotNumber: text("lot_number"),
+  type: text("type").notNull(),
+  class: text("class"),
+  brand: text("brand"),
+  receivedDate: timestamp("received_date"),
+  location: text("location").notNull(),
+  lastCalibration: timestamp("last_calibration"),
+  nextCalibration: timestamp("next_calibration"),
+  calibrationStatus: text("calibration_status"),
+  responsible: text("responsible"),
+  notes: text("notes"),
+});
+
+// Chemicals
+export const chemicals = pgTable("chemicals", {
+  id: serial("id").primaryKey(),
+  chemicalNo: text("chemical_no").notNull().unique(),
+  code: text("code"),
+  casNo: text("cas_no"),
+  name: text("name").notNull(),
+  brand: text("brand"),
+  grade: text("grade"),
+  packageSize: text("package_size"),
+  lotNumber: text("lot_number"),
+  molecularFormula: text("molecular_formula"),
+  molecularWeight: text("molecular_weight"),
+  receivedDate: timestamp("received_date"),
+  expiryDate: timestamp("expiry_date"),
+  location: text("location").notNull(),
+  category: text("category").notNull(), // "qa", "standard", "rd"
+  notes: text("notes"),
+});
+
+// Documents
+export const documents = pgTable("documents", {
+  id: serial("id").primaryKey(),
+  sequence: text("sequence"),
+  title: text("title").notNull(),
+  documentCode: text("document_code").notNull().unique(),
+  effectiveDate: timestamp("effective_date"),
+  revision: integer("revision").default(0),
+  category: text("category").notNull(), // "quality_manual", "procedures", "work_manual", "forms", "support", "announcements"
+  filePath: text("file_path"),
+  notes: text("notes"),
+});
+
+// Training
+export const training = pgTable("training", {
+  id: serial("id").primaryKey(),
+  sequence: text("sequence"),
+  course: text("course").notNull(),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  assessmentLevel: integer("assessment_level"), // 1, 2, 3
+  result: text("result"), // "passed", "failed"
+  trainee: text("trainee").notNull(),
+  acknowledgedDate: timestamp("acknowledged_date"),
+  trainer: text("trainer"),
+  signedDate: timestamp("signed_date"),
+  notes: text("notes"),
+});
+
+// MSDS
+export const msds = pgTable("msds", {
+  id: serial("id").primaryKey(),
+  sequence: text("sequence"),
+  title: text("title").notNull(),
+  documentCode: text("document_code").notNull().unique(),
+  effectiveDate: timestamp("effective_date"),
+  revision: integer("revision").default(0),
+  category: text("category").notNull(), // "sds_lab", "sds_product", "sds_rm"
+  filePath: text("file_path"),
+  notes: text("notes"),
+});
+
+// Tasks
+export const tasks = pgTable("tasks", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  responsible: text("responsible").notNull(),
+  startDate: timestamp("start_date"),
+  dueDate: timestamp("due_date"),
+  status: text("status").default("pending"), // "pending", "in_progress", "completed", "cancelled"
+  priority: text("priority").default("medium"), // "low", "medium", "high"
+  progress: integer("progress").default(0),
+  subtasks: json("subtasks"), // Array of subtask objects
+});
+
+// QA Samples
+export const qaSamples = pgTable("qa_samples", {
+  id: serial("id").primaryKey(),
+  requestNo: text("request_no").notNull().unique(),
+  receivedTime: text("received_time").notNull(),
+  receivedDate: timestamp("received_date").notNull(),
+  dueDate: timestamp("due_date").notNull(),
+  quotationNo: text("quotation_no"),
+  contactPerson: text("contact_person").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email").notNull(),
+  companyName: text("company_name").notNull(),
+  address: text("address"),
+  deliveryMethod: text("delivery_method").notNull(),
+  samples: json("samples"), // Array of sample objects
+  storage: text("storage").notNull(), // "room_temp", "chilled", "frozen"
+  postTesting: text("post_testing").notNull(), // "return", "dispose"
+  condition: text("condition").notNull(), // "normal", "abnormal"
+  status: text("status").default("received"), // "received", "testing", "completed", "delivered"
+});
+
+// Insert schemas
+export const insertToolSchema = createInsertSchema(tools).omit({ id: true });
+export const insertGlasswareSchema = createInsertSchema(glassware).omit({ id: true });
+export const insertChemicalSchema = createInsertSchema(chemicals).omit({ id: true });
+export const insertDocumentSchema = createInsertSchema(documents).omit({ id: true });
+export const insertTrainingSchema = createInsertSchema(training).omit({ id: true });
+export const insertMsdsSchema = createInsertSchema(msds).omit({ id: true });
+export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true });
+export const insertQaSampleSchema = createInsertSchema(qaSamples).omit({ id: true });
+
+// Types
+export type Tool = typeof tools.$inferSelect;
+export type InsertTool = z.infer<typeof insertToolSchema>;
+export type Glassware = typeof glassware.$inferSelect;
+export type InsertGlassware = z.infer<typeof insertGlasswareSchema>;
+export type Chemical = typeof chemicals.$inferSelect;
+export type InsertChemical = z.infer<typeof insertChemicalSchema>;
+export type Document = typeof documents.$inferSelect;
+export type InsertDocument = z.infer<typeof insertDocumentSchema>;
+export type Training = typeof training.$inferSelect;
+export type InsertTraining = z.infer<typeof insertTrainingSchema>;
+export type Msds = typeof msds.$inferSelect;
+export type InsertMsds = z.infer<typeof insertMsdsSchema>;
+export type Task = typeof tasks.$inferSelect;
+export type InsertTask = z.infer<typeof insertTaskSchema>;
+export type QaSample = typeof qaSamples.$inferSelect;
+export type InsertQaSample = z.infer<typeof insertQaSampleSchema>;
