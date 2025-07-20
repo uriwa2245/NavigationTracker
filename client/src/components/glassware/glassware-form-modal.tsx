@@ -298,38 +298,133 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
                   </FormItem>
                 )}
               />
+            </div>
 
-              <FormField
-                control={form.control}
-                name="responsible"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="thai-font">ผู้รับผิดชอบ</FormLabel>
-                    <FormControl>
-                      <Input placeholder="ชื่อผู้รับผิดชอบ" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {/* Calibration Results Section */}
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 thai-font">
+                ผลการสอบเทียบ
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="calibrationResult"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="thai-font">ผลการสอบเทียบ</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="เลือกผลการสอบเทียบ" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="ผ่าน">ผ่าน</SelectItem>
+                          <SelectItem value="ไม่ผ่าน">ไม่ผ่าน</SelectItem>
+                          <SelectItem value="ปรับเทียบ">ปรับเทียบ</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem className="md:col-span-2">
-                    <FormLabel className="thai-font">หมายเหตุ</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        rows={3}
-                        placeholder="ข้อมูลเพิ่มเติม..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="calibrationCertificate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="thai-font">เลขที่ใบรับรอง</FormLabel>
+                      <FormControl>
+                        <Input placeholder="เช่น CERT-2024-001" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="calibrationBy"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="thai-font">ผู้ทำการสอบเทียบ</FormLabel>
+                      <FormControl>
+                        <Input placeholder="ชื่อผู้ทำการสอบเทียบ หรือ บริษัท" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="calibrationMethod"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="thai-font">วิธีการสอบเทียบ</FormLabel>
+                      <FormControl>
+                        <Input placeholder="วิธีการหรือมาตรฐานที่ใช้" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="calibrationRemarks"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel className="thai-font">หมายเหตุผลการสอบเทียบ</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={3}
+                          placeholder="รายละเอียดเพิ่มเติมเกี่ยวกับผลการสอบเทียบ..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="responsible"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="thai-font">ผู้รับผิดชอบ</FormLabel>
+                      <FormControl>
+                        <Input placeholder="ชื่อผู้รับผิดชอบ" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel className="thai-font">หมายเหตุ</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={3}
+                          placeholder="ข้อมูลเพิ่มเติม..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
             <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">

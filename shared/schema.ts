@@ -14,6 +14,11 @@ export const tools = pgTable("tools", {
   lastCalibration: timestamp("last_calibration"),
   nextCalibration: timestamp("next_calibration"),
   calibrationStatus: text("calibration_status"), // "passed", "failed", "overdue", "upcoming"
+  calibrationResult: text("calibration_result"), // "ผ่าน", "ไม่ผ่าน", "ปรับเทียบ"
+  calibrationCertificate: text("calibration_certificate"), // เลขที่ใบรับรอง
+  calibrationBy: text("calibration_by"), // ผู้ทำการสอบเทียบ
+  calibrationMethod: text("calibration_method"), // วิธีการสอบเทียบ
+  calibrationRemarks: text("calibration_remarks"), // หมายเหตุผลการสอบเทียบ
   responsible: text("responsible"),
   notes: text("notes"),
   status: text("status").default("active"), // "active", "repair", "retired"
@@ -32,6 +37,11 @@ export const glassware = pgTable("glassware", {
   lastCalibration: timestamp("last_calibration"),
   nextCalibration: timestamp("next_calibration"),
   calibrationStatus: text("calibration_status"),
+  calibrationResult: text("calibration_result"), // "ผ่าน", "ไม่ผ่าน", "ปรับเทียบ"
+  calibrationCertificate: text("calibration_certificate"), // เลขที่ใบรับรอง
+  calibrationBy: text("calibration_by"), // ผู้ทำการสอบเทียบ
+  calibrationMethod: text("calibration_method"), // วิธีการสอบเทียบ
+  calibrationRemarks: text("calibration_remarks"), // หมายเหตุผลการสอบเทียบ
   responsible: text("responsible"),
   notes: text("notes"),
 });

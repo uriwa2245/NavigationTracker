@@ -100,7 +100,23 @@ export class MemStorage implements IStorage {
 
   async createTool(tool: InsertTool): Promise<Tool> {
     const id = this.currentId++;
-    const newTool: Tool = { ...tool, id };
+    const newTool: Tool = { 
+      ...tool, 
+      id,
+      status: tool.status ?? null,
+      serialNumber: tool.serialNumber ?? null,
+      range: tool.range ?? null,
+      lastCalibration: tool.lastCalibration ?? null,
+      nextCalibration: tool.nextCalibration ?? null,
+      calibrationStatus: tool.calibrationStatus ?? null,
+      calibrationResult: tool.calibrationResult ?? null,
+      calibrationCertificate: tool.calibrationCertificate ?? null,
+      calibrationBy: tool.calibrationBy ?? null,
+      calibrationMethod: tool.calibrationMethod ?? null,
+      calibrationRemarks: tool.calibrationRemarks ?? null,
+      responsible: tool.responsible ?? null,
+      notes: tool.notes ?? null
+    };
     this.tools.set(id, newTool);
     return newTool;
   }
@@ -129,7 +145,24 @@ export class MemStorage implements IStorage {
 
   async createGlassware(glassware: InsertGlassware): Promise<Glassware> {
     const id = this.currentId++;
-    const newGlassware: Glassware = { ...glassware, id };
+    const newGlassware: Glassware = { 
+      ...glassware, 
+      id,
+      class: glassware.class ?? null,
+      brand: glassware.brand ?? null,
+      lotNumber: glassware.lotNumber ?? null,
+      receivedDate: glassware.receivedDate ?? null,
+      lastCalibration: glassware.lastCalibration ?? null,
+      nextCalibration: glassware.nextCalibration ?? null,
+      calibrationStatus: glassware.calibrationStatus ?? null,
+      calibrationResult: glassware.calibrationResult ?? null,
+      calibrationCertificate: glassware.calibrationCertificate ?? null,
+      calibrationBy: glassware.calibrationBy ?? null,
+      calibrationMethod: glassware.calibrationMethod ?? null,
+      calibrationRemarks: glassware.calibrationRemarks ?? null,
+      responsible: glassware.responsible ?? null,
+      notes: glassware.notes ?? null
+    };
     this.glassware.set(id, newGlassware);
     return newGlassware;
   }
@@ -162,7 +195,21 @@ export class MemStorage implements IStorage {
 
   async createChemical(chemical: InsertChemical): Promise<Chemical> {
     const id = this.currentId++;
-    const newChemical: Chemical = { ...chemical, id };
+    const newChemical: Chemical = { 
+      ...chemical, 
+      id,
+      code: chemical.code ?? null,
+      brand: chemical.brand ?? null,
+      grade: chemical.grade ?? null,
+      packageSize: chemical.packageSize ?? null,
+      lotNumber: chemical.lotNumber ?? null,
+      molecularFormula: chemical.molecularFormula ?? null,
+      molecularWeight: chemical.molecularWeight ?? null,
+      casNo: chemical.casNo ?? null,
+      receivedDate: chemical.receivedDate ?? null,
+      expiryDate: chemical.expiryDate ?? null,
+      notes: chemical.notes ?? null
+    };
     this.chemicals.set(id, newChemical);
     return newChemical;
   }
@@ -195,7 +242,15 @@ export class MemStorage implements IStorage {
 
   async createDocument(document: InsertDocument): Promise<Document> {
     const id = this.currentId++;
-    const newDocument: Document = { ...document, id };
+    const newDocument: Document = { 
+      ...document, 
+      id,
+      sequence: document.sequence ?? null,
+      effectiveDate: document.effectiveDate ?? null,
+      revision: document.revision ?? null,
+      filePath: document.filePath ?? null,
+      notes: document.notes ?? null
+    };
     this.documents.set(id, newDocument);
     return newDocument;
   }
@@ -224,7 +279,19 @@ export class MemStorage implements IStorage {
 
   async createTraining(training: InsertTraining): Promise<Training> {
     const id = this.currentId++;
-    const newTraining: Training = { ...training, id };
+    const newTraining: Training = { 
+      ...training, 
+      id,
+      sequence: training.sequence ?? null,
+      startDate: training.startDate ?? null,
+      endDate: training.endDate ?? null,
+      assessmentLevel: training.assessmentLevel ?? null,
+      result: training.result ?? null,
+      acknowledgedDate: training.acknowledgedDate ?? null,
+      trainer: training.trainer ?? null,
+      signedDate: training.signedDate ?? null,
+      notes: training.notes ?? null
+    };
     this.training.set(id, newTraining);
     return newTraining;
   }
@@ -257,7 +324,15 @@ export class MemStorage implements IStorage {
 
   async createMsds(msds: InsertMsds): Promise<Msds> {
     const id = this.currentId++;
-    const newMsds: Msds = { ...msds, id };
+    const newMsds: Msds = { 
+      ...msds, 
+      id,
+      sequence: msds.sequence ?? null,
+      effectiveDate: msds.effectiveDate ?? null,
+      revision: msds.revision ?? null,
+      filePath: msds.filePath ?? null,
+      notes: msds.notes ?? null
+    };
     this.msds.set(id, newMsds);
     return newMsds;
   }
@@ -286,7 +361,17 @@ export class MemStorage implements IStorage {
 
   async createTask(task: InsertTask): Promise<Task> {
     const id = this.currentId++;
-    const newTask: Task = { ...task, id };
+    const newTask: Task = { 
+      ...task, 
+      id,
+      description: task.description ?? null,
+      startDate: task.startDate ?? null,
+      dueDate: task.dueDate ?? null,
+      status: task.status ?? null,
+      priority: task.priority ?? null,
+      progress: task.progress ?? null,
+      subtasks: task.subtasks ?? null
+    };
     this.tasks.set(id, newTask);
     return newTask;
   }
@@ -315,7 +400,14 @@ export class MemStorage implements IStorage {
 
   async createQaSample(qaSample: InsertQaSample): Promise<QaSample> {
     const id = this.currentId++;
-    const newQaSample: QaSample = { ...qaSample, id };
+    const newQaSample: QaSample = { 
+      ...qaSample, 
+      id,
+      quotationNo: qaSample.quotationNo ?? null,
+      address: qaSample.address ?? null,
+      status: qaSample.status ?? null,
+      samples: qaSample.samples ?? null
+    };
     this.qaSamples.set(id, newQaSample);
     return newQaSample;
   }

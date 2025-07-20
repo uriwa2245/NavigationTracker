@@ -33,14 +33,21 @@ The application follows a full-stack architecture with:
 
 ### Database Schema
 The system manages eight core entities:
-- **Tools**: Equipment tracking with calibration management
-- **Glassware**: Laboratory glassware inventory and calibration
+- **Tools**: Equipment tracking with comprehensive calibration management and results recording
+- **Glassware**: Laboratory glassware inventory with calibration tracking and results recording
 - **Chemicals**: Chemical inventory with expiry and safety tracking
 - **Documents**: Document management with categorization
 - **Training**: Staff training and assessment records
 - **MSDS**: Material Safety Data Sheets management
 - **Tasks**: Task tracking and project management
 - **QA Samples**: Quality assurance sample tracking
+
+### Key Features Added (July 2025)
+- **Calibration Results Recording**: Both Tools and Glassware modules now include detailed calibration result tracking:
+  - Calibration result status (ผ่าน/ไม่ผ่าน/ปรับเทียบ)
+  - Certificate numbers and responsible parties
+  - Calibration methods and detailed remarks
+  - Integrated into form interfaces with organized sections
 
 ### Frontend Components
 - **Dashboard**: Central overview with statistics and quick access
