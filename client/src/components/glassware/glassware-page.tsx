@@ -142,9 +142,9 @@ export default function GlasswarePage() {
         onDelete={handleDelete}
         isLoading={isLoading}
         statusFilters={[
-          { key: "due_soon", label: "ใกล้ครบกำหนด", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "due_soon").length : 0 },
-          { key: "overdue", label: "เกินกำหนด", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "overdue").length : 0 },
-          { key: "active", label: "ปกติ", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "active").length : 0 },
+          { key: "ปกติ", label: "ปกติ", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "ปกติ").length : 0 },
+          { key: "ใกล้ครบกำหนด", label: "ใกล้ครบกำหนด", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "ใกล้ครบกำหนด").length : 0 },
+          { key: "เลยกำหนด", label: "เลยกำหนด", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "เลยกำหนด").length : 0 },
         ]}
         getItemStatus={(item: Glassware) => getCalibrationStatus(item)}
       />

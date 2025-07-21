@@ -145,6 +145,7 @@ export default function ToolsPage() {
         statusFilters={[
           { key: "active", label: "ใช้งานได้", count: Array.isArray(tools) ? tools.filter((tool: Tool) => tool.status === "active").length : 0 },
           { key: "inactive", label: "ไม่ใช้งาน", count: Array.isArray(tools) ? tools.filter((tool: Tool) => tool.status === "inactive").length : 0 },
+          { key: "repair", label: "ซ่อมแซม", count: Array.isArray(tools) ? tools.filter((tool: Tool) => tool.status === "repair").length : 0 },
         ]}
         getItemStatus={(tool: Tool) => tool.status || "active"}
       />
