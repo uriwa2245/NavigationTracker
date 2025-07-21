@@ -50,12 +50,27 @@ The system manages eight core entities:
   - Calibration methods and detailed remarks
   - Integrated into form interfaces with organized sections
 
+- **Enhanced Status Management System (July 21, 2025)**:
+  - **Multi-select Chip Filtering**: Users can now select multiple status filters simultaneously across all data tables
+  - **Color-coded Status Display**: Comprehensive color system with both badges and row background colors:
+    - Red: Expired items, failed tests, cancelled tasks
+    - Yellow/Orange: Items nearing expiry, pending tasks, inactive equipment
+    - Green: Normal status, passed tests, completed tasks, active equipment
+    - Blue: In-progress items, received samples, equipment under repair
+  - **Consistent Status Mapping**: Standardized status values across all modules (tools, glassware, chemicals, training, documents, MSDS, tasks, QA samples)
+  - **Dark Mode Support**: All color schemes work seamlessly in both light and dark themes
+  - **Simplified Document Interface**: Removed chip filters from documents page, maintaining only dropdown category selection
+
 ### Frontend Components
 - **Dashboard**: Central overview with statistics and quick access
-- **Data Tables**: Reusable table component with search, pagination, and CRUD operations
+- **Data Tables**: Advanced reusable table component with:
+  - Multi-select status filtering with chip interface
+  - Color-coded row backgrounds based on item status
+  - Search, pagination, and CRUD operations
+  - Status-based visual indicators and badges
 - **Modal Forms**: Form modals for creating and editing records
 - **Navigation**: Sidebar navigation with collapsible menu items
-- **UI Components**: Complete set of accessible UI components from shadcn/ui
+- **UI Components**: Complete set of accessible UI components from shadcn/ui with custom lab-specific styling
 
 ### Backend Services
 - **Storage Layer**: Abstract storage interface with CRUD operations

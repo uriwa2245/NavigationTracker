@@ -242,11 +242,9 @@ export default function DocumentsPage() {
           { label: "รหัสเอกสาร", value: viewingDocument.documentCode },
           { label: "ชื่อเอกสาร", value: viewingDocument.title },
           { label: "หมวดหมู่", value: getCategoryLabel(viewingDocument.category), highlight: true },
-          { label: "Version", value: viewingDocument.version || "-" },
+          { label: "ปรับปรุงครั้งที่", value: viewingDocument.revision?.toString() || "0" },
           { label: "วันที่เริ่มใช้", value: viewingDocument.effectiveDate ? format(new Date(viewingDocument.effectiveDate), "dd/MM/yyyy") : "-" },
-          { label: "วันที่ทบทวน", value: viewingDocument.reviewDate ? format(new Date(viewingDocument.reviewDate), "dd/MM/yyyy") : "-" },
-          { label: "ผู้อนุมัติ", value: viewingDocument.approvedBy || "-" },
-          { label: "รายละเอียด", value: viewingDocument.description || "-" },
+          { label: "หมายเหตุ", value: viewingDocument.notes || "-" },
         ] : []}
       />
     </div>
