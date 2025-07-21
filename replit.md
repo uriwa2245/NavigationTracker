@@ -7,6 +7,7 @@ This is a comprehensive laboratory internal operations management system built w
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+UI Theme: Soft green, minimal design theme requested for entire website.
 
 ## System Architecture
 

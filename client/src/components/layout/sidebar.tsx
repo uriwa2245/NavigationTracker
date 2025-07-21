@@ -86,7 +86,7 @@ export default function Sidebar({
   return (
     <nav
       className={cn(
-        "bg-white dark:bg-gray-800 shadow-lg w-64 fixed left-0 top-16 bottom-0 transform transition-transform duration-300 ease-in-out z-40 overflow-y-auto custom-scrollbar",
+        "bg-card shadow-lg w-64 fixed left-0 top-16 bottom-0 transform transition-transform duration-300 ease-in-out z-40 overflow-y-auto custom-scrollbar border-r border-border",
         isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}
     >
@@ -97,10 +97,10 @@ export default function Sidebar({
               <button
                 onClick={() => handleItemClick(item.id)}
                 className={cn(
-                  "w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors",
+                  "w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors thai-font",
                   activeSection === item.id
-                    ? "bg-primary text-white"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-foreground hover:bg-accent hover:text-accent-foreground"
                 )}
               >
                 <item.icon className="w-5 h-5 mr-3" />

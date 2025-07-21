@@ -51,10 +51,10 @@ export default function Dashboard() {
           <div className="space-y-8">
             {/* Dashboard Header */}
             <div className="mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              <h2 className="text-3xl font-bold text-foreground mb-2 thai-font">
                 หน้าหลัก
               </h2>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-muted-foreground thai-font">
                 ภาพรวมระบบปฏิบัติการภายในห้องแลป
               </p>
             </div>
