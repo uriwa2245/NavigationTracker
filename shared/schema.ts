@@ -122,6 +122,19 @@ export const tasks = pgTable("tasks", {
   subtasks: json("subtasks"), // Array of subtask objects
 });
 
+// Tool Calibration History
+export const toolCalibrationHistory = pgTable("tool_calibration_history", {
+  id: serial("id").primaryKey(),
+  toolId: integer("tool_id").notNull(),
+  calibrationDate: timestamp("calibration_date").notNull(),
+  result: text("result").notNull(), // "ผ่าน", "ไม่ผ่าน"
+  certificateNumber: text("certificate_number"),
+  calibratedBy: text("calibrated_by"),
+  method: text("method"),
+  remarks: text("remarks"),
+  nextCalibrationDate: timestamp("next_calibration_date"),
+});
+
 // QA Samples
 export const qaSamples = pgTable("qa_samples", {
   id: serial("id").primaryKey(),
@@ -158,6 +171,7 @@ export const qaTestResults = pgTable("qa_test_results", {
 
 // Insert schemas
 export const insertToolSchema = createInsertSchema(tools).omit({ id: true });
+export const insertToolCalibrationHistorySchema = createInsertSchema(toolCalibrationHistory).omit({ id: true });
 export const insertGlasswareSchema = createInsertSchema(glassware).omit({ id: true });
 export const insertChemicalSchema = createInsertSchema(chemicals).omit({ id: true });
 export const insertDocumentSchema = createInsertSchema(documents).omit({ id: true });
@@ -170,6 +184,8 @@ export const insertQaTestResultSchema = createInsertSchema(qaTestResults).omit({
 // Types
 export type Tool = typeof tools.$inferSelect;
 export type InsertTool = z.infer<typeof insertToolSchema>;
+export type ToolCalibrationHistory = typeof toolCalibrationHistory.$inferSelect;
+export type InsertToolCalibrationHistory = z.infer<typeof insertToolCalibrationHistorySchema>;
 export type Glassware = typeof glassware.$inferSelect;
 export type InsertGlassware = z.infer<typeof insertGlasswareSchema>;
 export type Chemical = typeof chemicals.$inferSelect;

@@ -14,6 +14,7 @@ interface ViewDetailsModalProps {
   onClose: () => void;
   title: string;
   data: Array<{ label: string; value: string | React.ReactNode; highlight?: boolean }>;
+  additionalContent?: React.ReactNode;
 }
 
 export default function ViewDetailsModal({
@@ -21,6 +22,7 @@ export default function ViewDetailsModal({
   onClose,
   title,
   data,
+  additionalContent,
 }: ViewDetailsModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -60,6 +62,13 @@ export default function ViewDetailsModal({
                 {index < data.length - 1 && <Separator className="mt-3" />}
               </div>
             ))}
+            
+            {additionalContent && (
+              <>
+                <Separator className="my-4" />
+                {additionalContent}
+              </>
+            )}
           </div>
         </ScrollArea>
       </DialogContent>

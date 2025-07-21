@@ -5,7 +5,8 @@ import { apiRequest } from "@/lib/queryClient";
 import DataTable from "@/components/ui/data-table";
 import ToolFormModal from "./tool-form-modal";
 import ViewDetailsModal from "@/components/ui/view-details-modal";
-import { Tool } from "@shared/schema";
+import { CalibrationHistoryTable } from "@/components/ui/calibration-history-table";
+import { Tool, ToolCalibrationHistory } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -19,6 +20,11 @@ export default function ToolsPage() {
 
   const { data: tools, isLoading } = useQuery({
     queryKey: ["/api/tools"],
+  });
+
+  const { data: calibrationHistory } = useQuery({
+    queryKey: [`/api/tools/${viewingTool?.id}/calibration-history`],
+    enabled: !!viewingTool?.id,
   });
 
   const deleteMutation = useMutation({
@@ -64,6 +70,16 @@ export default function ToolsPage() {
       default:
         return <Badge className="lab-badge-info">{status}</Badge>;
     }
+  };
+
+  const getToolStatus = (tool: Tool) => {
+    if (tool.status === "repair") {
+      return <Badge className="lab-badge-error">ส่งซ่อม</Badge>;
+    }
+    if (tool.status === "active") {
+      return <Badge className="lab-badge-success">ใช้งานได้</Badge>;
+    }
+    return <Badge className="lab-badge-info">{tool.status || "ไม่ระบุ"}</Badge>;
   };
 
   const columns = [
@@ -170,15 +186,23 @@ export default function ToolsPage() {
         data={viewingTool ? [
           { label: "รหัสเครื่องมือ", value: viewingTool.code },
           { label: "ชื่อเครื่องมือ", value: viewingTool.name },
-          { label: "ยี่ห้อ/รุ่น", value: viewingTool.brand || "-" },
+          { label: "ยี่ห้อ / รุ่น", value: viewingTool.brand || "-" },
           { label: "Serial Number", value: viewingTool.serialNumber || "-" },
+          { label: "พิสัยการใช้งาน", value: viewingTool.range || "-" },
           { label: "สถานที่ตั้ง", value: viewingTool.location || "-" },
-          { label: "วันที่สอบเทียบล่าสุด", value: viewingTool.lastCalibration ? format(new Date(viewingTool.lastCalibration), "dd/MM/yyyy") : "-" },
-          { label: "วันที่สอบเทียบครั้งถัดไป", value: viewingTool.nextCalibration ? format(new Date(viewingTool.nextCalibration), "dd/MM/yyyy") : "-" },
-          { label: "สถานะ", value: getStatusBadge(getCalibrationStatus(viewingTool)), highlight: true },
-          { label: "หน่วยงานสอบเทียบ", value: viewingTool.calibrationBy || "-" },
+          { label: "ผู้รับผิดชอบ", value: viewingTool.responsible || "-" },
           { label: "หมายเหตุ", value: viewingTool.notes || "-" },
+          { label: "สถานะเครื่องมือ", value: getToolStatus(viewingTool), highlight: true },
         ] : []}
+        additionalContent={
+          calibrationHistory && calibrationHistory.length > 0 ? (
+            <CalibrationHistoryTable history={calibrationHistory} />
+          ) : (
+            <div className="mt-6 text-center py-8 text-muted-foreground">
+              ไม่มีประวัติการสอบเทียบ
+            </div>
+          )
+        }
       />
     </div>
   );

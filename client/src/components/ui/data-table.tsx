@@ -180,7 +180,7 @@ export default function DataTable({
             {onAdd && !hideAddButton && (
               <Button onClick={onAdd} className="lab-button-primary">
                 <Plus className="w-4 h-4 mr-2" />
-                เพิ่ม
+                เพิ่มรายการใหม่
               </Button>
             )}
             {onExport && (

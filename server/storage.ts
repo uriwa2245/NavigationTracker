@@ -1,5 +1,6 @@
 import {
   Tool, InsertTool,
+  ToolCalibrationHistory, InsertToolCalibrationHistory,
   Glassware, InsertGlassware,
   Chemical, InsertChemical,
   Document, InsertDocument,
@@ -17,6 +18,10 @@ export interface IStorage {
   createTool(tool: InsertTool): Promise<Tool>;
   updateTool(id: number, tool: Partial<InsertTool>): Promise<Tool | undefined>;
   deleteTool(id: number): Promise<boolean>;
+
+  // Tool Calibration History
+  getToolCalibrationHistory(toolId: number): Promise<ToolCalibrationHistory[]>;
+  createToolCalibrationHistory(history: InsertToolCalibrationHistory): Promise<ToolCalibrationHistory>;
 
   // Glassware
   getGlassware(): Promise<Glassware[]>;
@@ -88,6 +93,7 @@ export interface IStorage {
 
 export class MemStorage implements IStorage {
   private tools: Map<number, Tool> = new Map();
+  private toolCalibrationHistory: Map<number, ToolCalibrationHistory> = new Map();
   private glassware: Map<number, Glassware> = new Map();
   private chemicals: Map<number, Chemical> = new Map();
   private documents: Map<number, Document> = new Map();
@@ -394,6 +400,33 @@ export class MemStorage implements IStorage {
       }
     ];
 
+    // Mock Tool Calibration History
+    const mockToolCalibrationHistory: ToolCalibrationHistory[] = [
+      // History for Tool ID 1 (เครื่องชั่งวิเคราะห์)
+      { id: 1001, toolId: 1, calibrationDate: new Date("2024-01-15"), result: "ผ่าน", certificateNumber: "CAL-2024-001", 
+        calibratedBy: "บริษัท เมตเทลอร์ โทเลโด", method: "External Weight", remarks: "การสอบเทียบปกติ", nextCalibrationDate: new Date("2025-01-15") },
+      { id: 1002, toolId: 1, calibrationDate: new Date("2023-01-10"), result: "ผ่าน", certificateNumber: "CAL-2023-001", 
+        calibratedBy: "บริษัท เมตเทลอร์ โทเลโด", method: "External Weight", remarks: "การสอบเทียบปกติ", nextCalibrationDate: new Date("2024-01-10") },
+      { id: 1003, toolId: 1, calibrationDate: new Date("2022-01-12"), result: "ผ่าน", certificateNumber: "CAL-2022-001", 
+        calibratedBy: "บริษัท เมตเทลอร์ โทเลโด", method: "External Weight", remarks: "การสอบเทียบปกติ", nextCalibrationDate: new Date("2023-01-12") },
+      
+      // History for Tool ID 2 (เครื่องวัด pH)  
+      { id: 1004, toolId: 2, calibrationDate: new Date("2024-06-01"), result: "ผ่าน", certificateNumber: "CAL-2024-015", 
+        calibratedBy: "ทีมภายใน", method: "Buffer Solution", remarks: "ใช้ Buffer pH 4.01, 7.00, 10.01", nextCalibrationDate: new Date("2024-09-01") },
+      { id: 1005, toolId: 2, calibrationDate: new Date("2024-03-01"), result: "ผ่าน", certificateNumber: "CAL-2024-008", 
+        calibratedBy: "ทีมภายใน", method: "Buffer Solution", remarks: "ใช้ Buffer pH 4.01, 7.00, 10.01", nextCalibrationDate: new Date("2024-06-01") },
+      { id: 1006, toolId: 2, calibrationDate: new Date("2023-12-01"), result: "ผ่าน", certificateNumber: "CAL-2023-045", 
+        calibratedBy: "ทีมภายใน", method: "Buffer Solution", remarks: "เปลี่ยน electrode ใหม่", nextCalibrationDate: new Date("2024-03-01") },
+      
+      // History for Tool ID 4 (ตู้เพาะเชื้อ) - มีปัญหา
+      { id: 1007, toolId: 4, calibrationDate: new Date("2024-02-01"), result: "ไม่ผ่าน", certificateNumber: "CAL-2024-005", 
+        calibratedBy: "ทีมภายใน", method: "Temperature Mapping", remarks: "พบจุดร้อนในช่วงอุณหภูมิ 37°C - ส่งซ่อม", nextCalibrationDate: new Date("2024-08-01") },
+      { id: 1008, toolId: 4, calibrationDate: new Date("2023-08-01"), result: "ผ่าน", certificateNumber: "CAL-2023-025", 
+        calibratedBy: "ทีมภายใน", method: "Temperature Mapping", remarks: "การสอบเทียบปกติ", nextCalibrationDate: new Date("2024-02-01") },
+      { id: 1009, toolId: 4, calibrationDate: new Date("2023-02-01"), result: "ผ่าน", certificateNumber: "CAL-2023-005", 
+        calibratedBy: "ทีมภายใน", method: "Temperature Mapping", remarks: "การสอบเทียบปกติ", nextCalibrationDate: new Date("2023-08-01") },
+    ];
+
     // Mock QA Samples Data
     const mockQaSamples: QaSample[] = [
       {
@@ -481,6 +514,7 @@ export class MemStorage implements IStorage {
 
     // Initialize all data
     mockTools.forEach(tool => this.tools.set(tool.id, tool));
+    mockToolCalibrationHistory.forEach(history => this.toolCalibrationHistory.set(history.id, history));
     mockGlassware.forEach(item => this.glassware.set(item.id, item));
     mockChemicals.forEach(chemical => this.chemicals.set(chemical.id, chemical));
     mockDocuments.forEach(doc => this.documents.set(doc.id, doc));
@@ -491,8 +525,9 @@ export class MemStorage implements IStorage {
     mockQaTestResults.forEach(result => this.qaTestResults.set(result.id, result));
 
     // Set current ID to continue from the highest ID used
-    this.currentId = Math.max(
+    const allIds = [
       ...mockTools.map(t => t.id),
+      ...mockToolCalibrationHistory.map(h => h.id),
       ...mockGlassware.map(g => g.id), 
       ...mockChemicals.map(c => c.id),
       ...mockDocuments.map(d => d.id),
@@ -501,7 +536,8 @@ export class MemStorage implements IStorage {
       ...mockTasks.map(t => t.id),
       ...mockQaSamples.map(s => s.id),
       ...mockQaTestResults.map(r => r.id)
-    ) + 1;
+    ];
+    this.currentId = Math.max(...allIds) + 1;
   }
 
   // Tools
@@ -547,6 +583,26 @@ export class MemStorage implements IStorage {
 
   async deleteTool(id: number): Promise<boolean> {
     return this.tools.delete(id);
+  }
+
+  // Tool Calibration History
+  async getToolCalibrationHistory(toolId: number): Promise<ToolCalibrationHistory[]> {
+    const fiveYearsAgo = new Date();
+    fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+    
+    return Array.from(this.toolCalibrationHistory.values())
+      .filter(history => 
+        history.toolId === toolId && 
+        history.calibrationDate >= fiveYearsAgo
+      )
+      .sort((a, b) => new Date(b.calibrationDate).getTime() - new Date(a.calibrationDate).getTime());
+  }
+
+  async createToolCalibrationHistory(history: InsertToolCalibrationHistory): Promise<ToolCalibrationHistory> {
+    const id = this.currentId++;
+    const newHistory: ToolCalibrationHistory = { ...history, id };
+    this.toolCalibrationHistory.set(id, newHistory);
+    return newHistory;
   }
 
   // Glassware

@@ -164,7 +164,7 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
                 name="serialNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="thai-font">S/N</FormLabel>
+                    <FormLabel className="thai-font">Serial Number</FormLabel>
                     <FormControl>
                       <Input placeholder="หมายเลขผลิต" {...field} value={field.value ?? ""} />
                     </FormControl>

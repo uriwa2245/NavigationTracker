@@ -77,6 +77,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Tool Calibration History
+  app.get("/api/tools/:id/calibration-history", async (req, res) => {
+    try {
+      const history = await storage.getToolCalibrationHistory(parseInt(req.params.id));
+      res.json(history);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch calibration history" });
+    }
+  });
+
   // Glassware
   app.get("/api/glassware", async (req, res) => {
     try {
