@@ -88,7 +88,7 @@ export default function DataTable({
 }: DataTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeStatusFilter, setActiveStatusFilter] = useState<string>("all");
+  const [activeStatusFilters, setActiveStatusFilters] = useState<string[]>(["all"]);
   const itemsPerPage = 10;
 
   // Filter data based on search term and status
@@ -103,10 +103,10 @@ export default function DataTable({
     );
   }
 
-  // Apply status filter
-  if (activeStatusFilter !== "all" && getItemStatus) {
+  // Apply status filter - support multiple selections
+  if (!activeStatusFilters.includes("all") && getItemStatus) {
     filteredData = filteredData.filter((item) => 
-      getItemStatus(item) === activeStatusFilter
+      activeStatusFilters.includes(getItemStatus(item))
     );
   }
 
@@ -176,26 +176,36 @@ export default function DataTable({
           <div className="mt-4">
             <div className="flex flex-wrap gap-2">
               <Badge
-                variant={activeStatusFilter === "all" ? "default" : "outline"}
+                variant={activeStatusFilters.includes("all") ? "default" : "outline"}
                 className={`cursor-pointer transition-all ${
-                  activeStatusFilter === "all" 
+                  activeStatusFilters.includes("all") 
                     ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-700" 
                     : "hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
-                onClick={() => setActiveStatusFilter("all")}
+                onClick={() => setActiveStatusFilters(["all"])}
               >
                 ทั้งหมด ({data.length})
               </Badge>
               {statusFilters.map((filter) => (
                 <Badge
                   key={filter.key}
-                  variant={activeStatusFilter === filter.key ? "default" : "outline"}
+                  variant={activeStatusFilters.includes(filter.key) ? "default" : "outline"}
                   className={`cursor-pointer transition-all thai-font ${
-                    activeStatusFilter === filter.key
+                    activeStatusFilters.includes(filter.key)
                       ? getStatusChipStyle(filter.key)
                       : "hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
-                  onClick={() => setActiveStatusFilter(filter.key)}
+                  onClick={() => {
+                    if (activeStatusFilters.includes(filter.key)) {
+                      // Remove this filter
+                      const newFilters = activeStatusFilters.filter(f => f !== filter.key);
+                      setActiveStatusFilters(newFilters.length === 0 ? ["all"] : newFilters);
+                    } else {
+                      // Add this filter and remove "all"
+                      const newFilters = activeStatusFilters.filter(f => f !== "all");
+                      setActiveStatusFilters([...newFilters, filter.key]);
+                    }
+                  }}
                 >
                   {filter.label} ({filter.count})
                 </Badge>

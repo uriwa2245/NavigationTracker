@@ -216,6 +216,24 @@ export class MemStorage implements IStorage {
         molecularWeight: "98.08", receivedDate: new Date("2024-04-01"),
         expiryDate: new Date("2025-10-01"), location: "ตู้เก็บกรด", category: "qa",
         notes: "ระวังการใช้งาน สวมใส่ PPE"
+      },
+      // Add expired chemical
+      {
+        id: 50, chemicalNo: "CHE-004", code: "ACE-99", casNo: "67-64-1",
+        name: "Acetone", brand: "Fisher", grade: "HPLC",
+        packageSize: "1L", lotNumber: "FI7890", molecularFormula: "C3H6O",
+        molecularWeight: "58.08", receivedDate: new Date("2023-05-01"),
+        expiryDate: new Date("2024-05-01"), location: "ตู้เก็บตัวทำละลาย", category: "qa",
+        notes: "หมดอายุแล้ว - รอกำจัด"
+      },
+      // Add due soon chemical
+      {
+        id: 51, chemicalNo: "CHE-005", code: "METH-99", casNo: "67-56-1", 
+        name: "Methanol", brand: "J.T.Baker", grade: "HPLC",
+        packageSize: "4L", lotNumber: "JT2024", molecularFormula: "CH4O",
+        molecularWeight: "32.04", receivedDate: new Date("2024-06-01"),
+        expiryDate: new Date("2024-08-15"), location: "ตู้เก็บตัวทำละลาย", category: "rd",
+        notes: "ใกล้หมดอายุ - เตรียมสั่งใหม่"
       }
     ];
 
@@ -277,6 +295,14 @@ export class MemStorage implements IStorage {
         assessmentLevel: 2, result: "failed", trainee: "นาย สมชาย ซ่อม",
         acknowledgedDate: null, trainer: "ผู้เชี่ยวชาญภายนอก",
         signedDate: null, notes: "จำเป็นต้องฝึกอบรมเพิ่มเติม"
+      },
+      // Add more training with passed results
+      {
+        id: 54, sequence: "TRN-005", course: "Statistical Quality Control",
+        startDate: new Date("2024-07-01"), endDate: new Date("2024-07-02"),
+        assessmentLevel: 2, result: "passed", trainee: "นางสาว สถิติ ดี",
+        acknowledgedDate: new Date("2024-07-03"), trainer: "ผู้เชี่ยวชาญ SQC",
+        signedDate: new Date("2024-07-05"), notes: "เข้าใจเรื่อง Control Chart เป็นอย่างดี"
       }
     ];
 
@@ -301,6 +327,22 @@ export class MemStorage implements IStorage {
         notes: "ปรับปรุงข้อมูลการปฐมพยาบาล"
       }
     ];
+
+    // Add more MSDS data with different categories
+    mockMsds.push(
+      {
+        id: 52, sequence: "SDS-004", title: "Safety Data Sheet - Product ABC",
+        documentCode: "SDS-PROD-001", effectiveDate: new Date("2024-03-01"),
+        revision: 0, category: "sds_product", filePath: "/msds/SDS-PROD-001-Rev0.pdf",
+        notes: "SDS สำหรับผลิตภัณฑ์ลูกค้า"
+      },
+      {
+        id: 53, sequence: "SDS-005", title: "Safety Data Sheet - Reference Material CRM",
+        documentCode: "SDS-RM-001", effectiveDate: new Date("2024-04-01"),
+        revision: 1, category: "sds_rm", filePath: "/msds/SDS-RM-001-Rev1.pdf",
+        notes: "SDS สำหรับ Reference Material"
+      }
+    );
 
     // Mock Tasks Data
     const mockTasks: Task[] = [
@@ -334,6 +376,21 @@ export class MemStorage implements IStorage {
           { id: 3, title: "ดำเนินการอบรม", completed: true },
           { id: 4, title: "ประเมินผล", completed: true }
         ]
+      },
+      // Add more tasks with different statuses
+      {
+        id: 55, title: "ปรับปรุงระบบ LIMS", 
+        description: "อัพเดตระบบจัดการข้อมูลห้องปฏิบัติการ",
+        responsible: "ทีม IT", startDate: new Date("2024-07-15"),
+        dueDate: new Date("2024-08-30"), status: "cancelled", priority: "medium",
+        progress: 25, subtasks: []
+      },
+      {
+        id: 56, title: "ตรวจสอบคุณภาพน้ำประปา",
+        description: "ทดสอบคุณภาพน้ำประปาประจำเดือน", 
+        responsible: "นางสาว น้ำใส น้ำใจ", startDate: new Date("2024-07-20"),
+        dueDate: new Date("2024-07-25"), status: "completed", priority: "high",
+        progress: 100, subtasks: []
       }
     ];
 
@@ -360,6 +417,43 @@ export class MemStorage implements IStorage {
           { name: "ผลิตภัณฑ์ชำระล้าง", type: "Product", tests: ["pH", "Surfactant"] }
         ],
         storage: "room_temp", postTesting: "dispose", condition: "normal", status: "completed"
+      },
+      // Add samples with different statuses
+      {
+        id: 57, requestNo: "REQ-003", receivedTime: "10:00",
+        receivedDate: new Date("2024-07-05"), dueDate: new Date("2024-07-15"),
+        quotationNo: "QUO-2024-003", contactPerson: "นาย ทดสอบ ผล",
+        phone: "02-555-1234", email: "test@test.com", companyName: "บริษัท เทสต์ จำกัด",
+        address: "789 ถนนเทสต์ กรุงเทพฯ", deliveryMethod: "walk_in", 
+        samples: [{ name: "น้ำทิ้ง", type: "Waste", tests: ["COD", "BOD"] }],
+        storage: "chilled", postTesting: "return", condition: "normal", status: "testing"
+      },
+      {
+        id: 58, requestNo: "REQ-004", receivedTime: "16:30",
+        receivedDate: new Date("2024-06-25"), dueDate: new Date("2024-07-05"),
+        quotationNo: null, contactPerson: "นางสาว สำเร็จ งาน",
+        phone: "02-999-8888", email: "success@done.com", companyName: "บริษัท เสร็จแล้ว จำกัด",
+        address: "321 ถนนสำเร็จ กรุงเทพฯ", deliveryMethod: "post",
+        samples: [{ name: "น้ำดื่ม", type: "Drinking Water", tests: ["Microbe", "Heavy Metal"] }],
+        storage: "room_temp", postTesting: "dispose", condition: "normal", status: "completed"
+      },
+      {
+        id: 59, requestNo: "REQ-005", receivedTime: "11:45", 
+        receivedDate: new Date("2024-06-20"), dueDate: new Date("2024-06-30"),
+        quotationNo: "QUO-2024-005", contactPerson: "นาย ส่งมอบ รายงาน",
+        phone: "02-777-6666", email: "deliver@report.com", companyName: "บริษัท ส่งแล้ว จำกัด",
+        address: "654 ถนนส่งมอบ กรุงเทพฯ", deliveryMethod: "courier",
+        samples: [{ name: "ของเล่น", type: "Toy", tests: ["Heavy Metal", "Phthalate"] }],
+        storage: "room_temp", postTesting: "return", condition: "normal", status: "delivered"
+      },
+      {
+        id: 60, requestNo: "REQ-006", receivedTime: "08:15",
+        receivedDate: new Date("2024-07-10"), dueDate: new Date("2024-07-20"),
+        quotationNo: "QUO-2024-006", contactPerson: "นางสาว รับใหม่ ใส",
+        phone: "02-111-2222", email: "newreceive@fresh.com", companyName: "บริษัท รับใหม่ จำกัด", 
+        address: "987 ถนนใหม่ กรุงเทพฯ", deliveryMethod: "walk_in",
+        samples: [{ name: "อาหาร", type: "Food", tests: ["Microbe", "Additive"] }],
+        storage: "frozen", postTesting: "dispose", condition: "normal", status: "received"
       }
     ];
 
