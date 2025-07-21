@@ -14,7 +14,7 @@ export default function TrainingPage() {
   const [editingTraining, setEditingTraining] = useState<Training | null>(null);
   const { toast } = useToast();
 
-  const { data: training, isLoading } = useQuery({
+  const { data: training = [], isLoading } = useQuery<Training[]>({
     queryKey: ["/api/training"],
   });
 

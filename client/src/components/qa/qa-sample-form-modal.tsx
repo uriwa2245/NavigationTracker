@@ -45,7 +45,12 @@ const qaSampleFormSchema = insertQaSampleSchema.extend({
     name: z.string().min(1, "ชื่อตัวอย่างจำเป็นต้องระบุ"),
     description: z.string().optional(),
     analysisRequest: z.string().optional(),
-    unit: z.string().optional(),
+    itemTests: z.array(z.object({
+      itemTest: z.string().min(1, "Item Test จำเป็นต้องเลือก"),
+      specification: z.string().optional(),
+      unit: z.string().min(1, "Unit จำเป็นต้องระบุ"),
+      method: z.string().optional()
+    })).min(1, "ต้องมี Item Test อย่างน้อย 1 รายการ"),
   })).min(1, "ต้องมีตัวอย่างอย่างน้อย 1 รายการ"),
 });
 
@@ -59,9 +64,9 @@ const deliveryMethodOptions = [
 ];
 
 const storageOptions = [
-  { value: "room_temp", label: "อุณหภูมิห้อง" },
-  { value: "chilled", label: "แช่เย็น" },
-  { value: "frozen", label: "แช่แข็ง" },
+  { value: "room_temp", label: "Room temperature" },
+  { value: "chilled", label: "Refrigerated" },
+  { value: "frozen", label: "Frozen" },
 ];
 
 const postTestingOptions = [
@@ -74,19 +79,39 @@ const conditionOptions = [
   { value: "abnormal", label: "ไม่ปกติ" },
 ];
 
+const itemTestOptions = [
+  { value: "Appearance", label: "Appearance" },
+  { value: "ActiveIngredient", label: "% Active Ingredient" },
+  { value: "Density", label: "Density" },
+  { value: "pH", label: "pH" },
+  { value: "Reemulsification", label: "Re-emulsification" },
+  { value: "PersistanceFoaming", label: "Persistance foaming" },
+  { value: "AcceleratedStorage", label: "Accelerated storage" },
+  { value: "Moisture", label: "Moisture" },
+  { value: "Viscosity", label: "Viscosity" },
+  { value: "FormulaTest", label: "Formula test" },
+];
+
 export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampleFormModalProps) {
   const { toast } = useToast();
   const isEditing = !!qaSample;
 
-  const defaultSamples = qaSample?.samples || [
-    {
-      sampleNo: "",
-      name: "",
-      description: "",
-      analysisRequest: "",
-      unit: "",
-    },
-  ];
+  const defaultSamples = Array.isArray(qaSample?.samples) && qaSample?.samples.length > 0
+    ? qaSample.samples.map((sample: any) => ({
+      ...sample,
+      itemTests: sample.itemTests && Array.isArray(sample.itemTests) && sample.itemTests.length > 0
+        ? sample.itemTests
+        : [{ itemTest: "", unit: "" }],
+    }))
+    : [
+      {
+        sampleNo: "",
+        name: "",
+        description: "",
+        analysisRequest: "",
+        itemTests: [{ itemTest: "", unit: "" }],
+      },
+    ];
 
   const form = useForm<QaSampleFormData>({
     resolver: zodResolver(qaSampleFormSchema),
@@ -201,7 +226,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
       name: "",
       description: "",
       analysisRequest: "",
-      unit: "",
+      itemTests: [{ itemTest: "", specification: "", unit: "", method: "" }],
     });
   };
 
@@ -213,7 +238,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-6xl max-h-screen overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-screen overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="thai-font">
             {isEditing ? "แก้ไขฟอร์มรับตัวอย่าง QA" : "ฟอร์มรับตัวอย่าง QA"}
@@ -248,7 +273,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                     name="receivedTime"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="thai-font">เวลารับตัวอย่าง *</FormLabel>
+                        <FormLabel className="thai-font">Time *</FormLabel>
                         <FormControl>
                           <Input type="time" {...field} />
                         </FormControl>
@@ -262,7 +287,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                     name="receivedDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="thai-font">วันที่รับตัวอย่าง *</FormLabel>
+                        <FormLabel className="thai-font">Received date *</FormLabel>
                         <FormControl>
                           <Input
                             type="date"
@@ -281,7 +306,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                     name="dueDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="thai-font">วันครบกำหนด *</FormLabel>
+                        <FormLabel className="thai-font">Due date *</FormLabel>
                         <FormControl>
                           <Input
                             type="date"
@@ -302,7 +327,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                       <FormItem className="lg:col-span-4">
                         <FormLabel className="thai-font">Quotation No</FormLabel>
                         <FormControl>
-                          <Input placeholder="เลขที่ใบเสนอราคา" {...field} />
+                          <Input placeholder="เลขที่ใบเสนอราคา" {...field} value={field.value ?? ""} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -422,6 +447,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                           rows={3}
                           placeholder="ที่อยู่บริษัท..."
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -450,8 +476,12 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
               <CardContent>
                 <div className="space-y-4">
                   {fields.map((field, index) => (
-                    <div key={field.id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border relative">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div
+                      key={field.id}
+                      className="p-6 bg-white dark:bg-gray-900 rounded-xl border shadow-sm relative space-y-4"
+                    >
+                      {/* Sample Header */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <FormField
                           control={form.control}
                           name={`samples.${index}.sampleNo`}
@@ -471,7 +501,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                           name={`samples.${index}.name`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="thai-font">ชื่อตัวอย่าง *</FormLabel>
+                              <FormLabel className="thai-font">Sample Name *</FormLabel>
                               <FormControl>
                                 <Input placeholder="ชื่อตัวอย่าง" {...field} />
                               </FormControl>
@@ -485,23 +515,9 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                           name={`samples.${index}.analysisRequest`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="thai-font">การวิเคราะห์ที่ต้องการ</FormLabel>
+                              <FormLabel className="thai-font">Id_No/Batch_No</FormLabel>
                               <FormControl>
-                                <Input placeholder="การวิเคราะห์" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name={`samples.${index}.unit`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="thai-font">หน่วย</FormLabel>
-                              <FormControl>
-                                <Input placeholder="หน่วย" {...field} />
+                                <Input placeholder="Id_No/Batch_No" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -509,39 +525,124 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                         />
                       </div>
 
-                      <div className="mt-4">
-                        <FormField
-                          control={form.control}
-                          name={`samples.${index}.description`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="thai-font">รายละเอียดตัวอย่าง</FormLabel>
-                              <FormControl>
-                                <Textarea
-                                  rows={2}
-                                  placeholder="รายละเอียดเพิ่มเติม..."
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                      {/* Item Test Section */}
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <FormLabel className="thai-font">รายการทดสอบ (Item Test) *</FormLabel>
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={() => form.setValue(`samples.${index}.itemTests`, [
+                              ...form.getValues(`samples.${index}.itemTests`),
+                              { itemTest: "", specification: "", unit: "",  method: "" },
+                            ])}
+                          >
+                            <Plus className="w-4 h-4 mr-1" />
+                            เพิ่ม Item Test
+                          </Button>
+                        </div>
+
+                        {form.watch(`samples.${index}.itemTests`)?.map((_, itemIdx) => (
+                          <div key={itemIdx} className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-2">
+                            <FormField
+                              control={form.control}
+                              name={`samples.${index}.itemTests.${itemIdx}.itemTest`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <Select onValueChange={field.onChange} value={field.value || ""}>
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="เลือก Item Test" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {itemTestOptions.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                          {option.label}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`samples.${index}.itemTests.${itemIdx}.specification`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input placeholder="Specification" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`samples.${index}.itemTests.${itemIdx}.unit`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input placeholder="Unit" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`samples.${index}.itemTests.${itemIdx}.method`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input placeholder="Method" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            {form.watch(`samples.${index}.itemTests`)?.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  const current = form.getValues(`samples.${index}.itemTests`);
+                                  form.setValue(
+                                    `samples.${index}.itemTests`,
+                                    current.filter((_, i) => i !== itemIdx)
+                                  );
+                                }}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
                       </div>
 
+                      {/* Remove Sample Button */}
                       {fields.length > 1 && (
                         <Button
                           type="button"
                           onClick={() => removeSample(index)}
-                          size="sm"
+                          size="icon"
                           variant="ghost"
-                          className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                          className="absolute top-4 right-4 text-red-500 hover:text-red-700"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-5 h-5" />
                         </Button>
                       )}
                     </div>
                   ))}
+
                 </div>
               </CardContent>
             </Card>
@@ -558,7 +659,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                     name="storage"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="thai-font">การเก็บรักษา *</FormLabel>
+                        <FormLabel className="thai-font">Sample storage *</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>

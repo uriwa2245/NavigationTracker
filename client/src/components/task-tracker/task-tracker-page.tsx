@@ -15,8 +15,9 @@ export default function TaskTrackerPage() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const { toast } = useToast();
 
-  const { data: tasks, isLoading } = useQuery({
+  const { data: tasks = [], isLoading } = useQuery<Task[]>({
     queryKey: ["/api/tasks"],
+    initialData: [],
   });
 
   const deleteMutation = useMutation({

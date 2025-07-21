@@ -116,7 +116,7 @@ export default function DocumentFormModal({ isOpen, onClose, document }: Documen
                   <FormItem>
                     <FormLabel className="thai-font">ลำดับ</FormLabel>
                     <FormControl>
-                      <Input placeholder="เช่น 001" {...field} />
+                      <Input placeholder="เช่น 001" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -206,7 +206,8 @@ export default function DocumentFormModal({ isOpen, onClose, document }: Documen
                         type="number"
                         min="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.value === "" ? null : parseInt(e.target.value) || 0)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -249,6 +250,7 @@ export default function DocumentFormModal({ isOpen, onClose, document }: Documen
                         rows={3}
                         placeholder="ข้อมูลเพิ่มเติม..."
                         {...field}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />

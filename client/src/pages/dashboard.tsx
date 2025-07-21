@@ -17,7 +17,14 @@ export default function Dashboard() {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  type DashboardStats = {
+    overdueCount?: number;
+    calibrationDue?: number;
+    pendingTasks?: number;
+    completedTraining?: number;
+  };
+
+  const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ["/api/dashboard/stats"],
   });
 
@@ -45,7 +52,7 @@ export default function Dashboard() {
             {/* Dashboard Header */}
             <div className="mb-8">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                แดชบอร์ด
+                หน้าหลัก
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
                 ภาพรวมระบบปฏิบัติการภายในห้องแลป

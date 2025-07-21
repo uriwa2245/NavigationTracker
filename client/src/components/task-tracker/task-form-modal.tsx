@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { insertTaskSchema, Task, InsertTask } from "@shared/schema";
@@ -63,17 +63,36 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
 
   const form = useForm<InsertTask>({
     resolver: zodResolver(insertTaskSchema),
-    defaultValues: task || {
-      title: "",
-      description: "",
-      responsible: "",
-      startDate: null,
-      dueDate: null,
-      status: "pending",
-      priority: "medium",
-      progress: 0,
-      subtasks: null,
-    },
+    defaultValues: task
+      ? {
+          // Exclude 'id' and ensure 'subtasks' is not unknown
+          title: task.title ?? "",
+          description: task.description ?? "",
+          responsible: task.responsible ?? "",
+          startDate: task.startDate ?? null,
+          dueDate: task.dueDate ?? null,
+          status: task.status ?? "pending",
+          priority: task.priority ?? "medium",
+          progress: task.progress ?? 0,
+          subtasks: (task.subtasks ?? null) as any, // Cast to any if needed, or use correct type
+        }
+      : {
+          title: "",
+          description: "",
+          responsible: "",
+          startDate: null,
+          dueDate: null,
+          status: "pending",
+          priority: "medium",
+          progress: 0,
+          subtasks: null,
+        },
+  });
+
+  // เพิ่ม useFieldArray สำหรับ subtasks
+  const { fields: subtaskFields, append, remove, update } = useFieldArray<InsertTask>({
+    control: form.control,
+    name: "subtasks",
   });
 
   const mutation = useMutation({
@@ -150,6 +169,7 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
                         rows={3}
                         placeholder="รายละเอียดงาน..."
                         {...field}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -292,6 +312,77 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
                   </FormItem>
                 )}
               />
+
+              {/* เพิ่มส่วนของขั้นตอนย่อย */}
+              <div className="md:col-span-2">
+                <div className="flex items-center justify-between mb-2">
+                  <FormLabel className="thai-font">ขั้นตอนย่อยของงาน</FormLabel>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => append({ title: "", approved: false })}
+                  >
+                    เพิ่มขั้นตอน
+                  </Button>
+                </div>
+                {subtaskFields.length === 0 && (
+                  <div className="text-gray-400 text-sm mb-2">ยังไม่มีขั้นตอนย่อย</div>
+                )}
+                <div className="space-y-3">
+                  {subtaskFields.map((subtask, idx) => (
+                    <div key={subtask.id} className="flex items-center gap-2">
+                      <FormField
+                        control={form.control}
+                        name={`subtasks.${idx}.title`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormControl>
+                              <Input
+                                placeholder={`ขั้นตอนที่ ${idx + 1}`}
+                                {...field}
+                                value={field.value ?? ""}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`subtasks.${idx}.approved`}
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-1">
+                            <FormLabel className="thai-font text-xs">อนุมัติ</FormLabel>
+                            <Select
+                              value={field.value === true ? "approved" : field.value === false ? "not_approved" : ""}
+                              onValueChange={(val) => field.onChange(val === "approved")}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="w-24 h-8 text-xs">
+                                  <SelectValue placeholder="เลือก" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="approved">อนุมัติ</SelectItem>
+                                <SelectItem value="not_approved">ไม่อนุมัติ</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => remove(idx)}
+                        title="ลบขั้นตอน"
+                      >
+                        <span className="text-lg text-red-500">&times;</span>
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">

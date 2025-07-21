@@ -1,0 +1,165 @@
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
+import DataTable from "@/components/ui/data-table";
+import QaTestResultFormModal from "./qa-test-result-form-modal";
+import { QaTestResult } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+export default function QaTestResults() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTestResult, setEditingTestResult] = useState<QaTestResult | null>(null);
+  const { toast } = useToast();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["/api/qa-test-results"],
+    initialData: [],
+  });
+  const testResults: QaTestResult[] = Array.isArray(data) ? data : [];
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/qa-test-results/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/qa-test-results"] });
+      toast({
+        title: "สำเร็จ",
+        description: "ลบผลการทดสอบเรียบร้อยแล้ว",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถลบผลการทดสอบได้",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const getDaysUntilDue = (dueDate: string) => {
+    const now = new Date();
+    const due = new Date(dueDate);
+    const diffTime = due.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const columns = [
+    {
+      key: "sampleNo",
+      label: "Sample No",
+    },
+    {
+      key: "requestNo",
+      label: "Request No",
+    },
+    {
+      key: "product",
+      label: "Product",
+    },
+    {
+      key: "dueDate",
+      label: "วันครบกำหนด",
+      render: (value: string) => {
+        const daysUntil = getDaysUntilDue(value);
+        const dueDateStr = format(new Date(value), "dd/MM/yyyy");
+        return (
+          <div>
+            <div>{dueDateStr}</div>
+            <div className={`text-xs ${daysUntil < 0 ? 'text-red-500' : daysUntil <= 3 ? 'text-orange-500' : 'text-gray-500'}`}>
+              {daysUntil < 0 ? `เลย ${Math.abs(daysUntil)} วัน` : daysUntil === 0 ? 'วันนี้' : `อีก ${daysUntil} วัน`}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      key: "recordDate",
+      label: "วันที่บันทึก",
+      render: (value: string) => format(new Date(value), "dd/MM/yyyy"),
+    },
+  ];
+
+  const handleAdd = () => {
+    setEditingTestResult(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (testResult: QaTestResult) => {
+    setEditingTestResult(testResult);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (testResult: QaTestResult) => {
+    if (confirm(`คุณต้องการลบผลการทดสอบ "${testResult.sampleNo}" หรือไม่?`)) {
+      deleteMutation.mutate(testResult.id);
+    }
+  };
+
+  const handleView = (testResult: QaTestResult) => {
+    toast({
+      title: "ดูรายละเอียด",
+      description: `ดูรายละเอียดผลการทดสอบ ${testResult.sampleNo}`,
+    });
+  };
+
+  const handleExportPdf = (testResult: QaTestResult) => {
+    toast({
+      title: "Export PDF",
+      description: `กำลังสร้างรายงาน TEST REPORT สำหรับ ${testResult.sampleNo}`,
+    });
+  };
+
+  // Dashboard stats
+  const totalTests = testResults?.length || 0;
+
+  return (
+    <div className="space-y-6">
+      {/* Dashboard Summary */}
+      <div className="grid grid-cols-1 gap-6">
+        <div className="lab-card">
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 thai-font">
+              การทดสอบทั้งหมด
+            </h3>
+            <p className="text-3xl font-bold text-blue-600">{totalTests}</p>
+          </div>
+        </div>
+      </div>
+
+      <DataTable
+        title="สรุปรายการลงผลการทดสอบ"
+        data={testResults || []}
+        columns={columns}
+        searchPlaceholder="ค้นหาผลการทดสอบ..."
+        onAdd={handleAdd}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onView={handleView}
+        isLoading={isLoading}
+        customActions={(item: QaTestResult) => (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleExportPdf(item)}
+            className="flex items-center gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Export PDF
+          </Button>
+        )}
+      />
+
+      <QaTestResultFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        testResult={editingTestResult}
+      />
+    </div>
+  );
+} 

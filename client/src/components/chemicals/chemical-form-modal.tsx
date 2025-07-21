@@ -156,7 +156,7 @@ export default function ChemicalFormModal({
                   <FormItem>
                     <FormLabel className="thai-font">Code</FormLabel>
                     <FormControl>
-                      <Input placeholder="รหัสภายใน" {...field} />
+                      <Input placeholder="รหัสภายใน" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -170,7 +170,7 @@ export default function ChemicalFormModal({
                   <FormItem>
                     <FormLabel className="thai-font">CAS No</FormLabel>
                     <FormControl>
-                      <Input placeholder="หมายเลข CAS" {...field} />
+                      <Input placeholder="หมายเลข CAS" {...field} value={field.value ?? ""}  />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -198,7 +198,7 @@ export default function ChemicalFormModal({
                   <FormItem>
                     <FormLabel className="thai-font">ยี่ห้อ</FormLabel>
                     <FormControl>
-                      <Input placeholder="ยี่ห้อ" {...field} />
+                      <Input placeholder="ยี่ห้อ" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -237,7 +237,7 @@ export default function ChemicalFormModal({
                   <FormItem>
                     <FormLabel className="thai-font">ขนาดบรรจุ</FormLabel>
                     <FormControl>
-                      <Input placeholder="เช่น 500g, 1L" {...field} />
+                      <Input placeholder="เช่น 500g, 1L" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -251,7 +251,7 @@ export default function ChemicalFormModal({
                   <FormItem>
                     <FormLabel className="thai-font">Lot No./Batch No</FormLabel>
                     <FormControl>
-                      <Input placeholder="หมายเลข Lot/Batch" {...field} />
+                      <Input placeholder="หมายเลข Lot/Batch" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -265,7 +265,7 @@ export default function ChemicalFormModal({
                   <FormItem>
                     <FormLabel className="thai-font">สูตรโมเลกุล</FormLabel>
                     <FormControl>
-                      <Input placeholder="เช่น H2SO4" {...field} />
+                      <Input placeholder="เช่น H2SO4" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -279,7 +279,7 @@ export default function ChemicalFormModal({
                   <FormItem>
                     <FormLabel className="thai-font">มวลโมเลกุล</FormLabel>
                     <FormControl>
-                      <Input placeholder="เช่น 98.08" {...field} />
+                      <Input placeholder="เช่น 98.08" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -385,6 +385,7 @@ export default function ChemicalFormModal({
                         rows={3}
                         placeholder="ข้อมูลเพิ่มเติม..."
                         {...field}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />

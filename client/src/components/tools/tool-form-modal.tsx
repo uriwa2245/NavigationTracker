@@ -121,23 +121,9 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
                 name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="thai-font">รหัสเครื่องมือวัด *</FormLabel>
+                    <FormLabel className="thai-font">รหัสเครื่องมือ *</FormLabel>
                     <FormControl>
                       <Input placeholder="เช่น SCALE-001" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="thai-font">ชื่อเครื่องมือวัด *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="เช่น เครื่องชั่งดิจิตอล" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -160,12 +146,27 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
 
               <FormField
                 control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="thai-font">ชื่อเครื่องมือ *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="เช่น เครื่องชั่งดิจิตอล" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+
+              <FormField
+                control={form.control}
                 name="serialNumber"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="thai-font">S/N</FormLabel>
                     <FormControl>
-                      <Input placeholder="หมายเลขผลิต" {...field} />
+                      <Input placeholder="หมายเลขผลิต" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -179,7 +180,7 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
                   <FormItem>
                     <FormLabel className="thai-font">พิสัยการใช้งาน</FormLabel>
                     <FormControl>
-                      <Input placeholder="เช่น 0-200g" {...field} />
+                      <Input placeholder="เช่น 0-200g" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -248,15 +249,8 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
                   </FormItem>
                 )}
               />
-            </div>
 
-            {/* Calibration Results Section */}
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 thai-font">
-                ผลการสอบเทียบ
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
+              <FormField
                   control={form.control}
                   name="calibrationResult"
                   render={({ field }) => (
@@ -271,7 +265,6 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
                         <SelectContent>
                           <SelectItem value="ผ่าน">ผ่าน</SelectItem>
                           <SelectItem value="ไม่ผ่าน">ไม่ผ่าน</SelectItem>
-                          <SelectItem value="ปรับเทียบ">ปรับเทียบ</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -281,73 +274,9 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
 
                 <FormField
                   control={form.control}
-                  name="calibrationCertificate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="thai-font">เลขที่ใบรับรอง</FormLabel>
-                      <FormControl>
-                        <Input placeholder="เช่น CERT-2024-001" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="calibrationBy"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="thai-font">ผู้ทำการสอบเทียบ</FormLabel>
-                      <FormControl>
-                        <Input placeholder="ชื่อผู้ทำการสอบเทียบ หรือ บริษัท" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="calibrationMethod"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="thai-font">วิธีการสอบเทียบ</FormLabel>
-                      <FormControl>
-                        <Input placeholder="วิธีการหรือมาตรฐานที่ใช้" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="calibrationRemarks"
-                  render={({ field }) => (
-                    <FormItem className="md:col-span-2">
-                      <FormLabel className="thai-font">หมายเหตุผลการสอบเทียบ</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          rows={3}
-                          placeholder="รายละเอียดเพิ่มเติมเกี่ยวกับผลการสอบเทียบ..."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
                   name="responsible"
                   render={({ field }) => (
-                    <FormItem className="md:col-span-2">
+                    <FormItem >
                       <FormLabel className="thai-font">ผู้รับผิดชอบ</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value || ""}>
                         <FormControl>
@@ -368,6 +297,11 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
                   )}
                 />
 
+            </div>
+
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
                 <FormField
                   control={form.control}
                   name="notes"
@@ -379,6 +313,7 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
                           rows={3}
                           placeholder="ข้อมูลเพิ่มเติม..."
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />

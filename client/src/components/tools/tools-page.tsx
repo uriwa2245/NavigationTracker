@@ -126,7 +126,7 @@ export default function ToolsPage() {
 
       <DataTable
         title="รายการเครื่องมือ"
-        data={tools || []}
+        data={Array.isArray(tools) ? tools : []}
         columns={columns}
         searchPlaceholder="ค้นหาเครื่องมือ..."
         onAdd={handleAdd}

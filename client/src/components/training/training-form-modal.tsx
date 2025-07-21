@@ -135,7 +135,7 @@ export default function TrainingFormModal({ isOpen, onClose, training }: Trainin
                   <FormItem>
                     <FormLabel className="thai-font">ลำดับ</FormLabel>
                     <FormControl>
-                      <Input placeholder="เช่น TR-001" {...field} />
+                      <Input placeholder="เช่น TR-001" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -346,6 +346,7 @@ export default function TrainingFormModal({ isOpen, onClose, training }: Trainin
                         rows={3}
                         placeholder="ข้อมูลเพิ่มเติม..."
                         {...field}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />

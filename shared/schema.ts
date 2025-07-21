@@ -143,6 +143,19 @@ export const qaSamples = pgTable("qa_samples", {
   status: text("status").default("received"), // "received", "testing", "completed", "delivered"
 });
 
+// QA Test Results
+export const qaTestResults = pgTable("qa_test_results", {
+  id: serial("id").primaryKey(),
+  sampleNo: text("sample_no").notNull(),
+  requestNo: text("request_no").notNull(),
+  product: text("product").notNull(),
+  dueDate: timestamp("due_date").notNull(),
+  testItems: json("test_items"), // Array of test item objects with results
+  recordDate: timestamp("record_date").notNull(),
+  status: text("status").default("pending"), // "pending", "in_progress", "completed"
+  notes: text("notes"),
+});
+
 // Insert schemas
 export const insertToolSchema = createInsertSchema(tools).omit({ id: true });
 export const insertGlasswareSchema = createInsertSchema(glassware).omit({ id: true });
@@ -152,6 +165,7 @@ export const insertTrainingSchema = createInsertSchema(training).omit({ id: true
 export const insertMsdsSchema = createInsertSchema(msds).omit({ id: true });
 export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true });
 export const insertQaSampleSchema = createInsertSchema(qaSamples).omit({ id: true });
+export const insertQaTestResultSchema = createInsertSchema(qaTestResults).omit({ id: true });
 
 // Types
 export type Tool = typeof tools.$inferSelect;
@@ -170,3 +184,5 @@ export type Task = typeof tasks.$inferSelect;
 export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type QaSample = typeof qaSamples.$inferSelect;
 export type InsertQaSample = z.infer<typeof insertQaSampleSchema>;
+export type QaTestResult = typeof qaTestResults.$inferSelect;
+export type InsertQaTestResult = z.infer<typeof insertQaTestResultSchema>;

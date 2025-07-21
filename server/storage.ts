@@ -6,7 +6,8 @@ import {
   Training, InsertTraining,
   Msds, InsertMsds,
   Task, InsertTask,
-  QaSample, InsertQaSample
+  QaSample, InsertQaSample,
+  QaTestResult, InsertQaTestResult
 } from "@shared/schema";
 
 export interface IStorage {
@@ -69,6 +70,13 @@ export interface IStorage {
   updateQaSample(id: number, qaSample: Partial<InsertQaSample>): Promise<QaSample | undefined>;
   deleteQaSample(id: number): Promise<boolean>;
 
+  // QA Test Results
+  getQaTestResults(): Promise<QaTestResult[]>;
+  getQaTestResult(id: number): Promise<QaTestResult | undefined>;
+  createQaTestResult(testResult: InsertQaTestResult): Promise<QaTestResult>;
+  updateQaTestResult(id: number, testResult: InsertQaTestResult): Promise<QaTestResult | undefined>;
+  deleteQaTestResult(id: number): Promise<boolean>;
+
   // Dashboard stats
   getDashboardStats(): Promise<{
     overdueCount: number;
@@ -87,6 +95,7 @@ export class MemStorage implements IStorage {
   private msds: Map<number, Msds> = new Map();
   private tasks: Map<number, Task> = new Map();
   private qaSamples: Map<number, QaSample> = new Map();
+  private qaTestResults: Map<number, QaTestResult> = new Map();
   private currentId: number = 1;
 
   // Tools
@@ -423,6 +432,41 @@ export class MemStorage implements IStorage {
 
   async deleteQaSample(id: number): Promise<boolean> {
     return this.qaSamples.delete(id);
+  }
+
+  // QA Test Results
+  async getQaTestResults(): Promise<QaTestResult[]> {
+    return Array.from(this.qaTestResults.values());
+  }
+
+  async getQaTestResult(id: number): Promise<QaTestResult | undefined> {
+    return this.qaTestResults.get(id);
+  }
+
+  async createQaTestResult(testResult: InsertQaTestResult): Promise<QaTestResult> {
+    const id = this.currentId++;
+    const newTestResult: QaTestResult = { 
+      ...testResult, 
+      id,
+      testItems: testResult.testItems ?? null,
+      notes: testResult.notes ?? null,
+      status: testResult.status ?? null
+    };
+    this.qaTestResults.set(id, newTestResult);
+    return newTestResult;
+  }
+
+  async updateQaTestResult(id: number, testResult: InsertQaTestResult): Promise<QaTestResult | undefined> {
+    const existingTestResult = this.qaTestResults.get(id);
+    if (!existingTestResult) return undefined;
+    
+    const updatedTestResult = { ...existingTestResult, ...testResult };
+    this.qaTestResults.set(id, updatedTestResult);
+    return updatedTestResult;
+  }
+
+  async deleteQaTestResult(id: number): Promise<boolean> {
+    return this.qaTestResults.delete(id);
   }
 
   // Dashboard stats

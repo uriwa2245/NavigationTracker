@@ -113,7 +113,7 @@ export default function MsdsFormModal({ isOpen, onClose, msds }: MsdsFormModalPr
                   <FormItem>
                     <FormLabel className="thai-font">ลำดับ</FormLabel>
                     <FormControl>
-                      <Input placeholder="เช่น 001" {...field} />
+                      <Input placeholder="เช่น 001" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -203,6 +203,7 @@ export default function MsdsFormModal({ isOpen, onClose, msds }: MsdsFormModalPr
                         type="number"
                         min="0"
                         {...field}
+                        value={field.value ?? ""}
                         onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                       />
                     </FormControl>
@@ -246,6 +247,7 @@ export default function MsdsFormModal({ isOpen, onClose, msds }: MsdsFormModalPr
                         rows={3}
                         placeholder="ข้อมูลเพิ่มเติม..."
                         {...field}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />

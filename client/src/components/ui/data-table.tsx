@@ -28,6 +28,7 @@ interface DataTableProps {
   onDelete?: (item: any) => void;
   onExport?: () => void;
   isLoading?: boolean;
+  customActions?: (item: any) => React.ReactNode;
 }
 
 export default function DataTable({
@@ -41,6 +42,7 @@ export default function DataTable({
   onDelete,
   onExport,
   isLoading = false,
+  customActions,
 }: DataTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -122,7 +124,7 @@ export default function DataTable({
                   {column.label}
                 </TableHead>
               ))}
-              {(onEdit || onView || onDelete) && (
+              {(onEdit || onView || onDelete || customActions) && (
                 <TableHead className="thai-font">การดำเนินการ</TableHead>
               )}
             </TableRow>
@@ -131,7 +133,7 @@ export default function DataTable({
             {paginatedData.length === 0 ? (
               <TableRow>
                 <TableCell 
-                  colSpan={columns.length + (onEdit || onView || onDelete ? 1 : 0)}
+                  colSpan={columns.length + (onEdit || onView || onDelete || customActions ? 1 : 0)}
                   className="text-center py-8 text-gray-500 dark:text-gray-400 thai-font"
                 >
                   ไม่พบข้อมูล
@@ -147,7 +149,7 @@ export default function DataTable({
                         : item[column.key]}
                     </TableCell>
                   ))}
-                  {(onEdit || onView || onDelete) && (
+                  {(onEdit || onView || onDelete || customActions) && (
                     <TableCell>
                       <div className="flex space-x-2">
                         {onView && (
@@ -180,6 +182,7 @@ export default function DataTable({
                             <Trash2 className="w-4 h-4 text-red-500" />
                           </Button>
                         )}
+                        {customActions && customActions(item)}
                       </div>
                     </TableCell>
                   )}

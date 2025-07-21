@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { 
   insertToolSchema, insertGlasswareSchema, insertChemicalSchema,
   insertDocumentSchema, insertTrainingSchema, insertMsdsSchema,
-  insertTaskSchema, insertQaSampleSchema
+  insertTaskSchema, insertQaSampleSchema, insertQaTestResultSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -412,6 +412,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete QA sample" });
+    }
+  });
+
+  // QA Test Results
+  app.get("/api/qa-test-results", async (req, res) => {
+    try {
+      const testResults = await storage.getQaTestResults();
+      res.json(testResults);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch QA test results" });
+    }
+  });
+
+  app.post("/api/qa-test-results", async (req, res) => {
+    try {
+      const result = insertQaTestResultSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid QA test result data", errors: result.error.issues });
+      }
+      const testResult = await storage.createQaTestResult(result.data);
+      res.status(201).json(testResult);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create QA test result" });
+    }
+  });
+
+  app.put("/api/qa-test-results/:id", async (req, res) => {
+    try {
+      const result = insertQaTestResultSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid QA test result data", errors: result.error.issues });
+      }
+      const testResult = await storage.updateQaTestResult(parseInt(req.params.id), result.data);
+      if (!testResult) {
+        return res.status(404).json({ message: "QA test result not found" });
+      }
+      res.json(testResult);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update QA test result" });
+    }
+  });
+
+  app.delete("/api/qa-test-results/:id", async (req, res) => {
+    try {
+      const success = await storage.deleteQaTestResult(parseInt(req.params.id));
+      if (!success) {
+        return res.status(404).json({ message: "QA test result not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete QA test result" });
     }
   });
 

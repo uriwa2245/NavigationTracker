@@ -95,7 +95,7 @@ export default function ChemicalsPage() {
     {
       key: "status",
       label: "สถานะ",
-      render: (value: string, chemical: Chemical) => getStatusBadge(getExpiryStatus(chemical.expiryDate)),
+      render: (_value: string, chemical: Chemical) => getStatusBadge(getExpiryStatus(typeof chemical.expiryDate === "string" ? chemical.expiryDate : (chemical.expiryDate ? chemical.expiryDate.toISOString() : null))),
     },
   ];
 

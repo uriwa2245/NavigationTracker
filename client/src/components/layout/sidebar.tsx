@@ -27,7 +27,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   {
     id: "dashboard",
-    label: "แดชบอร์ด",
+    label: "หน้าหลัก",
     icon: ChartLine,
   },
   {
@@ -67,7 +67,7 @@ const menuItems: MenuItem[] = [
   },
   {
     id: "qa",
-    label: "QA",
+    label: "QA Managent",
     icon: ClipboardCheck,
   },
 ];
