@@ -17,10 +17,10 @@ export default function QaPage() {
 
       <Tabs defaultValue="sample-receiving" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="sample-receiving" className="thai-font">
+          <TabsTrigger value="sample-receiving" className="thai-font bg-green-100 hover:bg-green-200 data-[state=active]:bg-green-200 dark:bg-green-900/20 dark:hover:bg-green-800/30 dark:data-[state=active]:bg-green-800/30">
             รับตัวอย่าง
           </TabsTrigger>
-          <TabsTrigger value="test-results" className="thai-font">
+          <TabsTrigger value="test-results" className="thai-font bg-green-100 hover:bg-green-200 data-[state=active]:bg-green-200 dark:bg-green-900/20 dark:hover:bg-green-800/30 dark:data-[state=active]:bg-green-800/30">
             ลงผลการทดสอบ
           </TabsTrigger>
         </TabsList>
