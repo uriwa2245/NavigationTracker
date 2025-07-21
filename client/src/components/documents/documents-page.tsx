@@ -4,6 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import DataTable from "@/components/ui/data-table";
 import DocumentFormModal from "./document-form-modal";
+import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { Document } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -20,6 +21,8 @@ export default function DocumentsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState<Document | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [viewDetailsModalOpen, setViewDetailsModalOpen] = useState(false);
+  const [viewingDocument, setViewingDocument] = useState<Document | null>(null);
   const { toast } = useToast();
 
   const { data: documents, isLoading } = useQuery({
@@ -119,7 +122,8 @@ export default function DocumentsPage() {
   };
 
   const handleView = (document: Document) => {
-    alert(`ดูรายละเอียดเอกสาร: ${document.title}\nรหัสเอกสาร: ${document.documentCode}\nหมวดหมู่: ${getCategoryLabel(document.category)}\nวันที่เริ่มใช้: ${document.effectiveDate ? format(new Date(document.effectiveDate), "dd/MM/yyyy") : "-"}`);
+    setViewingDocument(document);
+    setViewDetailsModalOpen(true);
   };
 
   const handleDelete = (document: Document) => {
@@ -216,6 +220,22 @@ export default function DocumentsPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         document={editingDocument}
+      />
+
+      <ViewDetailsModal
+        isOpen={viewDetailsModalOpen}
+        onClose={() => setViewDetailsModalOpen(false)}
+        title="รายละเอียดเอกสาร"
+        data={viewingDocument ? [
+          { label: "รหัสเอกสาร", value: viewingDocument.documentCode },
+          { label: "ชื่อเอกสาร", value: viewingDocument.title },
+          { label: "หมวดหมู่", value: getCategoryLabel(viewingDocument.category), highlight: true },
+          { label: "Version", value: viewingDocument.version || "-" },
+          { label: "วันที่เริ่มใช้", value: viewingDocument.effectiveDate ? format(new Date(viewingDocument.effectiveDate), "dd/MM/yyyy") : "-" },
+          { label: "วันที่ทบทวน", value: viewingDocument.reviewDate ? format(new Date(viewingDocument.reviewDate), "dd/MM/yyyy") : "-" },
+          { label: "ผู้อนุมัติ", value: viewingDocument.approvedBy || "-" },
+          { label: "รายละเอียด", value: viewingDocument.description || "-" },
+        ] : []}
       />
     </div>
   );

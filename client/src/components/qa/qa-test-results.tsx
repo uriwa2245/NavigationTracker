@@ -4,6 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import DataTable from "@/components/ui/data-table";
 import QaTestResultFormModal from "./qa-test-result-form-modal";
+import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { QaTestResult } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -13,6 +14,8 @@ import { Button } from "@/components/ui/button";
 export default function QaTestResults() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTestResult, setEditingTestResult] = useState<QaTestResult | null>(null);
+  const [viewDetailsModalOpen, setViewDetailsModalOpen] = useState(false);
+  const [viewingResult, setViewingResult] = useState<QaTestResult | null>(null);
   const { toast } = useToast();
 
   const { data, isLoading } = useQuery({
@@ -102,10 +105,8 @@ export default function QaTestResults() {
   };
 
   const handleView = (testResult: QaTestResult) => {
-    toast({
-      title: "ดูรายละเอียด",
-      description: `ดูรายละเอียดผลการทดสอบ ${testResult.sampleNo}`,
-    });
+    setViewingResult(testResult);
+    setViewDetailsModalOpen(true);
   };
 
   const handleExportPdf = (testResult: QaTestResult) => {
@@ -159,6 +160,19 @@ export default function QaTestResults() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         testResult={editingTestResult}
+      />
+
+      <ViewDetailsModal
+        isOpen={viewDetailsModalOpen}
+        onClose={() => setViewDetailsModalOpen(false)}
+        title="รายละเอียดผลการทดสอบ"
+        data={viewingResult ? [
+          { label: "Sample No", value: viewingResult.sampleNo },
+          { label: "Product", value: viewingResult.product || "-" },
+          { label: "วันครบกำหนด", value: viewingResult.dueDate ? format(new Date(viewingResult.dueDate), "dd/MM/yyyy") : "-" },
+          { label: "วันที่บันทึก", value: viewingResult.recordDate ? format(new Date(viewingResult.recordDate), "dd/MM/yyyy") : "-" },
+          { label: "หมายเหตุ", value: viewingResult.notes || "-" },
+        ] : []}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import DataTable from "@/components/ui/data-table";
 import TrainingFormModal from "./training-form-modal";
+import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { Training } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +13,8 @@ import { format } from "date-fns";
 export default function TrainingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTraining, setEditingTraining] = useState<Training | null>(null);
+  const [viewDetailsModalOpen, setViewDetailsModalOpen] = useState(false);
+  const [viewingTraining, setViewingTraining] = useState<Training | null>(null);
   const { toast } = useToast();
 
   const { data: training = [], isLoading } = useQuery<Training[]>({
@@ -104,7 +107,8 @@ export default function TrainingPage() {
   };
 
   const handleView = (item: Training) => {
-    alert(`ดูรายละเอียดการอบรม: ${item.course}\nผู้เข้าอบรม: ${item.trainee}\nผู้ฝึกอบรม: ${item.trainer}\nการประเมิน: ${getAssessmentLevel(item.assessmentLevel)}\nผลการฝึกอบรม: ${item.result === 'passed' ? 'ผ่าน' : item.result === 'failed' ? 'ไม่ผ่าน' : 'ยังไม่ประเมิน'}`);
+    setViewingTraining(item);
+    setViewDetailsModalOpen(true);
   };
 
   const handleDelete = (item: Training) => {
@@ -214,6 +218,22 @@ export default function TrainingPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         training={editingTraining}
+      />
+
+      <ViewDetailsModal
+        isOpen={viewDetailsModalOpen}
+        onClose={() => setViewDetailsModalOpen(false)}
+        title="รายละเอียดการฝึกอบรม"
+        data={viewingTraining ? [
+          { label: "หลักสูตร/รายละเอียด", value: viewingTraining.course },
+          { label: "ผู้เข้าอบรม", value: viewingTraining.trainee },
+          { label: "ผู้ฝึกอบรม", value: viewingTraining.trainer || "-" },
+          { label: "วันที่เริ่มต้น", value: viewingTraining.startDate ? format(new Date(viewingTraining.startDate), "dd/MM/yyyy") : "-" },
+          { label: "วันที่สิ้นสุด", value: viewingTraining.endDate ? format(new Date(viewingTraining.endDate), "dd/MM/yyyy") : "-" },
+          { label: "การประเมิน", value: getAssessmentLevel(viewingTraining.assessmentLevel), highlight: true },
+          { label: "ผลการฝึกอบรม", value: getResultBadge(viewingTraining.result), highlight: true },
+          { label: "หมายเหตุ", value: viewingTraining.notes || "-" },
+        ] : []}
       />
     </div>
   );

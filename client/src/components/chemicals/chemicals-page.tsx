@@ -12,12 +12,15 @@ import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ViewDetailsModal from "@/components/ui/view-details-modal";
 
 export default function ChemicalsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingChemical, setEditingChemical] = useState<Chemical | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [viewDetailsModalOpen, setViewDetailsModalOpen] = useState(false);
+  const [viewingChemical, setViewingChemical] = useState<Chemical | null>(null);
   const { toast } = useToast();
 
   const { data: allChemicals, isLoading } = useQuery({
@@ -136,7 +139,8 @@ export default function ChemicalsPage() {
   };
 
   const handleView = (chemical: Chemical) => {
-    alert(`ดูรายละเอียดสารเคมี: ${chemical.name}\nรหัส: ${chemical.chemicalNo}\nยี่ห้อ: ${chemical.brand}\nเกรด: ${chemical.grade}\nสถานที่เก็บ: ${chemical.location}`);
+    setViewingChemical(chemical);
+    setViewDetailsModalOpen(true);
   };
 
   const handleDelete = (chemical: Chemical) => {
@@ -230,6 +234,25 @@ export default function ChemicalsPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         chemical={editingChemical}
+      />
+
+      <ViewDetailsModal
+        isOpen={viewDetailsModalOpen}
+        onClose={() => setViewDetailsModalOpen(false)}
+        title="รายละเอียดสารเคมี"
+        data={viewingChemical ? [
+          { label: "Chemical No", value: viewingChemical.chemicalNo },
+          { label: "รหัสสารเคมี", value: viewingChemical.code || "-" },
+          { label: "ชื่อสารเคมี", value: viewingChemical.name },
+          { label: "CAS No", value: viewingChemical.casNo || "-" },
+          { label: "ยี่ห้อ", value: viewingChemical.brand || "-" },
+          { label: "เกรด", value: viewingChemical.grade || "-" },
+          { label: "หมวดหมู่", value: getCategoryLabel(viewingChemical.category), highlight: true },
+          { label: "วันหมดอายุ", value: viewingChemical.expiryDate ? format(new Date(viewingChemical.expiryDate), "dd/MM/yyyy") : "-" },
+          { label: "สถานที่จัดเก็บ", value: viewingChemical.location || "-" },
+          { label: "สถานะ", value: getStatusBadge(getExpiryStatus(typeof viewingChemical.expiryDate === "string" ? viewingChemical.expiryDate : (viewingChemical.expiryDate ? viewingChemical.expiryDate.toISOString() : null))), highlight: true },
+          { label: "หมายเหตุ", value: viewingChemical.notes || "-" },
+        ] : []}
       />
     </div>
   );

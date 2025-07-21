@@ -4,6 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import DataTable from "@/components/ui/data-table";
 import GlasswareFormModal from "./glassware-form-modal";
+import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { Glassware } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +13,8 @@ import { format } from "date-fns";
 export default function GlasswarePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingGlassware, setEditingGlassware] = useState<Glassware | null>(null);
+  const [viewDetailsModalOpen, setViewDetailsModalOpen] = useState(false);
+  const [viewingGlassware, setViewingGlassware] = useState<Glassware | null>(null);
   const { toast } = useToast();
 
   const { data: glassware, isLoading } = useQuery({
@@ -107,7 +110,8 @@ export default function GlasswarePage() {
   };
 
   const handleView = (item: Glassware) => {
-    alert(`ดูรายละเอียดเครื่องแก้ว: ${item.type}\nรหัส: ${item.code}\nClass: ${item.class}\nยี่ห้อ: ${item.brand}\nสถานที่: ${item.location}`);
+    setViewingGlassware(item);
+    setViewDetailsModalOpen(true);
   };
 
   const handleDelete = (item: Glassware) => {
@@ -143,6 +147,23 @@ export default function GlasswarePage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         glassware={editingGlassware}
+      />
+
+      <ViewDetailsModal
+        isOpen={viewDetailsModalOpen}
+        onClose={() => setViewDetailsModalOpen(false)}
+        title="รายละเอียดเครื่องแก้ว"
+        data={viewingGlassware ? [
+          { label: "รหัส", value: viewingGlassware.code },
+          { label: "Lot Number", value: viewingGlassware.lotNumber || "-" },
+          { label: "ประเภทเครื่องแก้ว", value: viewingGlassware.type },
+          { label: "Class", value: viewingGlassware.class || "-" },
+          { label: "ยี่ห้อ", value: viewingGlassware.brand || "-" },
+          { label: "สถานที่จัดเก็บ", value: viewingGlassware.location || "-" },
+          { label: "วันที่สอบเทียบครั้งถัดไป", value: viewingGlassware.nextCalibration ? format(new Date(viewingGlassware.nextCalibration), "dd/MM/yyyy") : "-" },
+          { label: "สถานะ", value: getStatusBadge(getCalibrationStatus(viewingGlassware)), highlight: true },
+          { label: "หมายเหตุ", value: viewingGlassware.notes || "-" },
+        ] : []}
       />
     </div>
   );

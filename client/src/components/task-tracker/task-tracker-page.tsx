@@ -4,6 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import DataTable from "@/components/ui/data-table";
 import TaskFormModal from "./task-form-modal";
+import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { Task } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +14,8 @@ import { Progress } from "@/components/ui/progress";
 export default function TaskTrackerPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [viewDetailsModalOpen, setViewDetailsModalOpen] = useState(false);
+  const [viewingTask, setViewingTask] = useState<Task | null>(null);
   const { toast } = useToast();
 
   const { data: tasks = [], isLoading } = useQuery<Task[]>({
@@ -169,7 +172,8 @@ export default function TaskTrackerPage() {
       'medium': 'กลาง',
       'low': 'ต่ำ'
     };
-    alert(`ดูรายละเอียดงาน: ${task.title}\nผู้รับผิดชอบ: ${task.responsible}\nสถานะ: ${statusText[task.status as keyof typeof statusText] || task.status}\nความสำคัญ: ${priorityText[task.priority as keyof typeof priorityText] || task.priority}\nความคืบหน้า: ${task.progress || 0}%\nคำอธิบาย: ${task.description || 'ไม่มี'}`);
+    setViewingTask(task);
+    setViewDetailsModalOpen(true);
   };
 
   const handleDelete = (task: Task) => {
@@ -270,6 +274,22 @@ export default function TaskTrackerPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         task={editingTask}
+      />
+
+      <ViewDetailsModal
+        isOpen={viewDetailsModalOpen}
+        onClose={() => setViewDetailsModalOpen(false)}
+        title="รายละเอียดงาน"
+        data={viewingTask ? [
+          { label: "ชื่องาน", value: viewingTask.title || "-" },
+          { label: "ผู้รับผิดชอบ", value: viewingTask.responsible || "-" },
+          { label: "สถานะ", value: getStatusBadge(viewingTask.status || "pending"), highlight: true },
+          { label: "ความสำคัญ", value: getPriorityBadge(viewingTask.priority || "medium"), highlight: true },
+          { label: "ความคืบหน้า", value: `${viewingTask.progress || 0}%` },
+          { label: "วันที่เริ่มต้น", value: viewingTask.startDate ? format(new Date(viewingTask.startDate), "dd/MM/yyyy") : "-" },
+          { label: "กำหนดส่ง", value: viewingTask.dueDate ? format(new Date(viewingTask.dueDate), "dd/MM/yyyy") : "-" },
+          { label: "คำอธิบาย", value: viewingTask.description || "-" },
+        ] : []}
       />
     </div>
   );

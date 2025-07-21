@@ -4,6 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import DataTable from "@/components/ui/data-table";
 import QaSampleFormModal from "./qa-sample-form-modal";
+import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { QaSample } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -11,6 +12,8 @@ import { format } from "date-fns";
 export default function QaSampleReceiving() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingQaSample, setEditingQaSample] = useState<QaSample | null>(null);
+  const [viewDetailsModalOpen, setViewDetailsModalOpen] = useState(false);
+  const [viewingSample, setViewingSample] = useState<QaSample | null>(null);
   const { toast } = useToast();
 
   const { data, isLoading } = useQuery({
@@ -120,10 +123,8 @@ export default function QaSampleReceiving() {
   };
 
   const handleView = (qaSample: QaSample) => {
-    toast({
-      title: "ดูรายละเอียด",
-      description: `ดูรายละเอียดตัวอย่าง ${qaSample.requestNo}`,
-    });
+    setViewingSample(qaSample);
+    setViewDetailsModalOpen(true);
   };
 
   // Dashboard stats
@@ -159,6 +160,21 @@ export default function QaSampleReceiving() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         qaSample={editingQaSample}
+      />
+
+      <ViewDetailsModal
+        isOpen={viewDetailsModalOpen}
+        onClose={() => setViewDetailsModalOpen(false)}
+        title="รายละเอียดตัวอย่าง QA"
+        data={viewingSample ? [
+          { label: "Request No", value: viewingSample.requestNo },
+          { label: "ชื่อบริษัท", value: viewingSample.companyName },
+          { label: "ผู้ติดต่อ", value: viewingSample.contactPerson || "-" },
+          { label: "วันที่รับตัวอย่าง", value: viewingSample.receivedDate ? format(new Date(viewingSample.receivedDate), "dd/MM/yyyy") : "-" },
+          { label: "วันครบกำหนด", value: viewingSample.dueDate ? format(new Date(viewingSample.dueDate), "dd/MM/yyyy") : "-" },
+          { label: "การจัดส่ง", value: getDeliveryMethodLabel(viewingSample.deliveryMethod), highlight: true },
+          { label: "สภาพตัวอย่าง", value: viewingSample.condition === "normal" ? "ปกติ" : "ผิดปกติ" },
+        ] : []}
       />
     </div>
   );

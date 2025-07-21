@@ -4,6 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import DataTable from "@/components/ui/data-table";
 import MsdsFormModal from "./msds-form-modal";
+import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { Msds } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -20,6 +21,8 @@ export default function MsdsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMsds, setEditingMsds] = useState<Msds | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [viewDetailsModalOpen, setViewDetailsModalOpen] = useState(false);
+  const [viewingMsds, setViewingMsds] = useState<Msds | null>(null);
   const { toast } = useToast();
 
   const { data: msds, isLoading } = useQuery({
@@ -116,7 +119,8 @@ export default function MsdsPage() {
   };
 
   const handleView = (item: Msds) => {
-    alert(`ดูรายละเอียด MSDS: ${item.title}\nรหัสเอกสาร: ${item.documentCode}\nหมวดหมู่: ${getCategoryLabel(item.category)}\nวันที่เริ่มใช้: ${item.effectiveDate ? format(new Date(item.effectiveDate), "dd/MM/yyyy") : "-"}`);
+    setViewingMsds(item);
+    setViewDetailsModalOpen(true);
   };
 
   const handleDelete = (item: Msds) => {
@@ -213,6 +217,22 @@ export default function MsdsPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         msds={editingMsds}
+      />
+
+      <ViewDetailsModal
+        isOpen={viewDetailsModalOpen}
+        onClose={() => setViewDetailsModalOpen(false)}
+        title="รายละเอียด MSDS"
+        data={viewingMsds ? [
+          { label: "ลำดับ", value: viewingMsds.sequence?.toString() || "-" },
+          { label: "ชื่อเอกสาร", value: viewingMsds.title },
+          { label: "รหัสเอกสาร", value: viewingMsds.documentCode },
+          { label: "หมวดหมู่", value: getCategoryLabel(viewingMsds.category), highlight: true },
+          { label: "วันที่เริ่มใช้", value: viewingMsds.effectiveDate ? format(new Date(viewingMsds.effectiveDate), "dd/MM/yyyy") : "-" },
+          { label: "ปรับปรุงครั้งที่", value: viewingMsds.revision?.toString() || "0" },
+          { label: "ไฟล์", value: viewingMsds.filePath ? "✓ มีไฟล์แนบ" : "ไม่มีไฟล์" },
+          { label: "หมายเหตุ", value: viewingMsds.notes || "-" },
+        ] : []}
       />
     </div>
   );

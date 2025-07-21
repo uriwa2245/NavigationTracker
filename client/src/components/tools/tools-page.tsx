@@ -4,6 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import DataTable from "@/components/ui/data-table";
 import ToolFormModal from "./tool-form-modal";
+import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { Tool } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +13,8 @@ import { format } from "date-fns";
 export default function ToolsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
+  const [viewDetailsModalOpen, setViewDetailsModalOpen] = useState(false);
+  const [viewingTool, setViewingTool] = useState<Tool | null>(null);
   const { toast } = useToast();
 
   const { data: tools, isLoading } = useQuery({
@@ -108,7 +111,8 @@ export default function ToolsPage() {
   };
 
   const handleView = (tool: Tool) => {
-    alert(`ดูรายละเอียดเครื่องมือ: ${tool.name}\nรหัส: ${tool.code}\nยี่ห้อ: ${tool.brand}\nสถานที่: ${tool.location}\nสอบเทียบครั้งล่าสุด: ${tool.lastCalibration ? format(new Date(tool.lastCalibration), "dd/MM/yyyy") : "-"}`);
+    setViewingTool(tool);
+    setViewDetailsModalOpen(true);
   };
 
   const handleDelete = (tool: Tool) => {
@@ -144,6 +148,24 @@ export default function ToolsPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         tool={editingTool}
+      />
+
+      <ViewDetailsModal
+        isOpen={viewDetailsModalOpen}
+        onClose={() => setViewDetailsModalOpen(false)}
+        title="รายละเอียดเครื่องมือ"
+        data={viewingTool ? [
+          { label: "รหัสเครื่องมือ", value: viewingTool.code },
+          { label: "ชื่อเครื่องมือ", value: viewingTool.name },
+          { label: "ยี่ห้อ/รุ่น", value: viewingTool.brand || "-" },
+          { label: "Serial Number", value: viewingTool.serialNumber || "-" },
+          { label: "สถานที่ตั้ง", value: viewingTool.location || "-" },
+          { label: "วันที่สอบเทียบล่าสุด", value: viewingTool.lastCalibration ? format(new Date(viewingTool.lastCalibration), "dd/MM/yyyy") : "-" },
+          { label: "วันที่สอบเทียบครั้งถัดไป", value: viewingTool.nextCalibration ? format(new Date(viewingTool.nextCalibration), "dd/MM/yyyy") : "-" },
+          { label: "สถานะ", value: getStatusBadge(getCalibrationStatus(viewingTool)), highlight: true },
+          { label: "หน่วยงานสอบเทียบ", value: viewingTool.calibrationBy || "-" },
+          { label: "หมายเหตุ", value: viewingTool.notes || "-" },
+        ] : []}
       />
     </div>
   );
