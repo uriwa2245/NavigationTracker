@@ -164,8 +164,9 @@ export default function DataTable({
                             size="sm"
                             onClick={() => onView(item)}
                             title="ดูรายละเอียด"
+                            className="hover:bg-blue-50 dark:hover:bg-blue-900/20"
                           >
-                            <Eye className="w-4 h-4" />
+                            <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                           </Button>
                         )}
                         {onEdit && (
@@ -174,8 +175,9 @@ export default function DataTable({
                             size="sm"
                             onClick={() => onEdit(item)}
                             title="แก้ไข"
+                            className="hover:bg-green-50 dark:hover:bg-green-900/20"
                           >
-                            <Edit className="w-4 h-4" />
+                            <Edit className="w-4 h-4 text-green-600 dark:text-green-400" />
                           </Button>
                         )}
                         {onDelete && (
@@ -184,8 +186,9 @@ export default function DataTable({
                             size="sm"
                             onClick={() => onDelete(item)}
                             title="ลบ"
+                            className="hover:bg-red-50 dark:hover:bg-red-900/20"
                           >
-                            <Trash2 className="w-4 h-4 text-red-500" />
+                            <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
                           </Button>
                         )}
                         {customActions && customActions(item)}
