@@ -124,7 +124,15 @@ export default function ChemicalsPage() {
     {
       key: "status",
       label: "สถานะ",
-      render: (_value: string, chemical: Chemical) => getStatusBadge(getExpiryStatus(typeof chemical.expiryDate === "string" ? chemical.expiryDate : (chemical.expiryDate ? chemical.expiryDate.toISOString() : null))),
+      render: (_value: string, chemical: Chemical) => {
+        const status = getExpiryStatus(typeof chemical.expiryDate === "string" ? chemical.expiryDate : (chemical.expiryDate ? chemical.expiryDate.toISOString() : null));
+        const statusBadges = {
+          "ปกติ": <Badge className="lab-badge-success">ปกติ</Badge>,
+          "ใกล้หมดอายุ": <Badge className="lab-badge-warning">ใกล้หมดอายุ</Badge>,
+          "หมดอายุ": <Badge className="lab-badge-error">หมดอายุ</Badge>
+        };
+        return statusBadges[status as keyof typeof statusBadges] || <Badge className="lab-badge-info">{status}</Badge>;
+      },
     },
   ];
 

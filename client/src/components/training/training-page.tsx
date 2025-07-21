@@ -88,7 +88,13 @@ export default function TrainingPage() {
     {
       key: "result",
       label: "ผลการฝึกอบรม",
-      render: (value: string | null) => getResultBadge(value),
+      render: (value: string | null) => {
+        const statusBadges = {
+          "passed": <Badge className="lab-badge-success">ผ่าน</Badge>,
+          "failed": <Badge className="lab-badge-error">ไม่ผ่าน</Badge>
+        };
+        return statusBadges[value as keyof typeof statusBadges] || <Badge className="lab-badge-info">-</Badge>;
+      },
     },
     {
       key: "trainer",

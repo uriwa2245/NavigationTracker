@@ -95,7 +95,15 @@ export default function GlasswarePage() {
     {
       key: "status",
       label: "สถานะ",
-      render: (value: string, item: Glassware) => getStatusBadge(getCalibrationStatus(item)),
+      render: (value: string, item: Glassware) => {
+        const status = getCalibrationStatus(item);
+        const statusBadges = {
+          "ปกติ": <Badge className="lab-badge-success">ปกติ</Badge>,
+          "ใกล้ครบกำหนด": <Badge className="lab-badge-warning">ใกล้ครบกำหนด</Badge>,
+          "เลยกำหนด": <Badge className="lab-badge-error">เลยกำหนด</Badge>
+        };
+        return statusBadges[status as keyof typeof statusBadges] || <Badge className="lab-badge-info">{status}</Badge>;
+      },
     },
   ];
 

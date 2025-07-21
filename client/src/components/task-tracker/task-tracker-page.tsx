@@ -136,7 +136,15 @@ export default function TaskTrackerPage() {
     {
       key: "status",
       label: "สถานะ",
-      render: (value: string) => getStatusBadge(value),
+      render: (value: string) => {
+        const statusBadges = {
+          "pending": <Badge className="lab-badge-warning">รอดำเนินการ</Badge>,
+          "in_progress": <Badge className="lab-badge-info">กำลังดำเนินการ</Badge>,
+          "completed": <Badge className="lab-badge-success">เสร็จแล้ว</Badge>,
+          "cancelled": <Badge className="lab-badge-error">ยกเลิก</Badge>
+        };
+        return statusBadges[value as keyof typeof statusBadges] || <Badge className="lab-badge-info">{value}</Badge>;
+      },
     },
     {
       key: "progress",

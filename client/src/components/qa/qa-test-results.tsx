@@ -8,6 +8,7 @@ import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { QaTestResult } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -85,6 +86,18 @@ export default function QaTestResults() {
       key: "recordDate",
       label: "วันที่บันทึก",
       render: (value: string) => format(new Date(value), "dd/MM/yyyy"),
+    },
+    {
+      key: "status",
+      label: "สถานะ",
+      render: (value: string, result: QaTestResult) => {
+        const statusBadges = {
+          "pending": <Badge className="lab-badge-warning">รอดำเนินการ</Badge>,
+          "in_progress": <Badge className="lab-badge-info">กำลังดำเนินการ</Badge>,
+          "completed": <Badge className="lab-badge-success">เสร็จแล้ว</Badge>
+        };
+        return statusBadges[result.status as keyof typeof statusBadges] || <Badge className="lab-badge-info">{result.status}</Badge>;
+      },
     },
   ];
 

@@ -8,6 +8,7 @@ import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { Msds } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -105,6 +106,18 @@ export default function MsdsPage() {
           <span className="text-gray-400">-</span>
         )
       ),
+    },
+    {
+      key: "category", 
+      label: "หมวดหมู่",
+      render: (value: string, item: Msds) => {
+        const categoryBadges = {
+          "sds_lab": <Badge className="lab-badge-info">SDS Lab</Badge>,
+          "sds_product": <Badge className="lab-badge-success">SDS Product</Badge>,
+          "sds_rm": <Badge className="lab-badge-warning">SDS RM</Badge>
+        };
+        return categoryBadges[item.category as keyof typeof categoryBadges] || <Badge className="lab-badge-info">{getCategoryLabel(item.category)}</Badge>;
+      },
     },
   ];
 

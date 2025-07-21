@@ -86,7 +86,16 @@ export default function DocumentsPage() {
     {
       key: "category",
       label: "หมวดหมู่",
-      render: (value: string) => getCategoryLabel(value),
+      render: (value: string, doc: Document) => {
+        const categoryBadges = {
+          "quality_manual": <Badge className="lab-badge-success">คู่มือคุณภาพ</Badge>,
+          "procedures": <Badge className="lab-badge-info">ขั้นตอนการปฏิบัติ</Badge>,
+          "work_manual": <Badge className="lab-badge-warning">คู่มือการทำงาน</Badge>,
+          "forms": <Badge className="lab-badge-info">แบบฟอร์ม</Badge>,
+          "announcements": <Badge className="lab-badge-error">ประกาศ</Badge>
+        };
+        return categoryBadges[doc.category as keyof typeof categoryBadges] || <Badge className="lab-badge-info">{getCategoryLabel(doc.category)}</Badge>;
+      },
     },
     {
       key: "effectiveDate",

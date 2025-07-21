@@ -96,7 +96,14 @@ export default function ToolsPage() {
     {
       key: "status",
       label: "สถานะ",
-      render: (value: string, tool: Tool) => getStatusBadge(getCalibrationStatus(tool)),
+      render: (value: string, tool: Tool) => {
+        const statusBadges = {
+          "active": <Badge className="lab-badge-success">ใช้งานได้</Badge>,
+          "inactive": <Badge className="lab-badge-warning">ไม่ใช้งาน</Badge>,
+          "repair": <Badge className="lab-badge-error">ซ่อมแซม</Badge>
+        };
+        return statusBadges[tool.status as keyof typeof statusBadges] || <Badge className="lab-badge-info">{tool.status}</Badge>;
+      },
     },
   ];
 

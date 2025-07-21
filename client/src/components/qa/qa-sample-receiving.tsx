@@ -8,6 +8,7 @@ import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { QaSample } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 export default function QaSampleReceiving() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -103,6 +104,19 @@ export default function QaSampleReceiving() {
       key: "deliveryMethod",
       label: "การจัดส่ง",
       render: (value: string) => getDeliveryMethodLabel(value),
+    },
+    {
+      key: "status",
+      label: "สถานะ",
+      render: (value: string, sample: QaSample) => {
+        const statusBadges = {
+          "received": <Badge className="lab-badge-info">รับแล้ว</Badge>,
+          "testing": <Badge className="lab-badge-warning">กำลังทดสอบ</Badge>,
+          "completed": <Badge className="lab-badge-success">เสร็จแล้ว</Badge>,
+          "delivered": <Badge className="lab-badge-success">ส่งแล้ว</Badge>
+        };
+        return statusBadges[sample.status as keyof typeof statusBadges] || <Badge className="lab-badge-info">{sample.status}</Badge>;
+      },
     },
   ];
 
