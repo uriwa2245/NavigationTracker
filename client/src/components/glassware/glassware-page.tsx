@@ -5,7 +5,8 @@ import { apiRequest } from "@/lib/queryClient";
 import DataTable from "@/components/ui/data-table";
 import GlasswareFormModal from "./glassware-form-modal";
 import ViewDetailsModal from "@/components/ui/view-details-modal";
-import { Glassware } from "@shared/schema";
+import { CalibrationHistoryTable } from "@/components/ui/calibration-history-table";
+import { Glassware, GlasswareCalibrationHistory } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -19,6 +20,11 @@ export default function GlasswarePage() {
 
   const { data: glassware, isLoading } = useQuery({
     queryKey: ["/api/glassware"],
+  });
+
+  const { data: calibrationHistory } = useQuery({
+    queryKey: [`/api/glassware/${viewingGlassware?.id}/calibration-history`],
+    enabled: !!viewingGlassware?.id,
   });
 
   const deleteMutation = useMutation({
@@ -169,15 +175,24 @@ export default function GlasswarePage() {
         title="รายละเอียดเครื่องแก้ว"
         data={viewingGlassware ? [
           { label: "รหัส", value: viewingGlassware.code },
-          { label: "Lot Number", value: viewingGlassware.lotNumber || "-" },
+          { label: "Lot No./Batch No.", value: viewingGlassware.lotNumber || "-" },
           { label: "ประเภทเครื่องแก้ว", value: viewingGlassware.type },
           { label: "Class", value: viewingGlassware.class || "-" },
           { label: "ยี่ห้อ", value: viewingGlassware.brand || "-" },
+          { label: "วันที่รับ", value: viewingGlassware.receivedDate ? format(new Date(viewingGlassware.receivedDate), "dd/MM/yyyy") : "-" },
           { label: "สถานที่จัดเก็บ", value: viewingGlassware.location || "-" },
-          { label: "วันที่สอบเทียบครั้งถัดไป", value: viewingGlassware.nextCalibration ? format(new Date(viewingGlassware.nextCalibration), "dd/MM/yyyy") : "-" },
-          { label: "สถานะ", value: getStatusBadge(getCalibrationStatus(viewingGlassware)), highlight: true },
+          { label: "ผู้รับผิดชอบ", value: viewingGlassware.responsible || "-" },
           { label: "หมายเหตุ", value: viewingGlassware.notes || "-" },
         ] : []}
+        additionalContent={
+          calibrationHistory && calibrationHistory.length > 0 ? (
+            <CalibrationHistoryTable history={calibrationHistory} />
+          ) : (
+            <div className="mt-6 text-center py-8 text-muted-foreground">
+              ไม่มีประวัติการสอบเทียบ
+            </div>
+          )
+        }
       />
     </div>
   );

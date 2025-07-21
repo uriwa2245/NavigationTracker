@@ -50,6 +50,13 @@ The system manages eight core entities:
   - Calibration methods and detailed remarks
   - Integrated into form interfaces with organized sections
 
+- **Advanced Tool & Glassware Details with Calibration History (July 21, 2025)**:
+  - **Enhanced ViewDetailsModal**: Comprehensive information display for tools and glassware with proper field organization
+  - **5-Year Calibration History**: Historical tracking of calibration results with pass/fail status visualization
+  - **Repair Status Tracking**: Clear indication when equipment is sent for repair with color-coded badges
+  - **Database Schema Enhancement**: Added dedicated calibration history tables for both tools and glassware
+  - **API Integration**: Complete backend support for calibration history retrieval and management
+
 - **Enhanced Status Management System (July 21, 2025)**:
   - **Multi-select Chip Filtering**: Users can now select multiple status filters simultaneously across all data tables
   - **Color-coded Status Display**: Comprehensive color system with both badges and row background colors:

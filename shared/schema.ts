@@ -135,6 +135,19 @@ export const toolCalibrationHistory = pgTable("tool_calibration_history", {
   nextCalibrationDate: timestamp("next_calibration_date"),
 });
 
+// Glassware Calibration History
+export const glasswareCalibrationHistory = pgTable("glassware_calibration_history", {
+  id: serial("id").primaryKey(),
+  glasswareId: integer("glassware_id").notNull(),
+  calibrationDate: timestamp("calibration_date").notNull(),
+  result: text("result").notNull(), // "ผ่าน", "ไม่ผ่าน"
+  certificateNumber: text("certificate_number"),
+  calibratedBy: text("calibrated_by"),
+  method: text("method"),
+  remarks: text("remarks"),
+  nextCalibrationDate: timestamp("next_calibration_date"),
+});
+
 // QA Samples
 export const qaSamples = pgTable("qa_samples", {
   id: serial("id").primaryKey(),
@@ -173,6 +186,7 @@ export const qaTestResults = pgTable("qa_test_results", {
 export const insertToolSchema = createInsertSchema(tools).omit({ id: true });
 export const insertToolCalibrationHistorySchema = createInsertSchema(toolCalibrationHistory).omit({ id: true });
 export const insertGlasswareSchema = createInsertSchema(glassware).omit({ id: true });
+export const insertGlasswareCalibrationHistorySchema = createInsertSchema(glasswareCalibrationHistory).omit({ id: true });
 export const insertChemicalSchema = createInsertSchema(chemicals).omit({ id: true });
 export const insertDocumentSchema = createInsertSchema(documents).omit({ id: true });
 export const insertTrainingSchema = createInsertSchema(training).omit({ id: true });
@@ -188,6 +202,8 @@ export type ToolCalibrationHistory = typeof toolCalibrationHistory.$inferSelect;
 export type InsertToolCalibrationHistory = z.infer<typeof insertToolCalibrationHistorySchema>;
 export type Glassware = typeof glassware.$inferSelect;
 export type InsertGlassware = z.infer<typeof insertGlasswareSchema>;
+export type GlasswareCalibrationHistory = typeof glasswareCalibrationHistory.$inferSelect;
+export type InsertGlasswareCalibrationHistory = z.infer<typeof insertGlasswareCalibrationHistorySchema>;
 export type Chemical = typeof chemicals.$inferSelect;
 export type InsertChemical = z.infer<typeof insertChemicalSchema>;
 export type Document = typeof documents.$inferSelect;

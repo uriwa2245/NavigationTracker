@@ -2,6 +2,7 @@ import {
   Tool, InsertTool,
   ToolCalibrationHistory, InsertToolCalibrationHistory,
   Glassware, InsertGlassware,
+  GlasswareCalibrationHistory, InsertGlasswareCalibrationHistory,
   Chemical, InsertChemical,
   Document, InsertDocument,
   Training, InsertTraining,
@@ -29,6 +30,10 @@ export interface IStorage {
   createGlassware(glassware: InsertGlassware): Promise<Glassware>;
   updateGlassware(id: number, glassware: Partial<InsertGlassware>): Promise<Glassware | undefined>;
   deleteGlassware(id: number): Promise<boolean>;
+
+  // Glassware Calibration History
+  getGlasswareCalibrationHistory(glasswareId: number): Promise<GlasswareCalibrationHistory[]>;
+  createGlasswareCalibrationHistory(history: InsertGlasswareCalibrationHistory): Promise<GlasswareCalibrationHistory>;
 
   // Chemicals
   getChemicals(): Promise<Chemical[]>;
@@ -95,6 +100,7 @@ export class MemStorage implements IStorage {
   private tools: Map<number, Tool> = new Map();
   private toolCalibrationHistory: Map<number, ToolCalibrationHistory> = new Map();
   private glassware: Map<number, Glassware> = new Map();
+  private glasswareCalibrationHistory: Map<number, GlasswareCalibrationHistory> = new Map();
   private chemicals: Map<number, Chemical> = new Map();
   private documents: Map<number, Document> = new Map();
   private training: Map<number, Training> = new Map();
@@ -427,6 +433,23 @@ export class MemStorage implements IStorage {
         calibratedBy: "ทีมภายใน", method: "Temperature Mapping", remarks: "การสอบเทียบปกติ", nextCalibrationDate: new Date("2023-08-01") },
     ];
 
+    // Mock Glassware Calibration History
+    const mockGlasswareCalibrationHistory: GlasswareCalibrationHistory[] = [
+      // History for Glassware ID 6 (Volumetric Flask)
+      { id: 2001, glasswareId: 6, calibrationDate: new Date("2024-01-15"), result: "ผ่าน", certificateNumber: "VOL-2024-001", 
+        calibratedBy: "ทีมภายใน", method: "Gravimetric", remarks: "ปริมาตร 100mL ±0.1mL", nextCalibrationDate: new Date("2025-01-15") },
+      { id: 2002, glasswareId: 6, calibrationDate: new Date("2023-01-10"), result: "ผ่าน", certificateNumber: "VOL-2023-001", 
+        calibratedBy: "ทีมภายใน", method: "Gravimetric", remarks: "ปริมาตร 100mL ±0.1mL", nextCalibrationDate: new Date("2024-01-10") },
+      { id: 2003, glasswareId: 6, calibrationDate: new Date("2022-01-12"), result: "ผ่าน", certificateNumber: "VOL-2022-001", 
+        calibratedBy: "ทีมภายใน", method: "Gravimetric", remarks: "ปริมาตร 100mL ±0.1mL", nextCalibrationDate: new Date("2023-01-12") },
+      
+      // History for Glassware ID 7 (Burette)
+      { id: 2004, glasswareId: 7, calibrationDate: new Date("2024-02-05"), result: "ผ่าน", certificateNumber: "BUR-2024-001", 
+        calibratedBy: "ทีมภายใน", method: "Volume Delivery", remarks: "ปริมาตร 50mL ±0.05mL", nextCalibrationDate: new Date("2025-02-05") },
+      { id: 2005, glasswareId: 7, calibrationDate: new Date("2023-02-01"), result: "ผ่าน", certificateNumber: "BUR-2023-001", 
+        calibratedBy: "ทีมภายใน", method: "Volume Delivery", remarks: "ปริมาตร 50mL ±0.05mL", nextCalibrationDate: new Date("2024-02-01") },
+    ];
+
     // Mock QA Samples Data
     const mockQaSamples: QaSample[] = [
       {
@@ -516,6 +539,7 @@ export class MemStorage implements IStorage {
     mockTools.forEach(tool => this.tools.set(tool.id, tool));
     mockToolCalibrationHistory.forEach(history => this.toolCalibrationHistory.set(history.id, history));
     mockGlassware.forEach(item => this.glassware.set(item.id, item));
+    mockGlasswareCalibrationHistory.forEach(history => this.glasswareCalibrationHistory.set(history.id, history));
     mockChemicals.forEach(chemical => this.chemicals.set(chemical.id, chemical));
     mockDocuments.forEach(doc => this.documents.set(doc.id, doc));
     mockTraining.forEach(training => this.training.set(training.id, training));
@@ -528,7 +552,8 @@ export class MemStorage implements IStorage {
     const allIds = [
       ...mockTools.map(t => t.id),
       ...mockToolCalibrationHistory.map(h => h.id),
-      ...mockGlassware.map(g => g.id), 
+      ...mockGlassware.map(g => g.id),
+      ...mockGlasswareCalibrationHistory.map(h => h.id),
       ...mockChemicals.map(c => c.id),
       ...mockDocuments.map(d => d.id),
       ...mockTraining.map(t => t.id),
@@ -649,6 +674,26 @@ export class MemStorage implements IStorage {
 
   async deleteGlassware(id: number): Promise<boolean> {
     return this.glassware.delete(id);
+  }
+
+  // Glassware Calibration History
+  async getGlasswareCalibrationHistory(glasswareId: number): Promise<GlasswareCalibrationHistory[]> {
+    const fiveYearsAgo = new Date();
+    fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+    
+    return Array.from(this.glasswareCalibrationHistory.values())
+      .filter(history => 
+        history.glasswareId === glasswareId && 
+        history.calibrationDate >= fiveYearsAgo
+      )
+      .sort((a, b) => new Date(b.calibrationDate).getTime() - new Date(a.calibrationDate).getTime());
+  }
+
+  async createGlasswareCalibrationHistory(history: InsertGlasswareCalibrationHistory): Promise<GlasswareCalibrationHistory> {
+    const id = this.currentId++;
+    const newHistory: GlasswareCalibrationHistory = { ...history, id };
+    this.glasswareCalibrationHistory.set(id, newHistory);
+    return newHistory;
   }
 
   // Chemicals
