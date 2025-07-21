@@ -21,9 +21,6 @@ export function CalibrationHistoryTable({ history }: CalibrationHistoryTableProp
             <TableRow>
               <TableHead>วันที่สอบเทียบ</TableHead>
               <TableHead>ผลการสอบเทียบ</TableHead>
-              <TableHead>เลขที่ใบรับรอง</TableHead>
-              <TableHead>ผู้สอบเทียบ</TableHead>
-              <TableHead>วิธีการ</TableHead>
               <TableHead>หมายเหตุ</TableHead>
               <TableHead>วันครบกำหนดถัดไป</TableHead>
             </TableRow>
@@ -45,9 +42,6 @@ export function CalibrationHistoryTable({ history }: CalibrationHistoryTableProp
                     {record.result}
                   </Badge>
                 </TableCell>
-                <TableCell>{record.certificateNumber || "-"}</TableCell>
-                <TableCell>{record.calibratedBy || "-"}</TableCell>
-                <TableCell>{record.method || "-"}</TableCell>
                 <TableCell>{record.remarks || "-"}</TableCell>
                 <TableCell>
                   {record.nextCalibrationDate 
