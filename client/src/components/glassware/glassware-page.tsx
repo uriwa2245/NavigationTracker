@@ -106,6 +106,10 @@ export default function GlasswarePage() {
     setIsModalOpen(true);
   };
 
+  const handleView = (item: Glassware) => {
+    alert(`ดูรายละเอียดเครื่องแก้ว: ${item.type}\nรหัส: ${item.code}\nClass: ${item.class}\nยี่ห้อ: ${item.brand}\nสถานที่: ${item.location}`);
+  };
+
   const handleDelete = (item: Glassware) => {
     if (confirm(`คุณต้องการลบเครื่องแก้ว "${item.type}" หรือไม่?`)) {
       deleteMutation.mutate(item.id);
@@ -125,10 +129,11 @@ export default function GlasswarePage() {
 
       <DataTable
         title="รายการเครื่องแก้ว"
-        data={glassware || []}
+        data={Array.isArray(glassware) ? glassware : []}
         columns={columns}
         searchPlaceholder="ค้นหาเครื่องแก้ว..."
         onAdd={handleAdd}
+        onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
         isLoading={isLoading}

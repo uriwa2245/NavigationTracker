@@ -157,6 +157,21 @@ export default function TaskTrackerPage() {
     setIsModalOpen(true);
   };
 
+  const handleView = (task: Task) => {
+    const statusText = {
+      'pending': 'รอดำเนินการ',
+      'in_progress': 'กำลังดำเนินการ', 
+      'completed': 'เสร็จสิ้น',
+      'cancelled': 'ยกเลิก'
+    };
+    const priorityText = {
+      'high': 'สูง',
+      'medium': 'กลาง',
+      'low': 'ต่ำ'
+    };
+    alert(`ดูรายละเอียดงาน: ${task.title}\nผู้รับผิดชอบ: ${task.responsible}\nสถานะ: ${statusText[task.status as keyof typeof statusText] || task.status}\nความสำคัญ: ${priorityText[task.priority as keyof typeof priorityText] || task.priority}\nความคืบหน้า: ${task.progress || 0}%\nคำอธิบาย: ${task.description || 'ไม่มี'}`);
+  };
+
   const handleDelete = (task: Task) => {
     if (confirm(`คุณต้องการลบงาน "${task.title}" หรือไม่?`)) {
       deleteMutation.mutate(task.id);
@@ -245,6 +260,7 @@ export default function TaskTrackerPage() {
         columns={columns}
         searchPlaceholder="ค้นหางาน..."
         onAdd={handleAdd}
+        onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
         isLoading={isLoading}

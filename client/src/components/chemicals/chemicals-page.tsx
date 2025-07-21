@@ -135,6 +135,10 @@ export default function ChemicalsPage() {
     setIsModalOpen(true);
   };
 
+  const handleView = (chemical: Chemical) => {
+    alert(`ดูรายละเอียดสารเคมี: ${chemical.name}\nรหัส: ${chemical.chemicalNo}\nยี่ห้อ: ${chemical.brand}\nเกรด: ${chemical.grade}\nสถานที่เก็บ: ${chemical.location}`);
+  };
+
   const handleDelete = (chemical: Chemical) => {
     if (confirm(`คุณต้องการลบสารเคมี "${chemical.name}" หรือไม่?`)) {
       deleteMutation.mutate(chemical.id);
@@ -215,6 +219,7 @@ export default function ChemicalsPage() {
           searchPlaceholder=""
           hideSearch={true}
           hideAddButton={true}
+          onView={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}
           isLoading={isLoading}

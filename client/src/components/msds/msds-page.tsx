@@ -115,6 +115,10 @@ export default function MsdsPage() {
     setIsModalOpen(true);
   };
 
+  const handleView = (item: Msds) => {
+    alert(`ดูรายละเอียด MSDS: ${item.title}\nรหัสเอกสาร: ${item.documentCode}\nหมวดหมู่: ${getCategoryLabel(item.category)}\nวันที่เริ่มใช้: ${item.effectiveDate ? format(new Date(item.effectiveDate), "dd/MM/yyyy") : "-"}`);
+  };
+
   const handleDelete = (item: Msds) => {
     if (confirm(`คุณต้องการลบ MSDS "${item.title}" หรือไม่?`)) {
       deleteMutation.mutate(item.id);
@@ -201,7 +205,7 @@ export default function MsdsPage() {
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onView={handleDownload}
+        onView={handleView}
         isLoading={isLoading}
       />
 

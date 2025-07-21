@@ -118,6 +118,10 @@ export default function DocumentsPage() {
     setIsModalOpen(true);
   };
 
+  const handleView = (document: Document) => {
+    alert(`ดูรายละเอียดเอกสาร: ${document.title}\nรหัสเอกสาร: ${document.documentCode}\nหมวดหมู่: ${getCategoryLabel(document.category)}\nวันที่เริ่มใช้: ${document.effectiveDate ? format(new Date(document.effectiveDate), "dd/MM/yyyy") : "-"}`);
+  };
+
   const handleDelete = (document: Document) => {
     if (confirm(`คุณต้องการลบเอกสาร "${document.title}" หรือไม่?`)) {
       deleteMutation.mutate(document.id);
@@ -204,7 +208,7 @@ export default function DocumentsPage() {
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onView={handleDownload}
+        onView={handleView}
         isLoading={isLoading}
       />
 

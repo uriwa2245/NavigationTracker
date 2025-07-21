@@ -103,6 +103,10 @@ export default function TrainingPage() {
     setIsModalOpen(true);
   };
 
+  const handleView = (item: Training) => {
+    alert(`ดูรายละเอียดการอบรม: ${item.course}\nผู้เข้าอบรม: ${item.trainee}\nผู้ฝึกอบรม: ${item.trainer}\nการประเมิน: ${getAssessmentLevel(item.assessmentLevel)}\nผลการฝึกอบรม: ${item.result === 'passed' ? 'ผ่าน' : item.result === 'failed' ? 'ไม่ผ่าน' : 'ยังไม่ประเมิน'}`);
+  };
+
   const handleDelete = (item: Training) => {
     if (confirm(`คุณต้องการลบการฝึกอบรม "${item.course}" หรือไม่?`)) {
       deleteMutation.mutate(item.id);
@@ -200,6 +204,7 @@ export default function TrainingPage() {
         columns={columns}
         searchPlaceholder="ค้นหาการฝึกอบรม..."
         onAdd={handleAdd}
+        onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
         isLoading={isLoading}

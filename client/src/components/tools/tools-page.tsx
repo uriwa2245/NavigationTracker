@@ -107,6 +107,10 @@ export default function ToolsPage() {
     setIsModalOpen(true);
   };
 
+  const handleView = (tool: Tool) => {
+    alert(`ดูรายละเอียดเครื่องมือ: ${tool.name}\nรหัส: ${tool.code}\nยี่ห้อ: ${tool.brand}\nสถานที่: ${tool.location}\nสอบเทียบครั้งล่าสุด: ${tool.lastCalibration ? format(new Date(tool.lastCalibration), "dd/MM/yyyy") : "-"}`);
+  };
+
   const handleDelete = (tool: Tool) => {
     if (confirm(`คุณต้องการลบเครื่องมือ "${tool.name}" หรือไม่?`)) {
       deleteMutation.mutate(tool.id);
@@ -130,6 +134,7 @@ export default function ToolsPage() {
         columns={columns}
         searchPlaceholder="ค้นหาเครื่องมือ..."
         onAdd={handleAdd}
+        onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
         isLoading={isLoading}
