@@ -154,6 +154,13 @@ export default function QaSampleReceiving() {
         onDelete={handleDelete}
         onView={handleView}
         isLoading={isLoading}
+        statusFilters={[
+          { key: "received", label: "รับแล้ว", count: qaSamples?.filter((sample: QaSample) => sample.status === "received").length || 0 },
+          { key: "testing", label: "กำลังทดสอบ", count: qaSamples?.filter((sample: QaSample) => sample.status === "testing").length || 0 },
+          { key: "completed", label: "เสร็จแล้ว", count: qaSamples?.filter((sample: QaSample) => sample.status === "completed").length || 0 },
+          { key: "delivered", label: "ส่งแล้ว", count: qaSamples?.filter((sample: QaSample) => sample.status === "delivered").length || 0 },
+        ]}
+        getItemStatus={(sample: QaSample) => sample.status || "received"}
       />
 
       <QaSampleFormModal

@@ -141,6 +141,12 @@ export default function GlasswarePage() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         isLoading={isLoading}
+        statusFilters={[
+          { key: "due_soon", label: "ใกล้ครบกำหนด", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "due_soon").length : 0 },
+          { key: "overdue", label: "เกินกำหนด", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "overdue").length : 0 },
+          { key: "active", label: "ปกติ", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "active").length : 0 },
+        ]}
+        getItemStatus={(item: Glassware) => getCalibrationStatus(item)}
       />
 
       <GlasswareFormModal

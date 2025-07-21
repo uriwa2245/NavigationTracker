@@ -214,6 +214,13 @@ export default function DocumentsPage() {
         onDelete={handleDelete}
         onView={handleView}
         isLoading={isLoading}
+        statusFilters={[
+          { key: "quality_manual", label: "คู่มือคุณภาพ", count: documents?.filter((doc: Document) => doc.category === "quality_manual").length || 0 },
+          { key: "procedures", label: "ขั้นตอนการปฏิบัติ", count: documents?.filter((doc: Document) => doc.category === "procedures").length || 0 },
+          { key: "work_manual", label: "คู่มือการทำงาน", count: documents?.filter((doc: Document) => doc.category === "work_manual").length || 0 },
+          { key: "forms", label: "แบบฟอร์ม", count: documents?.filter((doc: Document) => doc.category === "forms").length || 0 },
+        ]}
+        getItemStatus={(doc: Document) => doc.category || "procedures"}
       />
 
       <DocumentFormModal

@@ -142,6 +142,11 @@ export default function ToolsPage() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         isLoading={isLoading}
+        statusFilters={[
+          { key: "active", label: "ใช้งานได้", count: Array.isArray(tools) ? tools.filter((tool: Tool) => tool.status === "active").length : 0 },
+          { key: "inactive", label: "ไม่ใช้งาน", count: Array.isArray(tools) ? tools.filter((tool: Tool) => tool.status === "inactive").length : 0 },
+        ]}
+        getItemStatus={(tool: Tool) => tool.status || "active"}
       />
 
       <ToolFormModal

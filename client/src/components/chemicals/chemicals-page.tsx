@@ -223,6 +223,12 @@ export default function ChemicalsPage() {
           searchPlaceholder=""
           hideSearch={true}
           hideAddButton={true}
+          statusFilters={[
+            { key: "หมดอายุ", label: "หมดอายุ", count: filteredChemicals.filter((chemical: Chemical) => getExpiryStatus(typeof chemical.expiryDate === "string" ? chemical.expiryDate : (chemical.expiryDate ? chemical.expiryDate.toISOString() : null)) === "หมดอายุ").length },
+            { key: "ใกล้หมดอายุ", label: "ใกล้หมดอายุ", count: filteredChemicals.filter((chemical: Chemical) => getExpiryStatus(typeof chemical.expiryDate === "string" ? chemical.expiryDate : (chemical.expiryDate ? chemical.expiryDate.toISOString() : null)) === "ใกล้หมดอายุ").length },
+            { key: "ปกติ", label: "ปกติ", count: filteredChemicals.filter((chemical: Chemical) => getExpiryStatus(typeof chemical.expiryDate === "string" ? chemical.expiryDate : (chemical.expiryDate ? chemical.expiryDate.toISOString() : null)) === "ปกติ").length },
+          ]}
+          getItemStatus={(chemical: Chemical) => getExpiryStatus(typeof chemical.expiryDate === "string" ? chemical.expiryDate : (chemical.expiryDate ? chemical.expiryDate.toISOString() : null))}
           onView={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}

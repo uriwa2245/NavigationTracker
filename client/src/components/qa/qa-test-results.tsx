@@ -143,6 +143,12 @@ export default function QaTestResults() {
         onDelete={handleDelete}
         onView={handleView}
         isLoading={isLoading}
+        statusFilters={[
+          { key: "pending", label: "รอดำเนินการ", count: testResults?.filter((result: QaTestResult) => result.status === "pending").length || 0 },
+          { key: "in_progress", label: "กำลังดำเนินการ", count: testResults?.filter((result: QaTestResult) => result.status === "in_progress").length || 0 },
+          { key: "completed", label: "เสร็จแล้ว", count: testResults?.filter((result: QaTestResult) => result.status === "completed").length || 0 },
+        ]}
+        getItemStatus={(result: QaTestResult) => result.status || "pending"}
         customActions={(item: QaTestResult) => (
           <Button
             variant="outline"

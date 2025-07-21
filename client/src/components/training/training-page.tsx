@@ -212,6 +212,11 @@ export default function TrainingPage() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         isLoading={isLoading}
+        statusFilters={[
+          { key: "passed", label: "ผ่าน", count: training?.filter((item: Training) => item.result === "passed").length || 0 },
+          { key: "failed", label: "ไม่ผ่าน", count: training?.filter((item: Training) => item.result === "failed").length || 0 },
+        ]}
+        getItemStatus={(item: Training) => item.result || "passed"}
       />
 
       <TrainingFormModal

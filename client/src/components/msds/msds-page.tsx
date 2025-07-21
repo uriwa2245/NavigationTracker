@@ -211,6 +211,12 @@ export default function MsdsPage() {
         onDelete={handleDelete}
         onView={handleView}
         isLoading={isLoading}
+        statusFilters={[
+          { key: "sds_lab", label: "SDS Lab", count: msds?.filter((item: Msds) => item.category === "sds_lab").length || 0 },
+          { key: "sds_product", label: "SDS Product", count: msds?.filter((item: Msds) => item.category === "sds_product").length || 0 },
+          { key: "sds_rm", label: "SDS RM", count: msds?.filter((item: Msds) => item.category === "sds_rm").length || 0 },
+        ]}
+        getItemStatus={(item: Msds) => item.category || "sds_lab"}
       />
 
       <MsdsFormModal

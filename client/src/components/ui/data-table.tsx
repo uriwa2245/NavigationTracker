@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -17,6 +18,12 @@ interface Column {
   render?: (value: any, row: any) => React.ReactNode;
 }
 
+interface StatusFilter {
+  key: string;
+  label: string;
+  count: number;
+}
+
 interface DataTableProps {
   title: string;
   data: any[];
@@ -31,7 +38,36 @@ interface DataTableProps {
   customActions?: (item: any) => React.ReactNode;
   hideSearch?: boolean;
   hideAddButton?: boolean;
+  statusFilters?: StatusFilter[];
+  getItemStatus?: (item: any) => string;
 }
+
+// Helper function to get status chip styles
+const getStatusChipStyle = (status: string) => {
+  switch (status) {
+    case "หมดอายุ":
+    case "overdue":
+    case "failed":
+    case "cancelled":
+      return "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border-red-300 dark:border-red-700";
+    case "ใกล้หมดอายุ":
+    case "due_soon":
+    case "pending":
+    case "in_progress":
+      return "bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 border-orange-300 dark:border-orange-700";
+    case "ปกติ":
+    case "active":
+    case "completed":
+    case "passed":
+      return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border-green-300 dark:border-green-700";
+    case "inactive":
+    case "received":
+    case "testing":
+      return "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-700";
+    default:
+      return "bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700";
+  }
+};
 
 export default function DataTable({
   title,
@@ -47,17 +83,32 @@ export default function DataTable({
   customActions,
   hideSearch = false,
   hideAddButton = false,
+  statusFilters = [],
+  getItemStatus,
 }: DataTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeStatusFilter, setActiveStatusFilter] = useState<string>("all");
   const itemsPerPage = 10;
 
-  // Filter data based on search term (only if hideSearch is false)
-  const filteredData = hideSearch ? data : data.filter((item) =>
-    Object.values(item).some((value) =>
-      String(value).toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  // Filter data based on search term and status
+  let filteredData = data;
+
+  // Apply search filter
+  if (!hideSearch && searchTerm) {
+    filteredData = filteredData.filter((item) =>
+      Object.values(item).some((value) =>
+        String(value).toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }
+
+  // Apply status filter
+  if (activeStatusFilter !== "all" && getItemStatus) {
+    filteredData = filteredData.filter((item) => 
+      getItemStatus(item) === activeStatusFilter
+    );
+  }
 
   // Paginate data
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -116,6 +167,39 @@ export default function DataTable({
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
+            </div>
+          </div>
+        )}
+
+        {/* Status Filter Chips */}
+        {statusFilters.length > 0 && (
+          <div className="mt-4">
+            <div className="flex flex-wrap gap-2">
+              <Badge
+                variant={activeStatusFilter === "all" ? "default" : "outline"}
+                className={`cursor-pointer transition-all ${
+                  activeStatusFilter === "all" 
+                    ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-700" 
+                    : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                }`}
+                onClick={() => setActiveStatusFilter("all")}
+              >
+                ทั้งหมด ({data.length})
+              </Badge>
+              {statusFilters.map((filter) => (
+                <Badge
+                  key={filter.key}
+                  variant={activeStatusFilter === filter.key ? "default" : "outline"}
+                  className={`cursor-pointer transition-all thai-font ${
+                    activeStatusFilter === filter.key
+                      ? getStatusChipStyle(filter.key)
+                      : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                  }`}
+                  onClick={() => setActiveStatusFilter(filter.key)}
+                >
+                  {filter.label} ({filter.count})
+                </Badge>
+              ))}
             </div>
           </div>
         )}

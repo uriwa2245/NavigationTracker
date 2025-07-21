@@ -268,6 +268,13 @@ export default function TaskTrackerPage() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         isLoading={isLoading}
+        statusFilters={[
+          { key: "pending", label: "รอดำเนินการ", count: tasks?.filter((task: Task) => task.status === "pending").length || 0 },
+          { key: "in_progress", label: "กำลังดำเนินการ", count: tasks?.filter((task: Task) => task.status === "in_progress").length || 0 },
+          { key: "completed", label: "เสร็จแล้ว", count: tasks?.filter((task: Task) => task.status === "completed").length || 0 },
+          { key: "cancelled", label: "ยกเลิก", count: tasks?.filter((task: Task) => task.status === "cancelled").length || 0 },
+        ]}
+        getItemStatus={(task: Task) => task.status || "pending"}
       />
 
       <TaskFormModal
