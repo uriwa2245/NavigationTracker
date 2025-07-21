@@ -8,18 +8,35 @@ import { Chemical } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Plus, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function ChemicalsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingChemical, setEditingChemical] = useState<Chemical | null>(null);
-  const [activeCategory, setActiveCategory] = useState("qa");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const { toast } = useToast();
 
-  const { data: chemicals, isLoading } = useQuery({
-    queryKey: ["/api/chemicals", activeCategory],
-    queryFn: () => fetch(`/api/chemicals?category=${activeCategory}`).then(res => res.json()),
+  const { data: allChemicals, isLoading } = useQuery({
+    queryKey: ["/api/chemicals"],
+    queryFn: () => fetch("/api/chemicals").then(res => res.json()),
   });
+
+  // Filter chemicals based on search query and category
+  const filteredChemicals = allChemicals?.filter((chemical: Chemical) => {
+    const matchesSearch = 
+      chemical.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      chemical.chemicalNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      chemical.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      chemical.casNo?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesCategory = categoryFilter === "all" || chemical.category === categoryFilter;
+    
+    return matchesSearch && matchesCategory;
+  }) || [];
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -84,6 +101,15 @@ export default function ChemicalsPage() {
       label: "เกรด",
     },
     {
+      key: "category",
+      label: "หมวดหมู่",
+      render: (value: string) => (
+        <Badge variant="outline" className="thai-font">
+          {getCategoryLabel(value)}
+        </Badge>
+      ),
+    },
+    {
       key: "expiryDate",
       label: "วันที่หมดอายุ",
       render: (value: string) => value ? format(new Date(value), "dd/MM/yyyy") : "-",
@@ -128,43 +154,77 @@ export default function ChemicalsPage() {
     }
   };
 
+  const categoryOptions = [
+    { value: "all", label: "ทุกหมวดหมู่" },
+    { value: "qa", label: "สารเคมี QA" },
+    { value: "standard", label: "สารมาตรฐาน" },
+    { value: "rd", label: "สารเคมี RD" },
+  ];
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 thai-font">
-          สารเคมี
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 thai-font">
-          จัดการสารเคมีและวันหมดอายุ
-        </p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 thai-font">
+            สารเคมี
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 thai-font">
+            จัดการสารเคมีและวันหมดอายุ
+          </p>
+        </div>
+        <Button 
+          onClick={handleAdd}
+          className="lab-button-primary px-6 py-3 thai-font"
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          เพิ่มสารเคมี
+        </Button>
       </div>
 
-      <Tabs value={activeCategory} onValueChange={setActiveCategory}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="qa" className="thai-font">สารเคมี QA</TabsTrigger>
-          <TabsTrigger value="standard" className="thai-font">สารมาตรฐาน</TabsTrigger>
-          <TabsTrigger value="rd" className="thai-font">สารเคมี RD</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value={activeCategory} className="space-y-4">
-          <DataTable
-            title={getCategoryLabel(activeCategory)}
-            data={chemicals || []}
-            columns={columns}
-            searchPlaceholder="ค้นหาสารเคมี..."
-            onAdd={handleAdd}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            isLoading={isLoading}
-          />
-        </TabsContent>
-      </Tabs>
+      <div className="lab-card p-6">
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Input
+              placeholder="ค้นหาสารเคมี (ชื่อ, Chemical No, ยี่ห้อ, CAS No)"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 thai-font"
+            />
+          </div>
+          <div className="w-full sm:w-64">
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="thai-font">
+                <SelectValue placeholder="เลือกหมวดหมู่" />
+              </SelectTrigger>
+              <SelectContent>
+                {categoryOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value} className="thai-font">
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <DataTable
+          title={`รายการสารเคมี (${filteredChemicals.length} รายการ)`}
+          data={filteredChemicals}
+          columns={columns}
+          searchPlaceholder=""
+          hideSearch={true}
+          hideAddButton={true}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          isLoading={isLoading}
+        />
+      </div>
 
       <ChemicalFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         chemical={editingChemical}
-        defaultCategory={activeCategory}
       />
     </div>
   );

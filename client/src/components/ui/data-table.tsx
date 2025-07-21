@@ -29,6 +29,8 @@ interface DataTableProps {
   onExport?: () => void;
   isLoading?: boolean;
   customActions?: (item: any) => React.ReactNode;
+  hideSearch?: boolean;
+  hideAddButton?: boolean;
 }
 
 export default function DataTable({
@@ -43,13 +45,15 @@ export default function DataTable({
   onExport,
   isLoading = false,
   customActions,
+  hideSearch = false,
+  hideAddButton = false,
 }: DataTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Filter data based on search term
-  const filteredData = data.filter((item) =>
+  // Filter data based on search term (only if hideSearch is false)
+  const filteredData = hideSearch ? data : data.filter((item) =>
     Object.values(item).some((value) =>
       String(value).toLowerCase().includes(searchTerm.toLowerCase())
     )
@@ -85,7 +89,7 @@ export default function DataTable({
             {title}
           </h3>
           <div className="mt-4 sm:mt-0 flex space-x-2">
-            {onAdd && (
+            {onAdd && !hideAddButton && (
               <Button onClick={onAdd} className="lab-button-primary">
                 <Plus className="w-4 h-4 mr-2" />
                 เพิ่ม
@@ -101,18 +105,20 @@ export default function DataTable({
         </div>
 
         {/* Search */}
-        <div className="mt-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              type="text"
-              placeholder={searchPlaceholder}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+        {!hideSearch && (
+          <div className="mt-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                type="text"
+                placeholder={searchPlaceholder}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="overflow-x-auto">
