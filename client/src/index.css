@@ -142,3 +142,36 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground));
 }
+
+/* Table row background colors based on status */
+.table-row-success {
+  background-color: hsl(142, 50%, 96%) !important;
+}
+
+.dark .table-row-success {
+  background-color: hsl(142, 30%, 15%) !important;
+}
+
+.table-row-error {
+  background-color: hsl(0, 50%, 96%) !important;
+}
+
+.dark .table-row-error {
+  background-color: hsl(0, 30%, 15%) !important;
+}
+
+.table-row-warning {
+  background-color: hsl(45, 50%, 96%) !important;
+}
+
+.dark .table-row-warning {
+  background-color: hsl(45, 30%, 15%) !important;
+}
+
+.table-row-info {
+  background-color: hsl(221, 50%, 96%) !important;
+}
+
+.dark .table-row-info {
+  background-color: hsl(221, 30%, 15%) !important;
+}

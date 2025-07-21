@@ -39,7 +39,7 @@ interface DataTableProps {
   hideSearch?: boolean;
   hideAddButton?: boolean;
   statusFilters?: StatusFilter[];
-  getItemStatus?: (item: any) => string;
+  getItemStatus?: (item: any) => string | null;
 }
 
 // Helper function to get status chip styles
@@ -66,6 +66,43 @@ const getStatusChipStyle = (status: string) => {
       return "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-700";
     default:
       return "bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700";
+  }
+};
+
+// Helper function to get row background color class
+const getRowColorClass = (status: string | null) => {
+  if (!status) return "";
+  
+  switch (status) {
+    case "หมดอายุ":
+    case "overdue":
+    case "failed":
+    case "cancelled":
+    case "ไม่ผ่าน":
+      return "table-row-error";
+    case "ใกล้หมดอายุ":
+    case "due_soon":
+    case "pending":
+    case "รอ":
+    case "ไม่ใช้งาน":
+      return "table-row-warning";
+    case "ปกติ":
+    case "active":
+    case "completed":
+    case "passed":
+    case "ผ่าน":
+    case "ใช้งานได้":
+    case "เสร็จสิ้น":
+      return "table-row-success";
+    case "inactive":
+    case "received":
+    case "testing":
+    case "กำลังดำเนินการ":
+    case "รับแล้ว":
+    case "ซ่อมแซม":
+      return "table-row-info";
+    default:
+      return "";
   }
 };
 
@@ -240,57 +277,62 @@ export default function DataTable({
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedData.map((item, index) => (
-                <TableRow key={item.id || index}>
-                  {columns.map((column) => (
-                    <TableCell key={column.key}>
-                      {column.render
-                        ? column.render(item[column.key], item)
-                        : item[column.key]}
-                    </TableCell>
-                  ))}
-                  {(onEdit || onView || onDelete || customActions) && (
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        {onView && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onView(item)}
-                            title="ดูรายละเอียด"
-                            className="hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                          >
-                            <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                          </Button>
-                        )}
-                        {onEdit && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onEdit(item)}
-                            title="แก้ไข"
-                            className="hover:bg-green-50 dark:hover:bg-green-900/20"
-                          >
-                            <Edit className="w-4 h-4 text-green-600 dark:text-green-400" />
-                          </Button>
-                        )}
-                        {onDelete && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onDelete(item)}
-                            title="ลบ"
-                            className="hover:bg-red-50 dark:hover:bg-red-900/20"
-                          >
-                            <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
-                          </Button>
-                        )}
-                        {customActions && customActions(item)}
-                      </div>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))
+              paginatedData.map((item, index) => {
+                const status = getItemStatus ? getItemStatus(item) : null;
+                const rowColorClass = getRowColorClass(status);
+                return (
+                  <TableRow key={item.id || index} className={rowColorClass}>
+                    {columns.map((column) => (
+                      <TableCell key={column.key}>
+                        {column.render
+                          ? column.render(item[column.key], item)
+                          : item[column.key]}
+                      </TableCell>
+                    ))}
+                    {(onEdit || onView || onDelete || customActions) && (
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          {onView && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onView(item)}
+                              title="ดูรายละเอียด"
+                              className="hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            >
+                              <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            </Button>
+                          )}
+                          {onEdit && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onEdit(item)}
+                              title="แก้ไข"
+                              className="hover:bg-green-50 dark:hover:bg-green-900/20"
+                            >
+                              <Edit className="w-4 h-4 text-green-600 dark:text-green-400" />
+                            </Button>
+                          )}
+                          {onDelete && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onDelete(item)}
+                              title="ลบ"
+                              className="hover:bg-red-50 dark:hover:bg-red-900/20"
+                            >
+                              <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+                            </Button>
+                          )}
+                          {customActions && customActions(item)}
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              })
+
             )}
           </TableBody>
         </Table>

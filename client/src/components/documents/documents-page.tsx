@@ -8,6 +8,7 @@ import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { Document } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
