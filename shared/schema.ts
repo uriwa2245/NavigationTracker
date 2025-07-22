@@ -182,16 +182,38 @@ export const qaTestResults = pgTable("qa_test_results", {
   notes: text("notes"),
 });
 
-// Insert schemas
-export const insertToolSchema = createInsertSchema(tools).omit({ id: true });
+// Insert schemas with custom transformations for timestamps
+export const insertToolSchema = createInsertSchema(tools).omit({ id: true }).extend({
+  lastCalibration: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  nextCalibration: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+});
 export const insertToolCalibrationHistorySchema = createInsertSchema(toolCalibrationHistory).omit({ id: true });
-export const insertGlasswareSchema = createInsertSchema(glassware).omit({ id: true });
+export const insertGlasswareSchema = createInsertSchema(glassware).omit({ id: true }).extend({
+  receivedDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  lastCalibration: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  nextCalibration: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+});
 export const insertGlasswareCalibrationHistorySchema = createInsertSchema(glasswareCalibrationHistory).omit({ id: true });
-export const insertChemicalSchema = createInsertSchema(chemicals).omit({ id: true });
-export const insertDocumentSchema = createInsertSchema(documents).omit({ id: true });
-export const insertTrainingSchema = createInsertSchema(training).omit({ id: true });
-export const insertMsdsSchema = createInsertSchema(msds).omit({ id: true });
-export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true });
+export const insertChemicalSchema = createInsertSchema(chemicals).omit({ id: true }).extend({
+  receivedDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  expiryDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+});
+export const insertDocumentSchema = createInsertSchema(documents).omit({ id: true }).extend({
+  effectiveDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+});
+export const insertTrainingSchema = createInsertSchema(training).omit({ id: true }).extend({
+  startDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  endDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  acknowledgedDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  signedDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+});
+export const insertMsdsSchema = createInsertSchema(msds).omit({ id: true }).extend({
+  effectiveDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+});
+export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true }).extend({
+  startDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  dueDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+});
 export const insertQaSampleSchema = createInsertSchema(qaSamples).omit({ id: true });
 export const insertQaTestResultSchema = createInsertSchema(qaTestResults).omit({ id: true });
 

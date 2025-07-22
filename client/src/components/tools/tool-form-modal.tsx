@@ -132,24 +132,23 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
   });
 
   const onSubmit = (data: InsertTool) => {
-    // Clean data by converting empty strings to null for optional fields
+    // Clean data by converting empty strings and "-" to null for optional fields
     const cleanedData = {
       ...data,
-      serialNumber: data.serialNumber || null,
-      range: data.range || null,
-      responsible: data.responsible || null,
-      notes: data.notes || null,
-      calibrationStatus: data.calibrationStatus || null,
-      calibrationResult: data.calibrationResult || null,
-      calibrationCertificate: data.calibrationCertificate || null,
-      calibrationBy: data.calibrationBy || null,
-      calibrationMethod: data.calibrationMethod || null,
-      calibrationRemarks: data.calibrationRemarks || null,
+      serialNumber: (data.serialNumber && data.serialNumber !== "-") ? data.serialNumber : null,
+      range: (data.range && data.range !== "-") ? data.range : null,
+      responsible: (data.responsible && data.responsible !== "-") ? data.responsible : null,
+      notes: (data.notes && data.notes !== "-") ? data.notes : null,
+      calibrationStatus: (data.calibrationStatus && data.calibrationStatus !== "-") ? data.calibrationStatus : null,
+      calibrationResult: (data.calibrationResult && data.calibrationResult !== "-") ? data.calibrationResult : null,
+      calibrationCertificate: (data.calibrationCertificate && data.calibrationCertificate !== "-") ? data.calibrationCertificate : null,
+      calibrationBy: (data.calibrationBy && data.calibrationBy !== "-") ? data.calibrationBy : null,
+      calibrationMethod: (data.calibrationMethod && data.calibrationMethod !== "-") ? data.calibrationMethod : null,
+      calibrationRemarks: (data.calibrationRemarks && data.calibrationRemarks !== "-") ? data.calibrationRemarks : null,
       lastCalibration: data.lastCalibration || null,
       nextCalibration: data.nextCalibration || null,
     };
     
-    console.log("Cleaned tool data:", cleanedData);
     mutation.mutate(cleanedData);
   };
 
