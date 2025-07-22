@@ -176,7 +176,17 @@ export class MemStorage implements IStorage {
 
   async createToolCalibrationHistory(history: InsertToolCalibrationHistory): Promise<ToolCalibrationHistory> {
     const id = this.currentId++;
-    const newHistory: ToolCalibrationHistory = { ...history, id };
+    const newHistory: ToolCalibrationHistory = { 
+      id,
+      toolId: history.toolId,
+      calibrationDate: history.calibrationDate,
+      result: history.result,
+      certificateNumber: history.certificateNumber ?? null,
+      calibratedBy: history.calibratedBy ?? null,
+      method: history.method ?? null,
+      remarks: history.remarks ?? null,
+      nextCalibrationDate: history.nextCalibrationDate ?? null
+    };
     this.toolCalibrationHistory.set(id, newHistory);
     return newHistory;
   }
@@ -242,7 +252,17 @@ export class MemStorage implements IStorage {
 
   async createGlasswareCalibrationHistory(history: InsertGlasswareCalibrationHistory): Promise<GlasswareCalibrationHistory> {
     const id = this.currentId++;
-    const newHistory: GlasswareCalibrationHistory = { ...history, id };
+    const newHistory: GlasswareCalibrationHistory = { 
+      id,
+      glasswareId: history.glasswareId,
+      calibrationDate: history.calibrationDate,
+      result: history.result,
+      certificateNumber: history.certificateNumber ?? null,
+      calibratedBy: history.calibratedBy ?? null,
+      method: history.method ?? null,
+      remarks: history.remarks ?? null,
+      nextCalibrationDate: history.nextCalibrationDate ?? null
+    };
     this.glasswareCalibrationHistory.set(id, newHistory);
     return newHistory;
   }

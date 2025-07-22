@@ -47,6 +47,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid tool data", errors: result.error.issues });
       }
       const tool = await storage.createTool(result.data);
+      
+      // Create initial calibration history record if calibration data exists
+      if (tool.lastCalibration && tool.calibrationResult) {
+        try {
+          console.log('Creating calibration history for tool:', tool.id, tool.calibrationResult);
+          await storage.createToolCalibrationHistory({
+            toolId: tool.id,
+            calibrationDate: tool.lastCalibration,
+            result: tool.calibrationResult,
+            certificateNumber: tool.calibrationCertificate || null,
+            calibratedBy: tool.calibrationBy || null,
+            method: tool.calibrationMethod || null,
+            remarks: tool.calibrationRemarks || null,
+            nextCalibrationDate: tool.nextCalibration || null
+          });
+          console.log('Calibration history created successfully');
+        } catch (error) {
+          console.error('Error creating calibration history:', error);
+        }
+      }
+      
       res.status(201).json(tool);
     } catch (error) {
       res.status(500).json({ message: "Failed to create tool" });
@@ -55,10 +76,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/tools/:id", async (req, res) => {
     try {
+      const previousTool = await storage.getTool(parseInt(req.params.id));
       const tool = await storage.updateTool(parseInt(req.params.id), req.body);
       if (!tool) {
         return res.status(404).json({ message: "Tool not found" });
       }
+      
+      // Create new calibration history record if calibration data changed
+      if (tool.lastCalibration && tool.calibrationResult && 
+          previousTool && 
+          (previousTool.lastCalibration?.getTime() !== tool.lastCalibration.getTime() ||
+           previousTool.calibrationResult !== tool.calibrationResult)) {
+        await storage.createToolCalibrationHistory({
+          toolId: tool.id,
+          calibrationDate: tool.lastCalibration,
+          result: tool.calibrationResult,
+          certificateNumber: tool.calibrationCertificate,
+          calibratedBy: tool.calibrationBy,
+          method: tool.calibrationMethod,
+          remarks: tool.calibrationRemarks,
+          nextCalibrationDate: tool.nextCalibration
+        });
+      }
+      
       res.json(tool);
     } catch (error) {
       res.status(500).json({ message: "Failed to update tool" });
@@ -114,6 +154,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid glassware data", errors: result.error.issues });
       }
       const glassware = await storage.createGlassware(result.data);
+      
+      // Create initial calibration history record if calibration data exists
+      if (glassware.lastCalibration && glassware.calibrationResult) {
+        await storage.createGlasswareCalibrationHistory({
+          glasswareId: glassware.id,
+          calibrationDate: glassware.lastCalibration,
+          result: glassware.calibrationResult,
+          certificateNumber: glassware.calibrationCertificate,
+          calibratedBy: glassware.calibrationBy,
+          method: glassware.calibrationMethod,
+          remarks: glassware.calibrationRemarks,
+          nextCalibrationDate: glassware.nextCalibration
+        });
+      }
+      
       res.status(201).json(glassware);
     } catch (error) {
       res.status(500).json({ message: "Failed to create glassware" });
@@ -122,10 +177,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/glassware/:id", async (req, res) => {
     try {
+      const previousGlassware = await storage.getGlasswareItem(parseInt(req.params.id));
       const glassware = await storage.updateGlassware(parseInt(req.params.id), req.body);
       if (!glassware) {
         return res.status(404).json({ message: "Glassware not found" });
       }
+      
+      // Create new calibration history record if calibration data changed
+      if (glassware.lastCalibration && glassware.calibrationResult && 
+          previousGlassware && 
+          (previousGlassware.lastCalibration?.getTime() !== glassware.lastCalibration.getTime() ||
+           previousGlassware.calibrationResult !== glassware.calibrationResult)) {
+        await storage.createGlasswareCalibrationHistory({
+          glasswareId: glassware.id,
+          calibrationDate: glassware.lastCalibration,
+          result: glassware.calibrationResult,
+          certificateNumber: glassware.calibrationCertificate,
+          calibratedBy: glassware.calibrationBy,
+          method: glassware.calibrationMethod,
+          remarks: glassware.calibrationRemarks,
+          nextCalibrationDate: glassware.nextCalibration
+        });
+      }
+      
       res.json(glassware);
     } catch (error) {
       res.status(500).json({ message: "Failed to update glassware" });

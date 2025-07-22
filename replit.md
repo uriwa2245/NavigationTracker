@@ -57,6 +57,12 @@ The system manages eight core entities:
   - **Database Schema Enhancement**: Added dedicated calibration history tables for both tools and glassware
   - **API Integration**: Complete backend support for calibration history retrieval and management
 
+- **Automatic Calibration History Creation (July 22, 2025)**:
+  - **Auto History Records**: System automatically creates calibration history records when tools/glassware are added or updated with calibration data
+  - **Historical Tracking**: All calibration changes are automatically logged with timestamps and details
+  - **Visual History Display**: CalibrationHistoryTable component displays complete calibration history with color-coded status indicators
+  - **Data Integrity**: Prevents duplicate history entries and maintains chronological order
+
 - **Enhanced Status Management System (July 21, 2025)**:
   - **Multi-select Chip Filtering**: Users can now select multiple status filters simultaneously across all data tables
   - **Color-coded Status Display**: Comprehensive color system with both badges and row background colors:
