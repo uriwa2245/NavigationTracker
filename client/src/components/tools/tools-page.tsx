@@ -195,8 +195,8 @@ export default function ToolsPage() {
           { label: "สถานะเครื่องมือ", value: getToolStatus(viewingTool), highlight: true },
         ] : []}
         additionalContent={
-          calibrationHistory && calibrationHistory.length > 0 ? (
-            <CalibrationHistoryTable history={calibrationHistory} />
+          (calibrationHistory as ToolCalibrationHistory[])?.length > 0 ? (
+            <CalibrationHistoryTable history={calibrationHistory as ToolCalibrationHistory[]} />
           ) : (
             <div className="mt-6 text-center py-8 text-muted-foreground">
               ไม่มีประวัติการสอบเทียบ

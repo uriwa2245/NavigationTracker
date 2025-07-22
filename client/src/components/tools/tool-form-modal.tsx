@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { insertToolSchema, Tool, InsertTool } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -53,7 +54,7 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
 
   const form = useForm<InsertTool>({
     resolver: zodResolver(insertToolSchema),
-    defaultValues: tool || {
+    defaultValues: {
       code: "",
       name: "",
       brand: "",
@@ -68,6 +69,41 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
       status: "active",
     },
   });
+
+  // Reset form when tool changes
+  useEffect(() => {
+    if (tool) {
+      form.reset({
+        code: tool.code || "",
+        name: tool.name || "",
+        brand: tool.brand || "",
+        serialNumber: tool.serialNumber || "",
+        range: tool.range || "",
+        location: tool.location || "",
+        lastCalibration: tool.lastCalibration || null,
+        nextCalibration: tool.nextCalibration || null,
+        calibrationStatus: tool.calibrationStatus || "",
+        responsible: tool.responsible || "",
+        notes: tool.notes || "",
+        status: tool.status || "active",
+      });
+    } else {
+      form.reset({
+        code: "",
+        name: "",
+        brand: "",
+        serialNumber: "",
+        range: "",
+        location: "",
+        lastCalibration: null,
+        nextCalibration: null,
+        calibrationStatus: "",
+        responsible: "",
+        notes: "",
+        status: "active",
+      });
+    }
+  }, [tool, form]);
 
   const mutation = useMutation({
     mutationFn: async (data: InsertTool) => {
