@@ -79,9 +79,6 @@ export default function CalibrationHistoryTable({ data, title = "ประวั
               <TableRow>
                 <TableHead className="thai-font text-xs">วันที่สอบเทียบ</TableHead>
                 <TableHead className="thai-font text-xs">ผลการสอบเทียบ</TableHead>
-                <TableHead className="thai-font text-xs">เลขที่ใบรับรอง</TableHead>
-                <TableHead className="thai-font text-xs">ผู้สอบเทียบ</TableHead>
-                <TableHead className="thai-font text-xs">วิธีการสอบเทียบ</TableHead>
                 <TableHead className="thai-font text-xs">วันครบรอบถัดไป</TableHead>
                 <TableHead className="thai-font text-xs">หมายเหตุ</TableHead>
               </TableRow>
@@ -107,21 +104,12 @@ export default function CalibrationHistoryTable({ data, title = "ประวั
                       </Badge>
                     </TableCell>
                     <TableCell className="thai-font text-xs">
-                      {record.certificateNumber || "-"}
-                    </TableCell>
-                    <TableCell className="thai-font text-xs">
-                      {record.calibratedBy || "-"}
-                    </TableCell>
-                    <TableCell className="thai-font text-xs">
-                      {record.method || "-"}
-                    </TableCell>
-                    <TableCell className="thai-font text-xs">
                       {record.nextCalibrationDate 
                         ? format(new Date(record.nextCalibrationDate), "dd/MM/yyyy")
                         : "-"
                       }
                     </TableCell>
-                    <TableCell className="thai-font text-xs max-w-[150px] truncate" title={record.remarks || ""}>
+                    <TableCell className="thai-font text-xs max-w-[200px] truncate" title={record.remarks || ""}>
                       {record.remarks || "-"}
                     </TableCell>
                   </TableRow>
