@@ -160,14 +160,14 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
 
   const onSubmit = (data: FormData) => {
     // Transform form data to API format
-    const apiData: InsertTask = {
+    const apiData = {
       ...data,
       startDate: data.startDate ? `${data.startDate}T00:00:00Z` : "",
       dueDate: data.dueDate ? `${data.dueDate}T00:00:00Z` : "",
       description: data.description || null,
-      subtasks: data.subtasks as any,
+      subtasks: data.subtasks || null,
     };
-    mutation.mutate(apiData);
+    mutation.mutate(apiData as any);
   };
 
   const handleClose = () => {
