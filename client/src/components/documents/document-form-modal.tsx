@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { insertDocumentSchema, Document, InsertDocument } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -50,7 +51,7 @@ export default function DocumentFormModal({ isOpen, onClose, document }: Documen
 
   const form = useForm<InsertDocument>({
     resolver: zodResolver(insertDocumentSchema),
-    defaultValues: document || {
+    defaultValues: {
       sequence: "",
       title: "",
       documentCode: "",
@@ -61,6 +62,36 @@ export default function DocumentFormModal({ isOpen, onClose, document }: Documen
       notes: "",
     },
   });
+
+  // Reset form when document prop changes
+  useEffect(() => {
+    if (isOpen) {
+      if (document) {
+        // Convert dates to strings for form inputs
+        const formData = {
+          ...document,
+          effectiveDate: document.effectiveDate ? new Date(document.effectiveDate).toISOString().split('T')[0] : null,
+          // Ensure all fields have proper values
+          sequence: document.sequence || "",
+          revision: document.revision || 0,
+          filePath: document.filePath || "",
+          notes: document.notes || "",
+        };
+        form.reset(formData);
+      } else {
+        form.reset({
+          sequence: "",
+          title: "",
+          documentCode: "",
+          effectiveDate: null,
+          revision: 0,
+          category: "",
+          filePath: "",
+          notes: "",
+        });
+      }
+    }
+  }, [document, isOpen, form]);
 
   const mutation = useMutation({
     mutationFn: async (data: InsertDocument) => {

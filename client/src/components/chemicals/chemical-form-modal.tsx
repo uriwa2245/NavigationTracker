@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { insertChemicalSchema, Chemical, InsertChemical } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -69,7 +70,7 @@ export default function ChemicalFormModal({
 
   const form = useForm<InsertChemical>({
     resolver: zodResolver(insertChemicalSchema),
-    defaultValues: chemical || {
+    defaultValues: {
       chemicalNo: "",
       code: "",
       casNo: "",
@@ -87,6 +88,52 @@ export default function ChemicalFormModal({
       notes: "",
     },
   });
+
+  // Reset form when chemical prop changes
+  useEffect(() => {
+    if (isOpen) {
+      if (chemical) {
+        // Convert dates to strings for form inputs
+        const formData = {
+          ...chemical,
+          receivedDate: chemical.receivedDate ? new Date(chemical.receivedDate).toISOString().split('T')[0] : null,
+          expiryDate: chemical.expiryDate ? new Date(chemical.expiryDate).toISOString().split('T')[0] : null,
+          // Ensure all fields have string values or null
+          chemicalNo: chemical.chemicalNo || "",
+          code: chemical.code || "",
+          casNo: chemical.casNo || "",
+          brand: chemical.brand || "",
+          grade: chemical.grade || "",
+          packageSize: chemical.packageSize || "",
+          lotNumber: chemical.lotNumber || "",
+          molecularFormula: chemical.molecularFormula || "",
+          molecularWeight: chemical.molecularWeight || "",
+          location: chemical.location || "",
+          category: chemical.category || defaultCategory,
+          notes: chemical.notes || "",
+        };
+        form.reset(formData);
+      } else {
+        form.reset({
+          chemicalNo: "",
+          code: "",
+          casNo: "",
+          name: "",
+          brand: "",
+          grade: "",
+          packageSize: "",
+          lotNumber: "",
+          molecularFormula: "",
+          molecularWeight: "",
+          receivedDate: null,
+          expiryDate: null,
+          location: "",
+          category: defaultCategory,
+          notes: "",
+        });
+      }
+    }
+  }, [chemical, isOpen, defaultCategory, form]);
 
   const mutation = useMutation({
     mutationFn: async (data: InsertChemical) => {

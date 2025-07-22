@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { insertTrainingSchema, Training, InsertTraining } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -66,7 +67,7 @@ export default function TrainingFormModal({ isOpen, onClose, training }: Trainin
 
   const form = useForm<InsertTraining>({
     resolver: zodResolver(insertTrainingSchema),
-    defaultValues: training || {
+    defaultValues: {
       sequence: "",
       course: "",
       startDate: null,
@@ -80,6 +81,43 @@ export default function TrainingFormModal({ isOpen, onClose, training }: Trainin
       notes: "",
     },
   });
+
+  // Reset form when training prop changes
+  useEffect(() => {
+    if (isOpen) {
+      if (training) {
+        // Convert dates to strings for form inputs
+        const formData = {
+          ...training,
+          startDate: training.startDate ? new Date(training.startDate).toISOString().split('T')[0] : null,
+          endDate: training.endDate ? new Date(training.endDate).toISOString().split('T')[0] : null,
+          acknowledgedDate: training.acknowledgedDate ? new Date(training.acknowledgedDate).toISOString().split('T')[0] : null,
+          signedDate: training.signedDate ? new Date(training.signedDate).toISOString().split('T')[0] : null,
+          // Ensure all fields have proper values
+          sequence: training.sequence || "",
+          assessmentLevel: training.assessmentLevel || null,
+          result: training.result || null,
+          trainer: training.trainer || "",
+          notes: training.notes || "",
+        };
+        form.reset(formData);
+      } else {
+        form.reset({
+          sequence: "",
+          course: "",
+          startDate: null,
+          endDate: null,
+          assessmentLevel: null,
+          result: null,
+          trainee: "",
+          acknowledgedDate: null,
+          trainer: "",
+          signedDate: null,
+          notes: "",
+        });
+      }
+    }
+  }, [training, isOpen, form]);
 
   const mutation = useMutation({
     mutationFn: async (data: InsertTraining) => {
