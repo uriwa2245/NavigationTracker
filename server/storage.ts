@@ -22,6 +22,7 @@ interface IStorage {
 
   // Tool Calibration History
   getToolCalibrationHistory(toolId: number): Promise<ToolCalibrationHistory[]>;
+  getToolCalibrationHistoryByName(toolName: string): Promise<ToolCalibrationHistory[]>;
   createToolCalibrationHistory(history: InsertToolCalibrationHistory): Promise<ToolCalibrationHistory>;
 
   // Glassware
@@ -33,6 +34,7 @@ interface IStorage {
 
   // Glassware Calibration History
   getGlasswareCalibrationHistory(glasswareId: number): Promise<GlasswareCalibrationHistory[]>;
+  getGlasswareCalibrationHistoryByType(glasswareType: string): Promise<GlasswareCalibrationHistory[]>;
   createGlasswareCalibrationHistory(history: InsertGlasswareCalibrationHistory): Promise<GlasswareCalibrationHistory>;
 
   // Chemicals
@@ -174,6 +176,35 @@ export class MemStorage implements IStorage {
       .sort((a, b) => new Date(b.calibrationDate).getTime() - new Date(a.calibrationDate).getTime());
   }
 
+  async getToolCalibrationHistoryByName(toolName: string): Promise<ToolCalibrationHistory[]> {
+    const fiveYearsAgo = new Date();
+    fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+    
+    // Find all tools with the same name
+    const toolsWithSameName = Array.from(this.tools.values())
+      .filter(tool => tool.name === toolName);
+    
+    if (toolsWithSameName.length === 0) return [];
+    
+    const toolIds = toolsWithSameName.map(tool => tool.id);
+    
+    return Array.from(this.toolCalibrationHistory.values())
+      .filter(history => 
+        toolIds.includes(history.toolId) && 
+        history.calibrationDate >= fiveYearsAgo
+      )
+      .map(history => {
+        // Add tool code/serial info to distinguish between same-name tools
+        const tool = toolsWithSameName.find(t => t.id === history.toolId);
+        return {
+          ...history,
+          toolCode: tool?.code || '',
+          toolSerial: tool?.serialNumber || ''
+        };
+      })
+      .sort((a, b) => new Date(b.calibrationDate).getTime() - new Date(a.calibrationDate).getTime());
+  }
+
   async createToolCalibrationHistory(history: InsertToolCalibrationHistory): Promise<ToolCalibrationHistory> {
     const id = this.currentId++;
     const newHistory: ToolCalibrationHistory = { 
@@ -247,6 +278,35 @@ export class MemStorage implements IStorage {
         history.glasswareId === glasswareId && 
         history.calibrationDate >= fiveYearsAgo
       )
+      .sort((a, b) => new Date(b.calibrationDate).getTime() - new Date(a.calibrationDate).getTime());
+  }
+
+  async getGlasswareCalibrationHistoryByType(glasswareType: string): Promise<GlasswareCalibrationHistory[]> {
+    const fiveYearsAgo = new Date();
+    fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+    
+    // Find all glassware with the same type
+    const glasswareWithSameType = Array.from(this.glassware.values())
+      .filter(item => item.type === glasswareType);
+    
+    if (glasswareWithSameType.length === 0) return [];
+    
+    const glasswareIds = glasswareWithSameType.map(item => item.id);
+    
+    return Array.from(this.glasswareCalibrationHistory.values())
+      .filter(history => 
+        glasswareIds.includes(history.glasswareId) && 
+        history.calibrationDate >= fiveYearsAgo
+      )
+      .map(history => {
+        // Add glassware code/lot info to distinguish between same-type items
+        const glassware = glasswareWithSameType.find(g => g.id === history.glasswareId);
+        return {
+          ...history,
+          glasswareCode: glassware?.code || '',
+          glasswareLot: glassware?.lotNumber || ''
+        };
+      })
       .sort((a, b) => new Date(b.calibrationDate).getTime() - new Date(a.calibrationDate).getTime());
   }
 

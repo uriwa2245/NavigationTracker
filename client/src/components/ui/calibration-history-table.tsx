@@ -14,11 +14,17 @@ interface CalibrationRecord {
   method?: string | null;
   remarks?: string | null;
   nextCalibrationDate?: string | Date | null;
+  // Additional fields for consolidated history
+  toolCode?: string;
+  toolSerial?: string;
+  glasswareCode?: string;
+  glasswareLot?: string;
 }
 
 interface CalibrationHistoryTableProps {
   data: CalibrationRecord[];
   title?: string;
+  isConsolidated?: boolean; // Whether to show equipment identifiers
 }
 
 const getResultBadgeStyle = (result: string) => {
@@ -52,7 +58,7 @@ const getResultBadgeStyle = (result: string) => {
   }
 };
 
-export default function CalibrationHistoryTable({ data, title = "ประวัติการสอบเทียบ" }: CalibrationHistoryTableProps) {
+export default function CalibrationHistoryTable({ data, title = "ประวัติการสอบเทียบ", isConsolidated = false }: CalibrationHistoryTableProps) {
   if (!data || data.length === 0) {
     return (
       <Card>
@@ -85,6 +91,9 @@ export default function CalibrationHistoryTable({ data, title = "ประวั
           <Table>
             <TableHeader>
               <TableRow>
+                {isConsolidated && (
+                  <TableHead className="thai-font text-xs">รหัส/Serial</TableHead>
+                )}
                 <TableHead className="thai-font text-xs">วันที่สอบเทียบ</TableHead>
                 <TableHead className="thai-font text-xs">ผลการสอบเทียบ</TableHead>
                 <TableHead className="thai-font text-xs">วันที่สอบเทียบครั้งถัดไป</TableHead>
@@ -94,8 +103,19 @@ export default function CalibrationHistoryTable({ data, title = "ประวั
             <TableBody>
               {data.map((record) => {
                 const badgeStyle = getResultBadgeStyle(record.result);
+                const identifier = record.toolCode 
+                  ? `${record.toolCode}${record.toolSerial ? ` (${record.toolSerial})` : ''}`
+                  : record.glasswareCode 
+                  ? `${record.glasswareCode}${record.glasswareLot ? ` (${record.glasswareLot})` : ''}`
+                  : '-';
+                
                 return (
                   <TableRow key={record.id}>
+                    {isConsolidated && (
+                      <TableCell className="thai-font text-xs font-medium">
+                        {identifier}
+                      </TableCell>
+                    )}
                     <TableCell className="thai-font text-xs">
                       {record.calibrationDate 
                         ? format(new Date(record.calibrationDate), "dd/MM/yyyy")

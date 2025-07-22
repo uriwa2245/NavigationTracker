@@ -127,6 +127,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Consolidated Tool Calibration History by Name
+  app.get("/api/tools/:id/calibration-history-by-name", async (req, res) => {
+    try {
+      const tool = await storage.getTool(parseInt(req.params.id));
+      if (!tool) {
+        return res.status(404).json({ message: "Tool not found" });
+      }
+      
+      const history = await storage.getToolCalibrationHistoryByName(tool.name);
+      res.json(history);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch consolidated calibration history" });
+    }
+  });
+
   // Glassware Calibration History  
   app.get("/api/glassware/:id/calibration-history", async (req, res) => {
     try {
@@ -134,6 +149,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(history);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch calibration history" });
+    }
+  });
+
+  // Consolidated Glassware Calibration History by Type
+  app.get("/api/glassware/:id/calibration-history-by-type", async (req, res) => {
+    try {
+      const glassware = await storage.getGlassware();
+      const targetItem = Array.isArray(glassware) ? glassware.find(g => g.id === parseInt(req.params.id)) : null;
+      if (!targetItem) {
+        return res.status(404).json({ message: "Glassware not found" });
+      }
+      
+      const history = await storage.getGlasswareCalibrationHistoryByType(targetItem.type);
+      res.json(history);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch consolidated calibration history" });
     }
   });
 

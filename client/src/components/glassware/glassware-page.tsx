@@ -23,7 +23,7 @@ export default function GlasswarePage() {
   });
 
   const { data: calibrationHistory } = useQuery({
-    queryKey: [`/api/glassware/${viewingGlassware?.id}/calibration-history`],
+    queryKey: [`/api/glassware/${viewingGlassware?.id}/calibration-history-by-type`],
     enabled: !!viewingGlassware?.id,
   });
 
@@ -209,7 +209,8 @@ export default function GlasswarePage() {
         additionalContent={
           <CalibrationHistoryTable 
             data={calibrationHistory as GlasswareCalibrationHistory[] || []} 
-            title="ประวัติการสอบเทียบ Glassware"
+            title={`ประวัติการสอบเทียบ ${viewingGlassware?.type || 'เครื่องแก้ว'} (รวมทุกชิ้น)`}
+            isConsolidated={true}
           />
         }
       />

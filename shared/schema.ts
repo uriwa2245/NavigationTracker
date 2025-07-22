@@ -189,6 +189,8 @@ export const qaTestResults = pgTable("qa_test_results", {
 export const insertToolSchema = createInsertSchema(tools).omit({ id: true }).extend({
   lastCalibration: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
   nextCalibration: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  repairDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  expectedReturnDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
 });
 export const insertToolCalibrationHistorySchema = createInsertSchema(toolCalibrationHistory).omit({ id: true }).extend({
   calibrationDate: z.union([z.date(), z.string().datetime()]).transform(val => new Date(val)),

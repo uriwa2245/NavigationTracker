@@ -23,7 +23,7 @@ export default function ToolsPage() {
   });
 
   const { data: calibrationHistory } = useQuery({
-    queryKey: [`/api/tools/${viewingTool?.id}/calibration-history`],
+    queryKey: [`/api/tools/${viewingTool?.id}/calibration-history-by-name`],
     enabled: !!viewingTool?.id,
   });
 
@@ -222,7 +222,8 @@ export default function ToolsPage() {
         additionalContent={
           <CalibrationHistoryTable 
             data={calibrationHistory as ToolCalibrationHistory[] || []} 
-            title="ประวัติการสอบเทียบ Tools"
+            title={`ประวัติการสอบเทียบ ${viewingTool?.name || 'เครื่องมือ'} (รวมทุกเครื่อง)`}
+            isConsolidated={true}
           />
         }
       />
