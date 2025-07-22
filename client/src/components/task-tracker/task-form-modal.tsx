@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { insertTaskSchema, Task, InsertTask } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -58,18 +59,39 @@ const responsibleOptions = [
   { value: "staff5", label: "นาย จ. สมาร์ท" },
 ];
 
+// Form schema with string dates (for HTML inputs)
+const formSchema = z.object({
+  title: z.string().min(1, "กรุณากรอกชื่องาน"),
+  description: z.string().optional(),
+  responsible: z.string().min(1, "กรุณาเลือกผู้รับผิดชอบ"),
+  startDate: z.string().optional(),
+  dueDate: z.string().optional(),
+  status: z.string().default("pending"),
+  priority: z.string().default("medium"),
+  progress: z.number().min(0).max(100).default(0),
+  subtasks: z.array(z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    responsible: z.string().optional(),
+    approved: z.boolean().default(false),
+    approvedDate: z.date().optional(),
+  })).optional(),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
 export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalProps) {
   const { toast } = useToast();
   const isEditing = !!task;
 
-  const form = useForm<InsertTask>({
-    resolver: zodResolver(insertTaskSchema),
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       description: "",
       responsible: "",
-      startDate: null,
-      dueDate: null,
+      startDate: "",
+      dueDate: "",
       status: "pending",
       priority: "medium",
       progress: 0,
@@ -86,8 +108,8 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
           title: task.title ?? "",
           description: task.description ?? "",
           responsible: task.responsible ?? "",
-          startDate: task.startDate ? new Date(task.startDate).toISOString().split('T')[0] : null,
-          dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : null,
+          startDate: task.startDate ? new Date(task.startDate).toISOString().split('T')[0] : "",
+          dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : "",
           status: task.status ?? "pending",
           priority: task.priority ?? "medium",
           progress: task.progress ?? 0,
@@ -99,8 +121,8 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
           title: "",
           description: "",
           responsible: "",
-          startDate: null,
-          dueDate: null,
+          startDate: "",
+          dueDate: "",
           status: "pending",
           priority: "medium",
           progress: 0,
@@ -111,7 +133,7 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
   }, [task, isOpen, form]);
 
   // เพิ่ม useFieldArray สำหรับ subtasks
-  const { fields: subtaskFields, append, remove, update } = useFieldArray<InsertTask>({
+  const { fields: subtaskFields, append, remove, update } = useFieldArray({
     control: form.control,
     name: "subtasks",
   });
@@ -142,20 +164,16 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
     },
   });
 
-  const onSubmit = (data: InsertTask) => {
-    // Clean data by converting empty strings to null for optional fields
-    const cleanedData = {
+  const onSubmit = (data: FormData) => {
+    // Transform form data to API format
+    const apiData: InsertTask = {
       ...data,
+      startDate: data.startDate ? data.startDate : "",
+      dueDate: data.dueDate ? data.dueDate : "",
       description: data.description || null,
-      startDate: data.startDate || null,
-      dueDate: data.dueDate || null,
-      status: data.status || null,
-      priority: data.priority || null,
-      progress: data.progress || null,
-      subtasks: data.subtasks || null,
+      subtasks: data.subtasks as any,
     };
-    
-    mutation.mutate(cleanedData);
+    mutation.mutate(apiData);
   };
 
   const handleClose = () => {
