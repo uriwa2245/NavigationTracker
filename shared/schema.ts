@@ -187,13 +187,19 @@ export const insertToolSchema = createInsertSchema(tools).omit({ id: true }).ext
   lastCalibration: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
   nextCalibration: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
 });
-export const insertToolCalibrationHistorySchema = createInsertSchema(toolCalibrationHistory).omit({ id: true });
+export const insertToolCalibrationHistorySchema = createInsertSchema(toolCalibrationHistory).omit({ id: true }).extend({
+  calibrationDate: z.union([z.date(), z.string().datetime()]).transform(val => new Date(val)),
+  nextCalibrationDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+});
 export const insertGlasswareSchema = createInsertSchema(glassware).omit({ id: true }).extend({
   receivedDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
   lastCalibration: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
   nextCalibration: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
 });
-export const insertGlasswareCalibrationHistorySchema = createInsertSchema(glasswareCalibrationHistory).omit({ id: true });
+export const insertGlasswareCalibrationHistorySchema = createInsertSchema(glasswareCalibrationHistory).omit({ id: true }).extend({
+  calibrationDate: z.union([z.date(), z.string().datetime()]).transform(val => new Date(val)),
+  nextCalibrationDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+});
 export const insertChemicalSchema = createInsertSchema(chemicals).omit({ id: true }).extend({
   receivedDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
   expiryDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
@@ -214,8 +220,16 @@ export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true }).ext
   startDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
   dueDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
 });
-export const insertQaSampleSchema = createInsertSchema(qaSamples).omit({ id: true });
-export const insertQaTestResultSchema = createInsertSchema(qaTestResults).omit({ id: true });
+export const insertQaSampleSchema = createInsertSchema(qaSamples).omit({ id: true }).extend({
+  receivedDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  dueDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+});
+export const insertQaTestResultSchema = createInsertSchema(qaTestResults).omit({ id: true }).extend({
+  dueDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  recordDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+});
+
+
 
 // Types
 export type Tool = typeof tools.$inferSelect;

@@ -5,7 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import DataTable from "@/components/ui/data-table";
 import GlasswareFormModal from "./glassware-form-modal";
 import ViewDetailsModal from "@/components/ui/view-details-modal";
-import { CalibrationHistoryTable } from "@/components/ui/calibration-history-table";
+import CalibrationHistoryTable from "@/components/ui/calibration-history-table";
 import { Glassware, GlasswareCalibrationHistory } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -185,13 +185,10 @@ export default function GlasswarePage() {
           { label: "หมายเหตุ", value: viewingGlassware.notes || "-" },
         ] : []}
         additionalContent={
-          calibrationHistory && calibrationHistory.length > 0 ? (
-            <CalibrationHistoryTable history={calibrationHistory} />
-          ) : (
-            <div className="mt-6 text-center py-8 text-muted-foreground">
-              ไม่มีประวัติการสอบเทียบ
-            </div>
-          )
+          <CalibrationHistoryTable 
+            data={calibrationHistory as GlasswareCalibrationHistory[] || []} 
+            title="ประวัติการสอบเทียบ Glassware"
+          />
         }
       />
     </div>

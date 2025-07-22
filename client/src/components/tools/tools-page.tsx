@@ -5,7 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import DataTable from "@/components/ui/data-table";
 import ToolFormModal from "./tool-form-modal";
 import ViewDetailsModal from "@/components/ui/view-details-modal";
-import { CalibrationHistoryTable } from "@/components/ui/calibration-history-table";
+import CalibrationHistoryTable from "@/components/ui/calibration-history-table";
 import { Tool, ToolCalibrationHistory } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -195,13 +195,10 @@ export default function ToolsPage() {
           { label: "สถานะเครื่องมือ", value: getToolStatus(viewingTool), highlight: true },
         ] : []}
         additionalContent={
-          (calibrationHistory as ToolCalibrationHistory[])?.length > 0 ? (
-            <CalibrationHistoryTable history={calibrationHistory as ToolCalibrationHistory[]} />
-          ) : (
-            <div className="mt-6 text-center py-8 text-muted-foreground">
-              ไม่มีประวัติการสอบเทียบ
-            </div>
-          )
+          <CalibrationHistoryTable 
+            data={calibrationHistory as ToolCalibrationHistory[] || []} 
+            title="ประวัติการสอบเทียบ Tools"
+          />
         }
       />
     </div>
