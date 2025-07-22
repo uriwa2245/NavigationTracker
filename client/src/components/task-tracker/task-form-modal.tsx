@@ -59,7 +59,7 @@ const responsibleOptions = [
   { value: "staff5", label: "นาย จ. สมาร์ท" },
 ];
 
-// Form schema with string dates (for HTML inputs)
+// Form schema for frontend (using strings for dates)
 const formSchema = z.object({
   title: z.string().min(1, "กรุณากรอกชื่องาน"),
   description: z.string().optional(),
@@ -69,13 +69,7 @@ const formSchema = z.object({
   status: z.string().default("pending"),
   priority: z.string().default("medium"),
   progress: z.number().min(0).max(100).default(0),
-  subtasks: z.array(z.object({
-    title: z.string(),
-    description: z.string().optional(),
-    responsible: z.string().optional(),
-    approved: z.boolean().default(false),
-    approvedDate: z.date().optional(),
-  })).optional(),
+  subtasks: z.array(z.any()).optional().nullable(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -95,7 +89,7 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
       status: "pending",
       priority: "medium",
       progress: 0,
-      subtasks: null,
+      subtasks: [],
     },
   });
 
@@ -126,7 +120,7 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
           status: "pending",
           priority: "medium",
           progress: 0,
-          subtasks: null,
+          subtasks: [],
         });
       }
     }
@@ -168,8 +162,8 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
     // Transform form data to API format
     const apiData: InsertTask = {
       ...data,
-      startDate: data.startDate ? data.startDate : "",
-      dueDate: data.dueDate ? data.dueDate : "",
+      startDate: data.startDate ? `${data.startDate}T00:00:00Z` : "",
+      dueDate: data.dueDate ? `${data.dueDate}T00:00:00Z` : "",
       description: data.description || null,
       subtasks: data.subtasks as any,
     };

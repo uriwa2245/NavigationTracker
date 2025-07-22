@@ -63,6 +63,13 @@ The system manages eight core entities:
   - **Visual History Display**: CalibrationHistoryTable component displays complete calibration history with color-coded status indicators
   - **Data Integrity**: Prevents duplicate history entries and maintains chronological order
 
+- **Task Tracker DateTime Fix & Work Step Approval System (July 22, 2025)**:
+  - **DateTime Validation Fix**: Resolved "Invalid datetime" error when editing tasks by implementing proper form schema with string dates and API transformation
+  - **Form Schema Separation**: Created separate form schema for frontend (string dates) and API schema transformation for backend compatibility
+  - **Work Step Approval**: Added comprehensive work step display with individual approval buttons and date tracking in task details view
+  - **Enhanced Task Details**: Task details modal now shows all subtasks with approval status, responsible parties, and approval timestamps
+  - **QA Test Results Fix**: Corrected schema validation issues for QA test result entry and editing functionality
+
 - **Enhanced Status Management System (July 21, 2025)**:
   - **Multi-select Chip Filtering**: Users can now select multiple status filters simultaneously across all data tables
   - **Color-coded Status Display**: Comprehensive color system with both badges and row background colors:
