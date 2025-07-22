@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { insertGlasswareSchema, Glassware, InsertGlassware } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -62,7 +63,7 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
 
   const form = useForm<InsertGlassware>({
     resolver: zodResolver(insertGlasswareSchema),
-    defaultValues: glassware || {
+    defaultValues: {
       code: "",
       lotNumber: "",
       type: "",
@@ -73,10 +74,63 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
       lastCalibration: null,
       nextCalibration: null,
       calibrationStatus: "",
+      calibrationResult: "",
+      calibrationCertificate: "",
+      calibrationBy: "",
+      calibrationMethod: "",
+      calibrationRemarks: "",
       responsible: "",
       notes: "",
     },
   });
+
+  // Reset form when glassware prop changes
+  useEffect(() => {
+    if (isOpen) {
+      if (glassware) {
+        // Convert dates to strings for form inputs
+        const formData = {
+          ...glassware,
+          receivedDate: glassware.receivedDate ? new Date(glassware.receivedDate).toISOString().split('T')[0] : null,
+          lastCalibration: glassware.lastCalibration ? new Date(glassware.lastCalibration).toISOString().split('T')[0] : null,
+          nextCalibration: glassware.nextCalibration ? new Date(glassware.nextCalibration).toISOString().split('T')[0] : null,
+          // Ensure all fields have string values or null
+          lotNumber: glassware.lotNumber || "",
+          class: glassware.class || "",
+          brand: glassware.brand || "",
+          calibrationStatus: glassware.calibrationStatus || "",
+          calibrationResult: glassware.calibrationResult || "",
+          calibrationCertificate: glassware.calibrationCertificate || "",
+          calibrationBy: glassware.calibrationBy || "",
+          calibrationMethod: glassware.calibrationMethod || "",
+          calibrationRemarks: glassware.calibrationRemarks || "",
+          responsible: glassware.responsible || "",
+          notes: glassware.notes || "",
+        };
+        form.reset(formData);
+      } else {
+        form.reset({
+          code: "",
+          lotNumber: "",
+          type: "",
+          class: "",
+          brand: "",
+          receivedDate: null,
+          location: "",
+          lastCalibration: null,
+          nextCalibration: null,
+          calibrationStatus: "",
+          calibrationResult: "",
+          calibrationCertificate: "",
+          calibrationBy: "",
+          calibrationMethod: "",
+          calibrationRemarks: "",
+          responsible: "",
+          notes: "",
+        });
+      }
+    }
+  }, [glassware, isOpen, form]);
 
   const mutation = useMutation({
     mutationFn: async (data: InsertGlassware) => {
@@ -340,6 +394,62 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
                           <SelectItem value="ปรับเทียบ">ปรับเทียบ</SelectItem>
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="calibrationCertificate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="thai-font">เลขที่ใบรับรอง</FormLabel>
+                      <FormControl>
+                        <Input placeholder="เลขที่ใบรับรอง" {...field} value={field.value ?? ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="calibrationBy"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="thai-font">ผู้ทำการสอบเทียบ</FormLabel>
+                      <FormControl>
+                        <Input placeholder="ชื่อผู้ทำการสอบเทียบ" {...field} value={field.value ?? ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="calibrationMethod"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="thai-font">วิธีการสอบเทียบ</FormLabel>
+                      <FormControl>
+                        <Input placeholder="วิธีการสอบเทียบ" {...field} value={field.value ?? ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="calibrationRemarks"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="thai-font">หมายเหตุผลการสอบเทียบ</FormLabel>
+                      <FormControl>
+                        <Input placeholder="หมายเหตุการสอบเทียบ" {...field} value={field.value ?? ""} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
