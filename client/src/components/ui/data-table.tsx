@@ -148,9 +148,10 @@ export default function DataTable({
 
   // Apply status filter - support multiple selections
   if (!activeStatusFilters.includes("all") && getItemStatus) {
-    filteredData = filteredData.filter((item) => 
-      activeStatusFilters.includes(getItemStatus(item))
-    );
+    filteredData = filteredData.filter((item) => {
+      const status = getItemStatus(item);
+      return status && activeStatusFilters.includes(status);
+    });
   }
 
   // Paginate data

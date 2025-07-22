@@ -212,6 +212,12 @@ export default function ToolsPage() {
           { label: "ผู้รับผิดชอบ", value: viewingTool.responsible || "-" },
           { label: "หมายเหตุ", value: viewingTool.notes || "-" },
           { label: "สถานะเครื่องมือ", value: getToolStatus(viewingTool), highlight: true },
+          // Add repair information if status is repair
+          ...(viewingTool.status === "repair" ? [
+            { label: "วันที่ส่งซ่อม", value: viewingTool.repairDate ? format(new Date(viewingTool.repairDate), "dd/MM/yyyy") : "-", highlight: true },
+            { label: "วันที่คาดว่าจะได้รับคืน", value: viewingTool.expectedReturnDate ? format(new Date(viewingTool.expectedReturnDate), "dd/MM/yyyy") : "-", highlight: true },
+            { label: "หมายเหตุการซ่อม", value: viewingTool.repairRemarks || "-", highlight: true },
+          ] : []),
         ] : []}
         additionalContent={
           <CalibrationHistoryTable 
