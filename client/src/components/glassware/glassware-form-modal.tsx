@@ -105,7 +105,26 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
   });
 
   const onSubmit = (data: InsertGlassware) => {
-    mutation.mutate(data);
+    // Clean data by converting empty strings to null for optional fields
+    const cleanedData = {
+      ...data,
+      lotNumber: data.lotNumber || null,
+      class: data.class || null,
+      brand: data.brand || null,
+      receivedDate: data.receivedDate || null,
+      lastCalibration: data.lastCalibration || null,
+      nextCalibration: data.nextCalibration || null,
+      calibrationStatus: data.calibrationStatus || null,
+      calibrationResult: data.calibrationResult || null,
+      calibrationCertificate: data.calibrationCertificate || null,
+      calibrationBy: data.calibrationBy || null,
+      calibrationMethod: data.calibrationMethod || null,
+      calibrationRemarks: data.calibrationRemarks || null,
+      responsible: data.responsible || null,
+      notes: data.notes || null,
+    };
+    
+    mutation.mutate(cleanedData);
   };
 
   const handleClose = () => {

@@ -132,7 +132,19 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
   });
 
   const onSubmit = (data: InsertTool) => {
-    mutation.mutate(data);
+    // Clean data by converting empty strings to null for optional fields
+    const cleanedData = {
+      ...data,
+      serialNumber: data.serialNumber || null,
+      range: data.range || null,
+      responsible: data.responsible || null,
+      notes: data.notes || null,
+      calibrationStatus: data.calibrationStatus || null,
+      lastCalibration: data.lastCalibration || null,
+      nextCalibration: data.nextCalibration || null,
+    };
+    
+    mutation.mutate(cleanedData);
   };
 
   const handleClose = () => {

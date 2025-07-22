@@ -122,7 +122,19 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
   });
 
   const onSubmit = (data: InsertTask) => {
-    mutation.mutate(data);
+    // Clean data by converting empty strings to null for optional fields
+    const cleanedData = {
+      ...data,
+      description: data.description || null,
+      startDate: data.startDate || null,
+      dueDate: data.dueDate || null,
+      status: data.status || null,
+      priority: data.priority || null,
+      progress: data.progress || null,
+      subtasks: data.subtasks || null,
+    };
+    
+    mutation.mutate(cleanedData);
   };
 
   const handleClose = () => {

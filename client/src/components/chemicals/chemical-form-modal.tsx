@@ -115,7 +115,25 @@ export default function ChemicalFormModal({
   });
 
   const onSubmit = (data: InsertChemical) => {
-    mutation.mutate(data);
+    // Clean data by converting empty strings to null for optional fields
+    const cleanedData = {
+      ...data,
+      chemicalNo: data.chemicalNo || null,
+      code: data.code || null,
+      casNo: data.casNo || null,
+      brand: data.brand || null,
+      grade: data.grade || null,
+      packageSize: data.packageSize || null,
+      lotNumber: data.lotNumber || null,
+      molecularFormula: data.molecularFormula || null,
+      molecularWeight: data.molecularWeight || null,
+      receivedDate: data.receivedDate || null,
+      expiryDate: data.expiryDate || null,
+      location: data.location || null,
+      notes: data.notes || null,
+    };
+    
+    mutation.mutate(cleanedData);
   };
 
   const handleClose = () => {

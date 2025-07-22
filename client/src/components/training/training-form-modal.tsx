@@ -108,7 +108,21 @@ export default function TrainingFormModal({ isOpen, onClose, training }: Trainin
   });
 
   const onSubmit = (data: InsertTraining) => {
-    mutation.mutate(data);
+    // Clean data by converting empty strings to null for optional fields
+    const cleanedData = {
+      ...data,
+      sequence: data.sequence || null,
+      startDate: data.startDate || null,
+      endDate: data.endDate || null,
+      assessmentLevel: data.assessmentLevel || null,
+      result: data.result || null,
+      acknowledgedDate: data.acknowledgedDate || null,
+      trainer: data.trainer || null,
+      signedDate: data.signedDate || null,
+      notes: data.notes || null,
+    };
+    
+    mutation.mutate(cleanedData);
   };
 
   const handleClose = () => {

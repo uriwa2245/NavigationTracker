@@ -86,7 +86,17 @@ export default function MsdsFormModal({ isOpen, onClose, msds }: MsdsFormModalPr
   });
 
   const onSubmit = (data: InsertMsds) => {
-    mutation.mutate(data);
+    // Clean data by converting empty strings to null for optional fields
+    const cleanedData = {
+      ...data,
+      sequence: data.sequence || null,
+      effectiveDate: data.effectiveDate || null,
+      revision: data.revision || null,
+      filePath: data.filePath || null,
+      notes: data.notes || null,
+    };
+    
+    mutation.mutate(cleanedData);
   };
 
   const handleClose = () => {
