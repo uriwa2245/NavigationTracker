@@ -140,10 +140,16 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
       responsible: data.responsible || null,
       notes: data.notes || null,
       calibrationStatus: data.calibrationStatus || null,
+      calibrationResult: data.calibrationResult || null,
+      calibrationCertificate: data.calibrationCertificate || null,
+      calibrationBy: data.calibrationBy || null,
+      calibrationMethod: data.calibrationMethod || null,
+      calibrationRemarks: data.calibrationRemarks || null,
       lastCalibration: data.lastCalibration || null,
       nextCalibration: data.nextCalibration || null,
     };
     
+    console.log("Cleaned tool data:", cleanedData);
     mutation.mutate(cleanedData);
   };
 

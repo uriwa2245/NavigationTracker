@@ -42,13 +42,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/tools", async (req, res) => {
     try {
+      console.log("Received tool data:", JSON.stringify(req.body, null, 2));
       const result = insertToolSchema.safeParse(req.body);
       if (!result.success) {
+        console.log("Validation errors:", result.error.issues);
         return res.status(400).json({ message: "Invalid tool data", errors: result.error.issues });
       }
       const tool = await storage.createTool(result.data);
       res.status(201).json(tool);
     } catch (error) {
+      console.log("Error creating tool:", error);
       res.status(500).json({ message: "Failed to create tool" });
     }
   });
@@ -109,13 +112,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/glassware", async (req, res) => {
     try {
+      console.log("Received glassware data:", JSON.stringify(req.body, null, 2));
       const result = insertGlasswareSchema.safeParse(req.body);
       if (!result.success) {
+        console.log("Validation errors:", result.error.issues);
         return res.status(400).json({ message: "Invalid glassware data", errors: result.error.issues });
       }
       const glassware = await storage.createGlassware(result.data);
       res.status(201).json(glassware);
     } catch (error) {
+      console.log("Error creating glassware:", error);
       res.status(500).json({ message: "Failed to create glassware" });
     }
   });

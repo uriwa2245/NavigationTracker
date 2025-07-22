@@ -124,6 +124,7 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
       notes: data.notes || null,
     };
     
+    console.log("Cleaned glassware data:", cleanedData);
     mutation.mutate(cleanedData);
   };
 
