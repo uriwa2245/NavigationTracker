@@ -1,6 +1,7 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { insertQaTestResultSchema, QaTestResult, InsertQaTestResult } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -99,32 +100,66 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
   const form = useForm<QaTestResultFormData>({
     resolver: zodResolver(qaTestResultFormSchema),
     defaultValues: {
-      sampleNo: testResult?.sampleNo || "",
-      requestNo: testResult?.requestNo || "",
-      product: testResult?.product || "",
-      dueDate: testResult?.dueDate ? format(new Date(testResult.dueDate), "yyyy-MM-dd") : "",
-      testItems: testResult?.testItems ? 
-        (testResult.testItems as any[]).map((item: any) => ({
-          testType: item.testType,
-          recordDate: item.recordDate ? format(new Date(item.recordDate), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
-          ph1: item.ph1 || "",
-          ph2: item.ph2 || "",
-          phAverage: item.phAverage || "",
-          activeIngredient1: item.activeIngredient1 || "",
-          activeIngredient2: item.activeIngredient2 || "",
-          activeIngredient3: item.activeIngredient3 || "",
-          activeIngredientAverage: item.activeIngredientAverage || "",
-          result: item.result || "",
-        })) : [
-          {
+      sampleNo: "",
+      requestNo: "",
+      product: "",
+      dueDate: "",
+      testItems: [{
+        testType: "Appearance" as const,
+        recordDate: format(new Date(), "yyyy-MM-dd"),
+        result: "",
+      }],
+      notes: "",
+    },
+  });
+
+  // Reset form when testResult prop changes
+  useEffect(() => {
+    if (isOpen) {
+      if (testResult) {
+        const formData = {
+          sampleNo: testResult.sampleNo || "",
+          requestNo: testResult.requestNo || "",
+          product: testResult.product || "",
+          dueDate: testResult.dueDate ? format(new Date(testResult.dueDate), "yyyy-MM-dd") : "",
+          testItems: testResult.testItems ? 
+            (testResult.testItems as any[]).map((item: any) => ({
+              testType: item.testType,
+              recordDate: item.recordDate ? format(new Date(item.recordDate), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
+              ph1: item.ph1 || "",
+              ph2: item.ph2 || "",
+              phAverage: item.phAverage || "",
+              activeIngredient1: item.activeIngredient1 || "",
+              activeIngredient2: item.activeIngredient2 || "",
+              activeIngredient3: item.activeIngredient3 || "",
+              activeIngredientAverage: item.activeIngredientAverage || "",
+              result: item.result || "",
+            })) : [
+              {
+                testType: "Appearance" as const,
+                recordDate: format(new Date(), "yyyy-MM-dd"),
+                result: "",
+              }
+            ],
+          notes: testResult.notes || "",
+        };
+        form.reset(formData);
+      } else {
+        form.reset({
+          sampleNo: "",
+          requestNo: "",
+          product: "",
+          dueDate: "",
+          testItems: [{
             testType: "Appearance" as const,
             recordDate: format(new Date(), "yyyy-MM-dd"),
             result: "",
-          }
-        ],
-      notes: testResult?.notes || "",
-    },
-  });
+          }],
+          notes: "",
+        });
+      }
+    }
+  }, [testResult, isOpen, form]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,

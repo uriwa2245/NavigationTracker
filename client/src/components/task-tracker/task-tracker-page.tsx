@@ -7,6 +7,7 @@ import TaskFormModal from "./task-form-modal";
 import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { Task } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Progress } from "@/components/ui/progress";
@@ -305,6 +306,56 @@ export default function TaskTrackerPage() {
           { label: "กำหนดส่ง", value: viewingTask.dueDate ? format(new Date(viewingTask.dueDate), "dd/MM/yyyy") : "-" },
           { label: "คำอธิบาย", value: viewingTask.description || "-" },
         ] : []}
+        additionalContent={viewingTask?.subtasks && Array.isArray(viewingTask.subtasks) && viewingTask.subtasks.length > 0 ? (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 thai-font">
+              ขั้นตอนการทำงาน
+            </h3>
+            <div className="space-y-3">
+              {viewingTask.subtasks.map((subtask: any, index: number) => (
+                <div key={index} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100 thai-font">
+                      {subtask.title}
+                    </h4>
+                    <div className="flex items-center gap-2">
+                      {subtask.approved ? (
+                        <Badge className="lab-badge-success">อนุมัติแล้ว</Badge>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="thai-font"
+                          onClick={() => {
+                            const updatedSubtasks = [...(viewingTask.subtasks as any[])];
+                            updatedSubtasks[index] = { ...subtask, approved: true, approvedDate: new Date() };
+                            updateTaskMutation.mutate({
+                              id: viewingTask.id,
+                              data: { subtasks: updatedSubtasks }
+                            });
+                          }}
+                        >
+                          อนุมัติ
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 thai-font mb-2">
+                    {subtask.description || "ไม่มีคำอธิบาย"}
+                  </p>
+                  <div className="text-xs text-gray-500 dark:text-gray-500 thai-font">
+                    ผู้รับผิดชอบ: {subtask.responsible || "ยังไม่ระบุ"}
+                    {subtask.approved && subtask.approvedDate && (
+                      <span className="ml-3">
+                        อนุมัติเมื่อ: {format(new Date(subtask.approvedDate), "dd/MM/yyyy HH:mm")}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
       />
     </div>
   );

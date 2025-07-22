@@ -180,7 +180,6 @@ export const qaTestResults = pgTable("qa_test_results", {
   product: text("product").notNull(),
   dueDate: timestamp("due_date").notNull(),
   testItems: json("test_items"), // Array of test item objects with results
-  recordDate: timestamp("record_date").notNull(),
   status: text("status").default("pending"), // "pending", "in_progress", "completed"
   notes: text("notes"),
 });
@@ -230,8 +229,7 @@ export const insertQaSampleSchema = createInsertSchema(qaSamples).omit({ id: tru
   dueDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
 });
 export const insertQaTestResultSchema = createInsertSchema(qaTestResults).omit({ id: true }).extend({
-  dueDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
-  recordDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  dueDate: z.union([z.date(), z.string().datetime()]).transform(val => new Date(val)),
 });
 
 
