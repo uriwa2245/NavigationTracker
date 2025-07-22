@@ -99,9 +99,21 @@ export default function GlasswarePage() {
       render: (value: string) => value ? format(new Date(value), "dd/MM/yyyy") : "-",
     },
     {
-      key: "status",
-      label: "สถานะ",
+      key: "calibrationResult",
+      label: "ผลการสอบเทียบ",
       render: (value: string, item: Glassware) => {
+        // Show calibration result if available, otherwise show calibration status
+        const result = item.calibrationResult;
+        if (result) {
+          const resultBadges = {
+            "ผ่าน": <Badge className="lab-badge-success">ผ่าน</Badge>,
+            "ไม่ผ่าน": <Badge className="lab-badge-error">ไม่ผ่าน</Badge>,
+            "ปรับเทียบ": <Badge className="lab-badge-warning">ปรับเทียบ</Badge>
+          };
+          return resultBadges[result as keyof typeof resultBadges] || <Badge className="lab-badge-info">{result}</Badge>;
+        }
+        
+        // Fallback to calibration status
         const status = getCalibrationStatus(item);
         const statusBadges = {
           "ปกติ": <Badge className="lab-badge-success">ปกติ</Badge>,
@@ -156,17 +168,19 @@ export default function GlasswarePage() {
         onDelete={handleDelete}
         isLoading={isLoading}
         statusFilters={[
-          { key: "ปกติ", label: "ปกติ", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "ปกติ").length : 0 },
-          { key: "ใกล้ครบกำหนด", label: "ใกล้ครบกำหนด", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "ใกล้ครบกำหนด").length : 0 },
+          { key: "ผ่าน", label: "ผ่าน", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => item.calibrationResult === "ผ่าน").length : 0 },
+          { key: "ไม่ผ่าน", label: "ไม่ผ่าน", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => item.calibrationResult === "ไม่ผ่าน").length : 0 },
+          { key: "ปรับเทียบ", label: "ปรับเทียบ", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => item.calibrationResult === "ปรับเทียบ").length : 0 },
           { key: "เลยกำหนด", label: "เลยกำหนด", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "เลยกำหนด").length : 0 },
         ]}
         getItemStatus={(item: Glassware) => {
-          const calibrationStatus = getCalibrationStatus(item);
-          
           // Check calibration result first
           if (item.calibrationResult === "ไม่ผ่าน") return "ไม่ผ่าน";
+          if (item.calibrationResult === "ผ่าน") return "ผ่าน";
+          if (item.calibrationResult === "ปรับเทียบ") return "ปรับเทียบ";
           
-          // Return calibration status that matches color mapping
+          // Fallback to calibration status
+          const calibrationStatus = getCalibrationStatus(item);
           return calibrationStatus;
         }}
       />

@@ -22,6 +22,9 @@ export const tools = pgTable("tools", {
   responsible: text("responsible"),
   notes: text("notes"),
   status: text("status").default("active"), // "active", "repair", "retired"
+  repairDate: timestamp("repair_date"), // วันที่ส่งซ่อม
+  expectedReturnDate: timestamp("expected_return_date"), // วันที่คาดว่าจะได้รับคืน
+  repairRemarks: text("repair_remarks"), // หมายเหตุการซ่อม
 });
 
 // Glassware

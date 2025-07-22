@@ -67,6 +67,9 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
       responsible: "",
       notes: "",
       status: "active",
+      repairDate: null,
+      expectedReturnDate: null,
+      repairRemarks: "",
     },
   });
 
@@ -86,6 +89,9 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
         responsible: tool.responsible || "",
         notes: tool.notes || "",
         status: tool.status || "active",
+        repairDate: tool.repairDate || null,
+        expectedReturnDate: tool.expectedReturnDate || null,
+        repairRemarks: tool.repairRemarks || "",
       });
     } else {
       form.reset({
@@ -101,6 +107,9 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
         responsible: "",
         notes: "",
         status: "active",
+        repairDate: null,
+        expectedReturnDate: null,
+        repairRemarks: "",
       });
     }
   }, [tool, form]);
@@ -147,6 +156,9 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
       calibrationRemarks: (data.calibrationRemarks && data.calibrationRemarks !== "-") ? data.calibrationRemarks : null,
       lastCalibration: data.lastCalibration || null,
       nextCalibration: data.nextCalibration || null,
+      repairRemarks: (data.repairRemarks && data.repairRemarks !== "-") ? data.repairRemarks : null,
+      repairDate: data.repairDate || null,
+      expectedReturnDate: data.expectedReturnDate || null,
     };
     
     mutation.mutate(cleanedData);
@@ -350,7 +362,97 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
                   )}
                 />
 
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="thai-font">สถานะเครื่องมือ</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || "active"}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="เลือกสถานะ" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="active">ใช้งานได้</SelectItem>
+                          <SelectItem value="inactive">ไม่ใช้งาน</SelectItem>
+                          <SelectItem value="repair">ส่งซ่อม</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
             </div>
+
+            {/* Repair Section - Only show if status is 'repair' */}
+            {form.watch("status") === "repair" && (
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 thai-font">
+                  ข้อมูลการส่งซ่อม
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="repairDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="thai-font">วันที่ส่งซ่อม *</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            {...field}
+                            value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''}
+                            onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="expectedReturnDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="thai-font">วันที่คาดว่าจะได้รับคืน *</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            {...field}
+                            value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''}
+                            onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="repairRemarks"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel className="thai-font">หมายเหตุการซ่อม</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            rows={3}
+                            placeholder="รายละเอียดการซ่อม, สาเหตุ, หรือข้อมูลเพิ่มเติม..."
+                            {...field}
+                            value={field.value ?? ""}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

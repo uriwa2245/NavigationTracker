@@ -111,7 +111,7 @@ export default function ToolsPage() {
     },
     {
       key: "status",
-      label: "สถานะ",
+      label: "สถานะเครื่องมือ",
       render: (value: string, tool: Tool) => {
         const statusBadges = {
           "active": <Badge className="lab-badge-success">ใช้งานได้</Badge>,
