@@ -75,10 +75,6 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
       nextCalibration: null,
       calibrationStatus: "",
       calibrationResult: "",
-      calibrationCertificate: "",
-      calibrationBy: "",
-      calibrationMethod: "",
-      calibrationRemarks: "",
       responsible: "",
       notes: "",
     },
@@ -100,10 +96,6 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
           brand: glassware.brand || "",
           calibrationStatus: glassware.calibrationStatus || "",
           calibrationResult: glassware.calibrationResult || "",
-          calibrationCertificate: glassware.calibrationCertificate || "",
-          calibrationBy: glassware.calibrationBy || "",
-          calibrationMethod: glassware.calibrationMethod || "",
-          calibrationRemarks: glassware.calibrationRemarks || "",
           responsible: glassware.responsible || "",
           notes: glassware.notes || "",
         };
@@ -121,10 +113,6 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
           nextCalibration: null,
           calibrationStatus: "",
           calibrationResult: "",
-          calibrationCertificate: "",
-          calibrationBy: "",
-          calibrationMethod: "",
-          calibrationRemarks: "",
           responsible: "",
           notes: "",
         });
@@ -170,10 +158,6 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
       nextCalibration: data.nextCalibration || null,
       calibrationStatus: data.calibrationStatus || null,
       calibrationResult: data.calibrationResult || null,
-      calibrationCertificate: data.calibrationCertificate || null,
-      calibrationBy: data.calibrationBy || null,
-      calibrationMethod: data.calibrationMethod || null,
-      calibrationRemarks: data.calibrationRemarks || null,
       responsible: data.responsible || null,
       notes: data.notes || null,
     };
@@ -394,62 +378,6 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
                           <SelectItem value="ปรับเทียบ">ปรับเทียบ</SelectItem>
                         </SelectContent>
                       </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="calibrationCertificate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="thai-font">เลขที่ใบรับรอง</FormLabel>
-                      <FormControl>
-                        <Input placeholder="เลขที่ใบรับรอง" {...field} value={field.value ?? ""} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="calibrationBy"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="thai-font">ผู้ทำการสอบเทียบ</FormLabel>
-                      <FormControl>
-                        <Input placeholder="ชื่อผู้ทำการสอบเทียบ" {...field} value={field.value ?? ""} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="calibrationMethod"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="thai-font">วิธีการสอบเทียบ</FormLabel>
-                      <FormControl>
-                        <Input placeholder="วิธีการสอบเทียบ" {...field} value={field.value ?? ""} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="calibrationRemarks"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="thai-font">หมายเหตุผลการสอบเทียบ</FormLabel>
-                      <FormControl>
-                        <Input placeholder="หมายเหตุการสอบเทียบ" {...field} value={field.value ?? ""} />
-                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
