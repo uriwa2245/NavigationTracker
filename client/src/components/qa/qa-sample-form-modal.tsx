@@ -1,6 +1,7 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { insertQaSampleSchema, QaSample, InsertQaSample } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -115,10 +116,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
 
   const form = useForm<QaSampleFormData>({
     resolver: zodResolver(qaSampleFormSchema),
-    defaultValues: qaSample ? {
-      ...qaSample,
-      samples: defaultSamples,
-    } : {
+    defaultValues: {
       requestNo: "",
       receivedTime: "",
       receivedDate: new Date(),
@@ -137,6 +135,81 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
       status: "received",
     },
   });
+
+  // Reset form when qaSample prop changes
+  useEffect(() => {
+    if (isOpen) {
+      if (qaSample) {
+        const formSamples = Array.isArray(qaSample?.samples) && qaSample?.samples.length > 0
+          ? qaSample.samples.map((sample: any) => ({
+              ...sample,
+              itemTests: sample.itemTests && Array.isArray(sample.itemTests) && sample.itemTests.length > 0
+                ? sample.itemTests
+                : [{ itemTest: "", unit: "" }],
+            }))
+          : [
+              {
+                sampleNo: "",
+                name: "",
+                description: "",
+                analysisRequest: "",
+                itemTests: [{ itemTest: "", unit: "" }],
+              },
+            ];
+        
+        const formData = {
+          ...qaSample,
+          receivedDate: qaSample.receivedDate ? new Date(qaSample.receivedDate) : new Date(),
+          dueDate: qaSample.dueDate ? new Date(qaSample.dueDate) : new Date(),
+          samples: formSamples,
+          // Ensure string fields are not null
+          requestNo: qaSample.requestNo || "",
+          receivedTime: qaSample.receivedTime || "",
+          quotationNo: qaSample.quotationNo || "",
+          contactPerson: qaSample.contactPerson || "",
+          phone: qaSample.phone || "",
+          email: qaSample.email || "",
+          companyName: qaSample.companyName || "",
+          address: qaSample.address || "",
+          deliveryMethod: qaSample.deliveryMethod || "",
+          storage: qaSample.storage || "",
+          postTesting: qaSample.postTesting || "",
+          condition: qaSample.condition || "",
+          status: qaSample.status || "received",
+        };
+        form.reset(formData);
+      } else {
+        const defaultFormSamples = [
+          {
+            sampleNo: "",
+            name: "",
+            description: "",
+            analysisRequest: "",
+            itemTests: [{ itemTest: "", unit: "" }],
+          },
+        ];
+        
+        form.reset({
+          requestNo: "",
+          receivedTime: "",
+          receivedDate: new Date(),
+          dueDate: new Date(),
+          quotationNo: "",
+          contactPerson: "",
+          phone: "",
+          email: "",
+          companyName: "",
+          address: "",
+          deliveryMethod: "",
+          samples: defaultFormSamples,
+          storage: "",
+          postTesting: "",
+          condition: "",
+          status: "received",
+        });
+      }
+    }
+  }, [qaSample, isOpen, form]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,

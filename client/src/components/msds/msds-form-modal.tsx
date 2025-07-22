@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { insertMsdsSchema, Msds, InsertMsds } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -47,7 +48,7 @@ export default function MsdsFormModal({ isOpen, onClose, msds }: MsdsFormModalPr
 
   const form = useForm<InsertMsds>({
     resolver: zodResolver(insertMsdsSchema),
-    defaultValues: msds || {
+    defaultValues: {
       sequence: "",
       title: "",
       documentCode: "",
@@ -58,6 +59,36 @@ export default function MsdsFormModal({ isOpen, onClose, msds }: MsdsFormModalPr
       notes: "",
     },
   });
+
+  // Reset form when msds prop changes
+  useEffect(() => {
+    if (isOpen) {
+      if (msds) {
+        // Convert dates to strings for form inputs
+        const formData = {
+          ...msds,
+          effectiveDate: msds.effectiveDate ? new Date(msds.effectiveDate).toISOString().split('T')[0] : null,
+          // Ensure all fields have proper values
+          sequence: msds.sequence || "",
+          revision: msds.revision || 0,
+          filePath: msds.filePath || "",
+          notes: msds.notes || "",
+        };
+        form.reset(formData);
+      } else {
+        form.reset({
+          sequence: "",
+          title: "",
+          documentCode: "",
+          effectiveDate: null,
+          revision: 0,
+          category: "",
+          filePath: "",
+          notes: "",
+        });
+      }
+    }
+  }, [msds, isOpen, form]);
 
   const mutation = useMutation({
     mutationFn: async (data: InsertMsds) => {

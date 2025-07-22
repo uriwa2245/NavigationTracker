@@ -1,6 +1,7 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { insertTaskSchema, Task, InsertTask } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -63,20 +64,38 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
 
   const form = useForm<InsertTask>({
     resolver: zodResolver(insertTaskSchema),
-    defaultValues: task
-      ? {
-          // Exclude 'id' and ensure 'subtasks' is not unknown
+    defaultValues: {
+      title: "",
+      description: "",
+      responsible: "",
+      startDate: null,
+      dueDate: null,
+      status: "pending",
+      priority: "medium",
+      progress: 0,
+      subtasks: null,
+    },
+  });
+
+  // Reset form when task prop changes
+  useEffect(() => {
+    if (isOpen) {
+      if (task) {
+        // Convert dates to strings for form inputs
+        const formData = {
           title: task.title ?? "",
           description: task.description ?? "",
           responsible: task.responsible ?? "",
-          startDate: task.startDate ?? null,
-          dueDate: task.dueDate ?? null,
+          startDate: task.startDate ? new Date(task.startDate).toISOString().split('T')[0] : null,
+          dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : null,
           status: task.status ?? "pending",
           priority: task.priority ?? "medium",
           progress: task.progress ?? 0,
-          subtasks: (task.subtasks ?? null) as any, // Cast to any if needed, or use correct type
-        }
-      : {
+          subtasks: (task.subtasks ?? null) as any,
+        };
+        form.reset(formData);
+      } else {
+        form.reset({
           title: "",
           description: "",
           responsible: "",
@@ -86,8 +105,10 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
           priority: "medium",
           progress: 0,
           subtasks: null,
-        },
-  });
+        });
+      }
+    }
+  }, [task, isOpen, form]);
 
   // เพิ่ม useFieldArray สำหรับ subtasks
   const { fields: subtaskFields, append, remove, update } = useFieldArray<InsertTask>({
