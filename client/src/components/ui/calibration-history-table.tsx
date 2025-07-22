@@ -30,10 +30,18 @@ const getResultBadgeStyle = (result: string) => {
         icon: <CheckCircle className="w-3 h-3" />
       };
     case "ไม่ผ่าน":
+    case "ส่งซ่อม":
+    case "เลยกำหนด":
       return {
         variant: "destructive" as const,
         className: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 border-red-200 dark:border-red-800",
         icon: <XCircle className="w-3 h-3" />
+      };
+    case "ปรับเทียบ":
+      return {
+        variant: "outline" as const,
+        className: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800",
+        icon: <AlertTriangle className="w-3 h-3" />
       };
     default:
       return {
@@ -69,7 +77,7 @@ export default function CalibrationHistoryTable({ data, title = "ประวั
       <CardHeader>
         <CardTitle className="text-lg thai-font flex items-center gap-2">
           <Calendar className="w-5 h-5 text-lab-primary" />
-          {title} ({data.length} รายการ)
+          {title} ( {data.length} รายการ )
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -79,7 +87,7 @@ export default function CalibrationHistoryTable({ data, title = "ประวั
               <TableRow>
                 <TableHead className="thai-font text-xs">วันที่สอบเทียบ</TableHead>
                 <TableHead className="thai-font text-xs">ผลการสอบเทียบ</TableHead>
-                <TableHead className="thai-font text-xs">วันครบรอบถัดไป</TableHead>
+                <TableHead className="thai-font text-xs">วันที่สอบเทียบครั้งถัดไป</TableHead>
                 <TableHead className="thai-font text-xs">หมายเหตุ</TableHead>
               </TableRow>
             </TableHeader>

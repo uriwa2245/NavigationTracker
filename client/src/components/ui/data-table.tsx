@@ -49,6 +49,9 @@ const getStatusChipStyle = (status: string) => {
     case "overdue":
     case "failed":
     case "cancelled":
+    case "ส่งซ่อม":
+    case "ไม่ผ่าน":
+    case "เลยกำหนด":
       return "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border-red-300 dark:border-red-700";
     case "ใกล้หมดอายุ":
     case "due_soon":
@@ -59,6 +62,7 @@ const getStatusChipStyle = (status: string) => {
     case "active":
     case "completed":
     case "passed":
+    case "ผ่าน":
       return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border-green-300 dark:border-green-700";
     case "inactive":
     case "received":
@@ -79,6 +83,8 @@ const getRowColorClass = (status: string | null) => {
     case "failed":
     case "cancelled":
     case "ไม่ผ่าน":
+    case "ส่งซ่อม":
+    case "เลยกำหนด":
       return "table-row-error";
     case "ใกล้หมดอายุ":
     case "due_soon":
