@@ -221,14 +221,14 @@ export const insertMsdsSchema = createInsertSchema(msds).omit({ id: true }).exte
   effectiveDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
 });
 export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true }).extend({
-  startDate: z.union([z.date(), z.string().datetime(), z.string().length(0), z.null()]).transform(val => {
-    if (!val || val === "") return null;
+  startDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => {
+    if (!val) return null;
     return new Date(val);
-  }),
-  dueDate: z.union([z.date(), z.string().datetime(), z.string().length(0), z.null()]).transform(val => {
-    if (!val || val === "") return null;
+  }).optional().nullable(),
+  dueDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => {
+    if (!val) return null;
     return new Date(val);
-  }),
+  }).optional().nullable(),
 });
 export const insertQaSampleSchema = createInsertSchema(qaSamples).omit({ id: true }).extend({
   receivedDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),

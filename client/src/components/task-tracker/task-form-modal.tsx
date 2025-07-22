@@ -107,7 +107,7 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
           status: task.status ?? "pending",
           priority: task.priority ?? "medium",
           progress: task.progress ?? 0,
-          subtasks: (task.subtasks ?? null) as any,
+          subtasks: Array.isArray(task.subtasks) ? task.subtasks : [],
         };
         form.reset(formData);
       } else {
@@ -159,14 +159,22 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
   });
 
   const onSubmit = (data: FormData) => {
+    console.log("Form data received:", data);
+    
     // Transform form data to API format
     const apiData = {
-      ...data,
-      startDate: data.startDate ? `${data.startDate}T00:00:00Z` : "",
-      dueDate: data.dueDate ? `${data.dueDate}T00:00:00Z` : "",
+      title: data.title,
+      responsible: data.responsible,
+      status: data.status || "pending",
+      priority: data.priority || "medium", 
+      progress: data.progress || 0,
       description: data.description || null,
-      subtasks: data.subtasks || null,
+      startDate: data.startDate && data.startDate !== "" ? `${data.startDate}T00:00:00Z` : null,
+      dueDate: data.dueDate && data.dueDate !== "" ? `${data.dueDate}T00:00:00Z` : null,
+      subtasks: Array.isArray(data.subtasks) && data.subtasks.length > 0 ? data.subtasks : null,
     };
+    
+    console.log("API data to send:", apiData);
     mutation.mutate(apiData as any);
   };
 
