@@ -160,7 +160,15 @@ export default function GlasswarePage() {
           { key: "ใกล้ครบกำหนด", label: "ใกล้ครบกำหนด", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "ใกล้ครบกำหนด").length : 0 },
           { key: "เลยกำหนด", label: "เลยกำหนด", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "เลยกำหนด").length : 0 },
         ]}
-        getItemStatus={(item: Glassware) => getCalibrationStatus(item)}
+        getItemStatus={(item: Glassware) => {
+          const calibrationStatus = getCalibrationStatus(item);
+          
+          // Check calibration result first
+          if (item.calibrationResult === "ไม่ผ่าน") return "ไม่ผ่าน";
+          
+          // Return calibration status that matches color mapping
+          return calibrationStatus;
+        }}
       />
 
       <GlasswareFormModal

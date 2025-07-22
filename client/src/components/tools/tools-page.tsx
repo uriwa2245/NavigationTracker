@@ -170,7 +170,26 @@ export default function ToolsPage() {
           { key: "inactive", label: "ไม่ใช้งาน", count: Array.isArray(tools) ? tools.filter((tool: Tool) => tool.status === "inactive").length : 0 },
           { key: "repair", label: "ซ่อมแซม", count: Array.isArray(tools) ? tools.filter((tool: Tool) => tool.status === "repair").length : 0 },
         ]}
-        getItemStatus={(tool: Tool) => tool.status || "active"}
+        getItemStatus={(tool: Tool) => {
+          // Return status that matches DataTable color mapping
+          if (tool.status === "repair") return "ส่งซ่อม";
+          if (tool.status === "active") return "ใช้งานได้";
+          if (tool.status === "inactive") return "ไม่ใช้งาน";
+          
+          // Check calibration status for expired items
+          if (tool.nextCalibration) {
+            const now = new Date();
+            const nextCalibration = new Date(tool.nextCalibration);
+            const daysUntil = Math.ceil((nextCalibration.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+            if (daysUntil < 0) return "เลยกำหนด";
+            if (daysUntil <= 30) return "ใกล้หมดอายุ";
+          }
+          
+          // Check calibration result
+          if (tool.calibrationResult === "ไม่ผ่าน") return "ไม่ผ่าน";
+          
+          return "ปกติ";
+        }}
       />
 
       <ToolFormModal
