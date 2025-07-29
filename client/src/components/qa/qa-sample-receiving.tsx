@@ -190,30 +190,60 @@ export default function QaSampleReceiving() {
         data={viewingSample ? [
           // กลุ่มข้อมูลการรับตัวอย่าง
           {
-            label: "📝 ข้อมูลการรับตัวอย่าง",
-            value: ""
+            label: "ข้อมูลการรับตัวอย่าง",
+            value: "",
+            type: "header"
           },
-          { label: "Request No", value: viewingSample.requestNo },
-          { label: "เลขที่ใบเสนอราคา", value: viewingSample.quotationNo || "-" },
           { 
-            label: "วันที่และเวลารับตัวอย่าง", 
-            value: `${viewingSample.receivedDate ? format(new Date(viewingSample.receivedDate), "dd/MM/yyyy") : "-"} ${viewingSample.receivedTime || ""}`
+            label: "Request No", 
+            value: viewingSample.requestNo,
+            highlight: true
+          },
+          { 
+            label: "เลขที่ใบเสนอราคา", 
+            value: viewingSample.quotationNo || "-"
+          },
+          { 
+            label: "วันที่รับตัวอย่าง", 
+            value: viewingSample.receivedDate ? format(new Date(viewingSample.receivedDate), "dd/MM/yyyy") : "-"
+          },
+          { 
+            label: "เวลารับตัวอย่าง", 
+            value: viewingSample.receivedTime || "-"
           },
           { 
             label: "วันครบกำหนด", 
-            value: viewingSample.dueDate ? format(new Date(viewingSample.dueDate), "dd/MM/yyyy") : "-"
+            value: viewingSample.dueDate ? format(new Date(viewingSample.dueDate), "dd/MM/yyyy") : "-",
+            highlight: viewingSample.dueDate ? getDaysUntilDue(viewingSample.dueDate.toString()) <= 3 : false
           },
 
           // กลุ่มข้อมูลผู้ใช้บริการ
           {
-            label: "👤 ข้อมูลผู้ใช้บริการ",
-            value: ""
+            label: "ข้อมูลผู้ใช้บริการ",
+            value: "",
+            type: "header"
           },
-          { label: "ชื่อบริษัท", value: viewingSample.companyName },
-          { label: "ผู้ติดต่อ", value: viewingSample.contactPerson },
-          { label: "เบอร์โทรศัพท์", value: viewingSample.phone },
-          { label: "อีเมล", value: viewingSample.email },
-          { label: "ที่อยู่", value: viewingSample.address || "-" },
+          { 
+            label: "ชื่อบริษัท", 
+            value: viewingSample.companyName,
+            highlight: true
+          },
+          { 
+            label: "ผู้ติดต่อ", 
+            value: viewingSample.contactPerson
+          },
+          { 
+            label: "เบอร์โทรศัพท์", 
+            value: viewingSample.phone
+          },
+          { 
+            label: "อีเมล", 
+            value: viewingSample.email
+          },
+          { 
+            label: "ที่อยู่", 
+            value: viewingSample.address || "-"
+          },
           { 
             label: "การจัดส่งผลการทดสอบ", 
             value: getDeliveryMethodLabel(viewingSample.deliveryMethod)
@@ -221,8 +251,9 @@ export default function QaSampleReceiving() {
 
           // กลุ่มข้อมูลการจัดการตัวอย่าง
           {
-            label: "📦 การจัดการตัวอย่าง",
-            value: ""
+            label: "การจัดการตัวอย่าง",
+            value: "",
+            type: "header"
           },
           { 
             label: "การเก็บรักษา", 
@@ -241,22 +272,24 @@ export default function QaSampleReceiving() {
 
           // กลุ่มรายละเอียดตัวอย่าง
           {
-            label: "🧪 รายละเอียดตัวอย่าง",
-            value: ""
+            label: "รายละเอียดตัวอย่าง",
+            value: "",
+            type: "header"
           },
           { 
             label: "จำนวนตัวอย่าง", 
-            value: Array.isArray(viewingSample.samples) ? viewingSample.samples.length : 0
+            value: `${Array.isArray(viewingSample.samples) ? viewingSample.samples.length : 0} รายการ`,
+            highlight: true
           },
           ...((Array.isArray(viewingSample.samples) ? viewingSample.samples : [])?.map((sample, index) => ({
             label: `ตัวอย่างที่ ${index + 1}`,
             value: [
-              `🏷️ Sample No: ${sample.sampleNo}`,
-              `📋 Sample Name: ${sample.name}`,
-              `🔍 Id_No/Batch_No: ${sample.analysisRequest || "-"}`,
-              `📊 รายการทดสอบ:`,
-              sample.itemTests?.map((test: { itemTest: any; specification: any; unit: any; }) => 
-                `   • ${test.itemTest} (${test.specification || "-"}) ${test.unit || "-"}`
+              `Sample No: ${sample.sampleNo}`,
+              `Sample Name: ${Array.isArray(sample.names) ? sample.names.join(", ") : sample.name || "-"}`,
+              `Id_No/Batch_No: ${sample.analysisRequest || "-"}`,
+              `รายการทดสอบ:`,
+              sample.itemTests?.map((test: { itemTest: any; specification: any; unit: any; method: any; }) => 
+                `   • ${test.itemTest}${test.specification ? ` (${test.specification})` : ""}${test.unit ? ` ${test.unit}` : ""}${test.method ? ` - ${test.method}` : ""}`
               ).join("\n") || "-"
             ].join("\n")
           })) || [])

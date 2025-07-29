@@ -22,7 +22,11 @@ export function log(message: string, source = "express") {
 export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
     middlewareMode: true,
-    hmr: { server },
+    hmr: process.env.DISABLE_HMR === 'true' ? false : { 
+      server,
+      port: process.env.VITE_HMR_PORT ? parseInt(process.env.VITE_HMR_PORT) : 24678,
+      host: process.env.VITE_HMR_HOST || 'localhost'
+    },
     allowedHosts: true as const,
   };
 

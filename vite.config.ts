@@ -15,6 +15,9 @@ export default defineConfig({
         ]
       : []),
   ],
+  define: {
+    __DEV__: process.env.NODE_ENV === 'development',
+  },
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
@@ -28,9 +31,9 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    hmr: {
-      clientPort: 443,
-      host: true,
+    hmr: process.env.DISABLE_HMR === 'true' ? false : {
+      port: process.env.VITE_HMR_PORT ? parseInt(process.env.VITE_HMR_PORT) : 24678,
+      host: process.env.VITE_HMR_HOST || 'localhost',
     },
     fs: {
       strict: true,

@@ -43,14 +43,15 @@ interface QaSampleFormModalProps {
 const qaSampleFormSchema = insertQaSampleSchema.extend({
   samples: z.array(z.object({
     sampleNo: z.string().min(1, "Sample No จำเป็นต้องระบุ"),
-    name: z.string().min(1, "ชื่อตัวอย่างจำเป็นต้องระบุ"),
+    names: z.array(z.string()).min(1, "ต้องระบุชื่อตัวอย่างอย่างน้อย 1 ชื่อ"), // Changed from name to names
     description: z.string().optional(),
     analysisRequest: z.string().optional(),
     itemTests: z.array(z.object({
       itemTest: z.string().min(1, "Item Test จำเป็นต้องเลือก"),
       specification: z.string().optional(),
       unit: z.string().min(1, "Unit จำเป็นต้องระบุ"),
-      method: z.string().optional()
+      method: z.string().optional(),
+      sampleName: z.string().optional(),
     })).min(1, "ต้องมี Item Test อย่างน้อย 1 รายการ"),
   })).min(1, "ต้องมีตัวอย่างอย่างน้อย 1 รายการ"),
 });
@@ -100,17 +101,18 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
   const defaultSamples = Array.isArray(qaSample?.samples) && qaSample?.samples.length > 0
     ? qaSample.samples.map((sample: any) => ({
       ...sample,
+      names: Array.isArray(sample.names) ? sample.names : [sample.name || ""], // Convert old name to names array
       itemTests: sample.itemTests && Array.isArray(sample.itemTests) && sample.itemTests.length > 0
         ? sample.itemTests
-        : [{ itemTest: "", unit: "" }],
+        : [{ itemTest: "", unit: "", specification: "", method: "", sampleName: "" }],
     }))
     : [
       {
         sampleNo: "",
-        name: "",
+        names: [""], // Initialize with empty array containing one empty string
         description: "",
         analysisRequest: "",
-        itemTests: [{ itemTest: "", unit: "" }],
+        itemTests: [{ itemTest: "", unit: "", specification: "", method: "", sampleName: "" }],
       },
     ];
 
@@ -145,15 +147,15 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
               ...sample,
               itemTests: sample.itemTests && Array.isArray(sample.itemTests) && sample.itemTests.length > 0
                 ? sample.itemTests
-                : [{ itemTest: "", unit: "" }],
+                : [{ itemTest: "", unit: "", specification: "", method: "", sampleName: "" }],
             }))
           : [
               {
                 sampleNo: "",
-                name: "",
+                names: [""], // Changed from name to names
                 description: "",
                 analysisRequest: "",
-                itemTests: [{ itemTest: "", unit: "" }],
+                itemTests: [{ itemTest: "", unit: "", specification: "", method: "", sampleName: "" }],
               },
             ];
         
@@ -182,10 +184,10 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
         const defaultFormSamples = [
           {
             sampleNo: "",
-            name: "",
+            names: [""], // Changed from name to names
             description: "",
             analysisRequest: "",
-            itemTests: [{ itemTest: "", unit: "" }],
+            itemTests: [{ itemTest: "", unit: "", specification: "", method: "", sampleName: "" }],
           },
         ];
         
@@ -259,10 +261,10 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
   const addSample = () => {
     append({
       sampleNo: "",
-      name: "",
+      names: [""], // Changed from name to names
       description: "",
       analysisRequest: "",
-      itemTests: [{ itemTest: "", specification: "", unit: "", method: "" }],
+      itemTests: [{ itemTest: "", unit: "", specification: "", method: "", sampleName: "" }],
     });
   };
 
@@ -532,19 +534,61 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                           )}
                         />
 
-                        <FormField
-                          control={form.control}
-                          name={`samples.${index}.name`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="thai-font">Sample Name *</FormLabel>
-                              <FormControl>
-                                <Input placeholder="ชื่อตัวอย่าง" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        {/* Replace the single name FormField with this new implementation */}
+                        <div className="space-y-2">
+                          <FormLabel className="thai-font">Sample Name *</FormLabel>
+                          {form.watch(`samples.${index}.names`)?.map((_, nameIdx) => (
+                            <div key={nameIdx} className="flex gap-2">
+                              <FormField
+                                control={form.control}
+                                name={`samples.${index}.names.${nameIdx}`}
+                                render={({ field }) => (
+                                  <FormItem className="flex-1">
+                                    <FormControl>
+                                      <Input placeholder="ชื่อตัวอย่าง" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <div className="flex gap-2">
+                                {/* Add name button */}
+                                {nameIdx === form.watch(`samples.${index}.names`).length - 1 && (
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      const current = form.getValues(`samples.${index}.names`);
+                                      form.setValue(`samples.${index}.names`, [...current, ""]);
+                                    }}
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                  </Button>
+                                )}
+                                {/* Remove name button */}
+                                {form.watch(`samples.${index}.names`).length > 1 && (
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      const current = form.getValues(`samples.${index}.names`);
+                                      if (current.length > 1) {
+                                        form.setValue(
+                                          `samples.${index}.names`,
+                                          current.filter((_, i) => i !== nameIdx)
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
 
                         <FormField
                           control={form.control}
@@ -570,7 +614,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                             size="sm"
                             onClick={() => form.setValue(`samples.${index}.itemTests`, [
                               ...form.getValues(`samples.${index}.itemTests`),
-                              { itemTest: "", specification: "", unit: "",  method: "" },
+                              { itemTest: "", unit: "", specification: "", method: "", sampleName: "" },
                             ])}
                           >
                             <Plus className="w-4 h-4 mr-1" />
@@ -579,7 +623,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                         </div>
 
                         {form.watch(`samples.${index}.itemTests`)?.map((_, itemIdx) => (
-                          <div key={itemIdx} className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-2">
+                          <div key={itemIdx} className="grid grid-cols-1 md:grid-cols-6 gap-4 mt-2">
                             <FormField
                               control={form.control}
                               name={`samples.${index}.itemTests.${itemIdx}.itemTest`}
@@ -642,6 +686,8 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                                 </FormItem>
                               )}
                             />
+
+
 
                             {form.watch(`samples.${index}.itemTests`)?.length > 1 && (
                               <Button

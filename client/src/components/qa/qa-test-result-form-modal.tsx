@@ -1,8 +1,8 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { insertQaTestResultSchema, QaTestResult, InsertQaTestResult } from "@shared/schema";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { insertQaTestResultSchema, QaTestResult, InsertQaTestResult, QaSample } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -55,6 +55,7 @@ const testItemSchema = z.object({
     "FormulaTest"
   ]),
   recordDate: z.string(),
+  sampleName: z.string().optional(), // Add sample name for Active Ingredient
   // pH specific fields
   ph1: z.string().optional(),
   ph2: z.string().optional(),
@@ -96,6 +97,16 @@ const testTypeOptions = [
 export default function QaTestResultFormModal({ isOpen, onClose, testResult }: QaTestResultFormModalProps) {
   const { toast } = useToast();
   const isEditing = !!testResult;
+  const [selectedSampleNames, setSelectedSampleNames] = useState<string[]>([]);
+
+  // Fetch QA Samples for dropdown
+  const { data: qaSamples = [] } = useQuery({
+    queryKey: ["/api/qa-samples"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/qa-samples");
+      return response as unknown as QaSample[];
+    },
+  });
 
   const form = useForm<QaTestResultFormData>({
     resolver: zodResolver(qaTestResultFormSchema),
@@ -113,6 +124,98 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
     },
   });
 
+  // Get selected sample data
+  const selectedSampleNo = form.watch("sampleNo");
+  const selectedSample = qaSamples.find(sample => 
+    Array.isArray(sample.samples) && 
+    sample.samples.some((s: any) => s.sampleNo === selectedSampleNo)
+  );
+
+  // Get sample names for the selected sample
+  const getSampleNames = (sampleNo: string) => {
+    const sample = qaSamples.find(s => 
+      Array.isArray(s.samples) && 
+      s.samples.some((s: any) => s.sampleNo === sampleNo)
+    );
+    
+    if (sample && Array.isArray(sample.samples)) {
+      const targetSample = sample.samples.find((s: any) => s.sampleNo === sampleNo);
+      if (targetSample && Array.isArray(targetSample.names)) {
+        // Return all names from the names array
+        return targetSample.names;
+      }
+    }
+    return [];
+  };
+
+  // Auto-populate form when sample is selected
+  useEffect(() => {
+    if (selectedSample && selectedSampleNo) {
+      const sampleData = Array.isArray(selectedSample.samples) 
+        ? selectedSample.samples.find((s: any) => s.sampleNo === selectedSampleNo)
+        : null;
+
+      if (sampleData) {
+        // Update basic information
+        form.setValue("requestNo", selectedSample.requestNo);
+        form.setValue("product", Array.isArray(sampleData.names) ? sampleData.names[0] : "");
+        form.setValue("dueDate", selectedSample.dueDate ? format(new Date(selectedSample.dueDate), "yyyy-MM-dd") : "");
+
+        // Get sample names for Active Ingredient separation
+        const sampleNames = getSampleNames(selectedSampleNo);
+        setSelectedSampleNames(sampleNames);
+
+        // Update test items based on sample data
+        if (Array.isArray(sampleData.itemTests) && sampleData.itemTests.length > 0) {
+          const testItems: any[] = [];
+          
+          sampleData.itemTests.forEach((test: any) => {
+            const testTypeMap: { [key: string]: string } = {
+              "Appearance": "Appearance",
+              "pH": "pH",
+              "Active Ingredient": "ActiveIngredient",
+              "ActiveIngredient": "ActiveIngredient",
+              "Density": "Density",
+              "Re-emulsification": "Reemulsification",
+              "Persistance foaming": "PersistanceFoaming",
+              "Aging test": "AgingTest",
+              "Moisture": "Moisture",
+              "Viscosity": "Viscosity",
+              "Formula Test": "FormulaTest"
+            };
+
+            const testType = testTypeMap[test.itemTest] || "Appearance";
+
+            if (testType === "ActiveIngredient" && sampleNames.length > 0) {
+              // Create separate Active Ingredient test for each sample name
+              sampleNames.forEach((sampleName: any) => {
+                testItems.push({
+                  testType: "ActiveIngredient" as any,
+                  recordDate: format(new Date(), "yyyy-MM-dd"),
+                  sampleName: sampleName,
+                  result: "",
+                  activeIngredient1: "",
+                  activeIngredient2: "",
+                  activeIngredient3: "",
+                  activeIngredientAverage: "",
+                });
+              });
+            } else {
+              // Regular test item
+              testItems.push({
+                testType: testType as any,
+                recordDate: format(new Date(), "yyyy-MM-dd"),
+                result: "",
+              });
+            }
+          });
+
+          form.setValue("testItems", testItems);
+        }
+      }
+    }
+  }, [selectedSampleNo, selectedSample, form]);
+
   // Reset form when testResult prop changes
   useEffect(() => {
     if (isOpen) {
@@ -126,6 +229,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
             (testResult.testItems as any[]).map((item: any) => ({
               testType: item.testType,
               recordDate: item.recordDate ? format(new Date(item.recordDate), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
+              sampleName: item.sampleName || "",
               ph1: item.ph1 || "",
               ph2: item.ph2 || "",
               phAverage: item.phAverage || "",
@@ -206,6 +310,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
 
   const handleClose = () => {
     form.reset();
+    setSelectedSampleNames([]);
     onClose();
   };
 
@@ -240,6 +345,12 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
     return "";
   };
 
+  // Get all available sample numbers from QA samples
+  const availableSampleNos = qaSamples
+    .flatMap(sample => Array.isArray(sample.samples) ? sample.samples : [])
+    .map((sample: any) => sample.sampleNo)
+    .filter(Boolean);
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -263,9 +374,20 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="thai-font">Sample No</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="เลือก Sample No" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {availableSampleNos.map((sampleNo) => (
+                            <SelectItem key={sampleNo} value={sampleNo}>
+                              {sampleNo}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -278,7 +400,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                     <FormItem>
                       <FormLabel className="thai-font">Request No</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} readOnly className="bg-gray-50" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -292,7 +414,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                     <FormItem>
                       <FormLabel className="thai-font">Product</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} readOnly className="bg-gray-50" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -306,14 +428,52 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                     <FormItem>
                       <FormLabel className="thai-font">Due Date</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} />
+                        <Input type="date" {...field} readOnly className="bg-gray-50" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-
+                {/* Display selected sample information */}
+                {selectedSample && (
+                  <div className="col-span-2 p-4 bg-blue-50 rounded-lg">
+                    <h4 className="font-medium text-blue-900 mb-2 thai-font">ข้อมูลตัวอย่างที่เลือก</h4>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="font-medium">บริษัท:</span> {selectedSample.companyName}
+                      </div>
+                      <div>
+                        <span className="font-medium">ผู้ติดต่อ:</span> {selectedSample.contactPerson}
+                      </div>
+                      <div>
+                        <span className="font-medium">วันที่รับตัวอย่าง:</span> {selectedSample.receivedDate ? format(new Date(selectedSample.receivedDate), "dd/MM/yyyy") : "-"}
+                      </div>
+                      <div>
+                        <span className="font-medium">การจัดส่ง:</span> {
+                          selectedSample.deliveryMethod === "pickup" ? "รับด้วยตนเอง" :
+                          selectedSample.deliveryMethod === "address_report" ? "จัดส่งตามที่อยู่ในรายงาน" :
+                          selectedSample.deliveryMethod === "address_invoice" ? "จัดส่งตามที่อยู่ใบกำกับภาษี" :
+                          selectedSample.deliveryMethod === "other" ? "อื่นๆ" : selectedSample.deliveryMethod
+                        }
+                      </div>
+                    </div>
+                    
+                    {/* Display sample names if multiple */}
+                    {selectedSampleNames.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-blue-200">
+                        <h5 className="font-medium text-blue-900 mb-2 thai-font">ชื่อตัวอย่าง:</h5>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedSampleNames.map((name, index) => (
+                            <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
+                              {name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -390,7 +550,33 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                         )}
                       />
 
-
+                      {/* Sample Name field for Active Ingredient */}
+                      {form.watch(`testItems.${index}.testType`) === "ActiveIngredient" && selectedSampleNames.length > 0 && (
+                        <FormField
+                          control={form.control}
+                          name={`testItems.${index}.sampleName`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="thai-font">Sample Name</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value || ""}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="เลือกชื่อตัวอย่าง" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {selectedSampleNames.map((name) => (
+                                    <SelectItem key={name} value={name}>
+                                      {name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
                     </div>
 
                     {/* pH specific fields */}
@@ -611,4 +797,4 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
       </DialogContent>
     </Dialog>
   );
-} 
+}

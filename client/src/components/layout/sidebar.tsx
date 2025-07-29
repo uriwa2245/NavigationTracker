@@ -31,6 +31,16 @@ const menuItems: MenuItem[] = [
     icon: ChartLine,
   },
   {
+    id: "qa",
+    label: "QA Managent",
+    icon: ClipboardCheck,
+  },
+  {
+    id: "task-tracker",
+    label: "Task Tracker",
+    icon: ListTodo,
+  },
+  {
     id: "tools",
     label: "เครื่องมือ",
     icon: Settings,
@@ -60,16 +70,8 @@ const menuItems: MenuItem[] = [
     label: "MSDS",
     icon: Shield,
   },
-  {
-    id: "task-tracker",
-    label: "Task Tracker",
-    icon: ListTodo,
-  },
-  {
-    id: "qa",
-    label: "QA Managent",
-    icon: ClipboardCheck,
-  },
+  
+  
 ];
 
 export default function Sidebar({

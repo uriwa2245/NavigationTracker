@@ -1,72 +1,128 @@
-# Navigation Tracker
+# Navigation Tracker - Laboratory Management System
 
-A full-stack React application for laboratory navigation tracking.
+ระบบจัดการห้องปฏิบัติการที่ครอบคลุมการจัดการเครื่องมือ อุปกรณ์ สารเคมี และกระบวนการ QA
 
-## Deployment on Vercel
+## ฟีเจอร์หลัก
 
-This project is configured for deployment on Vercel. The following files have been set up:
+### 1. การจัดการเครื่องมือ (Tools)
+- ระบบติดตามการสอบเทียบเครื่องมือ
+- ประวัติการสอบเทียบ
+- การแจ้งเตือนการสอบเทียบที่ใกล้ครบกำหนด
 
-- `vercel.json` - Vercel configuration
-- `api/index.ts` - Serverless API functions
-- `client/package.json` - Client build configuration
+### 2. การจัดการอุปกรณ์ (Glassware)
+- ระบบติดตามการสอบเทียบอุปกรณ์แก้ว
+- ประวัติการสอบเทียบ
+- การจัดการตำแหน่งที่เก็บ
 
-### Deployment Steps
+### 3. การจัดการสารเคมี (Chemicals)
+- ระบบติดตามวันหมดอายุ
+- การแจ้งเตือนสารเคมีที่ใกล้หมดอายุ
+- การจัดการตามหมวดหมู่
 
-1. **Install Vercel CLI** (if not already installed):
-   ```bash
-   npm i -g vercel
-   ```
+### 4. ระบบ QA (Quality Assurance)
 
-2. **Login to Vercel**:
-   ```bash
-   vercel login
-   ```
+#### 4.1 การรับตัวอย่าง (QA Sample Receiving)
+- **ฟีเจอร์ใหม่**: สามารถเพิ่มชื่อตัวอย่างได้หลายชื่อในแต่ละ Sample No
+- ระบบจัดการข้อมูลผู้ใช้บริการ
+- การกำหนดรายการทดสอบ (Item Tests)
+- **ฟีเจอร์ใหม่**: รองรับ Active Ingredient ที่แยกตามชื่อตัวอย่าง
 
-3. **Deploy the project**:
-   ```bash
-   vercel
-   ```
+#### 4.2 การลงผลการทดสอบ (QA Test Results)
+- **ฟีเจอร์ใหม่**: ดึงข้อมูลจากระบบรับตัวอย่างอัตโนมัติ
+- **ฟีเจอร์ใหม่**: แยก Active Ingredient ตามชื่อตัวอย่าง
+- ระบบคำนวณค่าเฉลี่ยอัตโนมัติ
+- การจัดการผลการทดสอบแบบละเอียด
 
-4. **For production deployment**:
-   ```bash
-   vercel --prod
-   ```
+### 5. ระบบอื่นๆ
+- การจัดการเอกสาร (Documents)
+- การจัดการการฝึกอบรม (Training)
+- การจัดการ MSDS
+- การจัดการงาน (Tasks)
 
-### Important Notes
+## การใช้งานฟีเจอร์ใหม่
 
-- The project uses Vercel version 2 configuration
-- Build process is handled by Vercel's static build system
-- API routes are served through serverless functions in `/api` directory
-- Static files are served from the built client application
+### การรับตัวอย่างหลายชื่อ
+1. ไปที่หน้า "รับตัวอย่าง"
+2. คลิก "เพิ่มตัวอย่าง"
+3. กรอกข้อมูลพื้นฐาน
+4. ในส่วน "รายละเอียดตัวอย่าง":
+   - กรอก Sample No
+   - กรอกชื่อตัวอย่าง
+   - เพิ่มรายการทดสอบ
+   - **สำหรับ Active Ingredient**: กรอกชื่อตัวอย่างเฉพาะในฟิลด์ "ชื่อตัวอย่าง"
 
-### Project Structure
+### การลงผลการทดสอบ
+1. ไปที่หน้า "ผลการทดสอบ"
+2. คลิก "เพิ่มผลการทดสอบ"
+3. เลือก Sample No จาก dropdown
+4. ระบบจะแสดงข้อมูลอัตโนมัติ:
+   - Request No
+   - Product (ชื่อตัวอย่าง)
+   - Due Date
+   - ข้อมูลบริษัทและผู้ติดต่อ
+5. **สำหรับ Active Ingredient**: ระบบจะแยกการทดสอบตามชื่อตัวอย่างที่กำหนดไว้
 
-- `client/` - React frontend application
-- `server/` - Express.js backend API
-- `api/` - Vercel serverless functions
-- `shared/` - Shared TypeScript schemas
+## การติดตั้ง
 
-### Build Process
+```bash
+npm install
+npm run dev
+```
 
-The project uses Vite for building the frontend and esbuild for the backend. The build process:
+## เทคโนโลยีที่ใช้
 
-1. Builds the React app using Vite
-2. Bundles the server code using esbuild
-3. Deploys static files and serverless functions to Vercel
+- **Frontend**: React + TypeScript + Vite
+- **Backend**: Node.js + Express
+- **Database**: PostgreSQL + Drizzle ORM
+- **UI**: Tailwind CSS + shadcn/ui
+- **State Management**: TanStack Query
+- **Form Management**: React Hook Form + Zod
 
-### Environment Variables
+## โครงสร้างโปรเจค
 
-Make sure to set up the following environment variables in your Vercel project:
+```
+NavigationTracker/
+├── client/                 # Frontend React app
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── hooks/         # Custom hooks
+│   │   ├── lib/           # Utilities
+│   │   └── pages/         # Page components
+├── server/                # Backend Express app
+│   ├── routes.ts          # API routes
+│   └── storage.ts         # Data storage
+├── shared/                # Shared schemas
+└── package.json
+```
 
-- Database connection strings
-- API keys
-- Other configuration variables
+## การพัฒนา
 
-### Troubleshooting
+### การเพิ่มฟีเจอร์ใหม่
+1. อัปเดต schema ใน `shared/schema.ts`
+2. เพิ่ม API routes ใน `server/routes.ts`
+3. อัปเดต storage ใน `server/storage.ts`
+4. สร้าง components ใน `client/src/components/`
+5. อัปเดต pages ใน `client/src/pages/`
 
-If you see code instead of the website:
+### การทดสอบ
+```bash
+npm run test
+```
 
-1. Check that the build process completed successfully
-2. Verify that `vercel.json` is properly configured
-3. Ensure all dependencies are installed
-4. Check the Vercel deployment logs for errors 
+## การ Deploy
+
+### Vercel
+```bash
+npm run build
+vercel --prod
+```
+
+### Docker
+```bash
+docker build -t navigation-tracker .
+docker run -p 3000:3000 navigation-tracker
+```
+
+## การสนับสนุน
+
+สำหรับคำถามหรือปัญหาการใช้งาน กรุณาติดต่อทีมพัฒนา 
