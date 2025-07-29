@@ -170,6 +170,8 @@ export const qaSamples = pgTable("qa_samples", {
   postTesting: text("post_testing").notNull(), // "return", "dispose"
   condition: text("condition").notNull(), // "normal", "abnormal"
   status: text("status").default("received"), // "received", "testing", "completed", "delivered"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // QA Test Results
