@@ -97,7 +97,6 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
   useEffect(() => {
     if (isOpen) {
       if (task) {
-        // Convert dates to strings for form inputs
         const formData = {
           title: task.title ?? "",
           description: task.description ?? "",
@@ -290,8 +289,8 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
                       <Input
                         type="date"
                         {...field}
-                        value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''}
-                        onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                        value={field.value || ''}
+                        onChange={(e) => field.onChange(e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -309,8 +308,8 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
                       <Input
                         type="date"
                         {...field}
-                        value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''}
-                        onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                        value={field.value || ''}
+                        onChange={(e) => field.onChange(e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />

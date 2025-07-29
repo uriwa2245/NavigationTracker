@@ -186,11 +186,33 @@ export default function QaTestResults() {
         onClose={() => setViewDetailsModalOpen(false)}
         title="รายละเอียดผลการทดสอบ"
         data={viewingResult ? [
+          // ข้อมูลพื้นฐาน
           { label: "Sample No", value: viewingResult.sampleNo },
-          { label: "Product", value: viewingResult.product || "-" },
+          { label: "Request No", value: viewingResult.requestNo },
+          { label: "Product", value: viewingResult.product },
           { label: "วันครบกำหนด", value: viewingResult.dueDate ? format(new Date(viewingResult.dueDate), "dd/MM/yyyy") : "-" },
-          { label: "วันที่บันทึก", value: viewingResult.recordDate ? format(new Date(viewingResult.recordDate), "dd/MM/yyyy") : "-" },
-          { label: "หมายเหตุ", value: viewingResult.notes || "-" },
+
+          // รายการทดสอบ
+          { label: "จำนวนรายการทดสอบ", value: Array.isArray(viewingResult.testItems) ? viewingResult.testItems.length : 0 },
+          ...((Array.isArray(viewingResult.testItems) ? viewingResult.testItems : [])).map((item, index) => ({
+            label: `Test Item ${index + 1}`,
+            value: `ประเภท: ${item.testType}
+              วันที่ทดสอบ: ${item.recordDate ? format(new Date(item.recordDate), "dd/MM/yyyy") : "-"}
+              ${item.testType === "pH" ?
+                `pH1: ${item.ph1 || "-"}
+                 pH2: ${item.ph2 || "-"}
+                 pH Average: ${item.phAverage || "-"}` :
+                item.testType === "ActiveIngredient" ?
+                  `AI1: ${item.activeIngredient1 || "-"}
+                 AI2: ${item.activeIngredient2 || "-"}
+                 AI3: ${item.activeIngredient3 || "-"}
+                 AI Average: ${item.activeIngredientAverage || "-"}` :
+                  `ผลการทดสอบ: ${item.result || "-"}`}`,
+            multiline: true
+          })),
+
+          // หมายเหตุ
+          { label: "หมายเหตุ", value: viewingResult.notes || "-" }
         ] : []}
       />
     </div>

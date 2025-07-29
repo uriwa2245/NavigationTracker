@@ -247,45 +247,8 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
     },
   });
 
-  const saveDraftMutation = useMutation({
-    mutationFn: async (data: QaSampleFormData) => {
-      const submitData: InsertQaSample = {
-        ...data,
-        samples: data.samples,
-        status: "draft",
-      };
-
-      if (isEditing) {
-        return await apiRequest("PATCH", `/api/qa-samples/${qaSample.id}`, submitData);
-      } else {
-        return await apiRequest("POST", "/api/qa-samples", submitData);
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/qa-samples"] });
-      toast({
-        title: "สำเร็จ",
-        description: "บันทึกแบบร่างเรียบร้อยแล้ว",
-      });
-      onClose();
-      form.reset();
-    },
-    onError: () => {
-      toast({
-        title: "เกิดข้อผิดพลาด",
-        description: "ไม่สามารถบันทึกแบบร่างได้",
-        variant: "destructive",
-      });
-    },
-  });
-
   const onSubmit = (data: QaSampleFormData) => {
     mutation.mutate(data);
-  };
-
-  const onSaveDraft = () => {
-    const data = form.getValues();
-    saveDraftMutation.mutate(data);
   };
 
   const handleClose = () => {
@@ -810,19 +773,11 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                 ยกเลิก
               </Button>
               <Button
-                type="button"
-                onClick={onSaveDraft}
-                className="lab-button-warning"
-                disabled={saveDraftMutation.isPending}
-              >
-                {saveDraftMutation.isPending ? "กำลังบันทึก..." : "บันทึกแบบร่าง"}
-              </Button>
-              <Button
                 type="submit"
                 className="lab-button-primary"
                 disabled={mutation.isPending}
               >
-                {mutation.isPending ? "กำลังส่ง..." : "ส่งรายการ"}
+                {mutation.isPending ? "กำลังบันทึก..." : "บันทึก"}
               </Button>
             </div>
           </form>

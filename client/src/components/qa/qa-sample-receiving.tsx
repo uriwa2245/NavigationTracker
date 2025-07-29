@@ -9,6 +9,8 @@ import { QaSample } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function QaSampleReceiving() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -105,19 +107,6 @@ export default function QaSampleReceiving() {
       label: "การจัดส่ง",
       render: (value: string) => getDeliveryMethodLabel(value),
     },
-    {
-      key: "status",
-      label: "สถานะ",
-      render: (value: string, sample: QaSample) => {
-        const statusBadges = {
-          "received": <Badge className="lab-badge-info">รับแล้ว</Badge>,
-          "testing": <Badge className="lab-badge-warning">กำลังทดสอบ</Badge>,
-          "completed": <Badge className="lab-badge-success">เสร็จแล้ว</Badge>,
-          "delivered": <Badge className="lab-badge-success">ส่งแล้ว</Badge>
-        };
-        return statusBadges[sample.status as keyof typeof statusBadges] || <Badge className="lab-badge-info">{sample.status}</Badge>;
-      },
-    },
   ];
 
   const handleAdd = () => {
@@ -139,6 +128,13 @@ export default function QaSampleReceiving() {
   const handleView = (qaSample: QaSample) => {
     setViewingSample(qaSample);
     setViewDetailsModalOpen(true);
+  };
+
+  const handleExportPdf = (qaSample: QaSample) => {
+    toast({
+      title: "Export PDF",
+      description: `กำลังสร้างรายงานการรับตัวอย่าง สำหรับ ${qaSample.requestNo}`,
+    });
   };
 
   // Dashboard stats
@@ -168,13 +164,17 @@ export default function QaSampleReceiving() {
         onDelete={handleDelete}
         onView={handleView}
         isLoading={isLoading}
-        statusFilters={[
-          { key: "received", label: "รับแล้ว", count: qaSamples?.filter((sample: QaSample) => sample.status === "received").length || 0 },
-          { key: "testing", label: "กำลังทดสอบ", count: qaSamples?.filter((sample: QaSample) => sample.status === "testing").length || 0 },
-          { key: "completed", label: "เสร็จแล้ว", count: qaSamples?.filter((sample: QaSample) => sample.status === "completed").length || 0 },
-          { key: "delivered", label: "ส่งแล้ว", count: qaSamples?.filter((sample: QaSample) => sample.status === "delivered").length || 0 },
-        ]}
-        getItemStatus={(sample: QaSample) => sample.status || "received"}
+        customActions={(item: QaSample) => (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleExportPdf(item)}
+            className="flex items-center gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Export PDF
+          </Button>
+        )}
       />
 
       <QaSampleFormModal
@@ -188,15 +188,80 @@ export default function QaSampleReceiving() {
         onClose={() => setViewDetailsModalOpen(false)}
         title="รายละเอียดตัวอย่าง QA"
         data={viewingSample ? [
+          // กลุ่มข้อมูลการรับตัวอย่าง
+          {
+            label: "📝 ข้อมูลการรับตัวอย่าง",
+            value: ""
+          },
           { label: "Request No", value: viewingSample.requestNo },
+          { label: "เลขที่ใบเสนอราคา", value: viewingSample.quotationNo || "-" },
+          { 
+            label: "วันที่และเวลารับตัวอย่าง", 
+            value: `${viewingSample.receivedDate ? format(new Date(viewingSample.receivedDate), "dd/MM/yyyy") : "-"} ${viewingSample.receivedTime || ""}`
+          },
+          { 
+            label: "วันครบกำหนด", 
+            value: viewingSample.dueDate ? format(new Date(viewingSample.dueDate), "dd/MM/yyyy") : "-"
+          },
+
+          // กลุ่มข้อมูลผู้ใช้บริการ
+          {
+            label: "👤 ข้อมูลผู้ใช้บริการ",
+            value: ""
+          },
           { label: "ชื่อบริษัท", value: viewingSample.companyName },
-          { label: "ผู้ติดต่อ", value: viewingSample.contactPerson || "-" },
-          { label: "วันที่รับตัวอย่าง", value: viewingSample.receivedDate ? format(new Date(viewingSample.receivedDate), "dd/MM/yyyy") : "-" },
-          { label: "วันครบกำหนด", value: viewingSample.dueDate ? format(new Date(viewingSample.dueDate), "dd/MM/yyyy") : "-" },
-          { label: "การจัดส่ง", value: getDeliveryMethodLabel(viewingSample.deliveryMethod), highlight: true },
-          { label: "สภาพตัวอย่าง", value: viewingSample.condition === "normal" ? "ปกติ" : "ผิดปกติ" },
+          { label: "ผู้ติดต่อ", value: viewingSample.contactPerson },
+          { label: "เบอร์โทรศัพท์", value: viewingSample.phone },
+          { label: "อีเมล", value: viewingSample.email },
+          { label: "ที่อยู่", value: viewingSample.address || "-" },
+          { 
+            label: "การจัดส่งผลการทดสอบ", 
+            value: getDeliveryMethodLabel(viewingSample.deliveryMethod)
+          },
+
+          // กลุ่มข้อมูลการจัดการตัวอย่าง
+          {
+            label: "📦 การจัดการตัวอย่าง",
+            value: ""
+          },
+          { 
+            label: "การเก็บรักษา", 
+            value: viewingSample.storage === "room_temp" ? "Room temperature" : 
+                   viewingSample.storage === "chilled" ? "Refrigerated" : 
+                   viewingSample.storage === "frozen" ? "Frozen" : "-"
+          },
+          { 
+            label: "ตัวอย่างหลังการทดสอบ", 
+            value: viewingSample.postTesting === "return" ? "รับคืน" : "ไม่รับคืน"
+          },
+          { 
+            label: "สภาพตัวอย่าง", 
+            value: viewingSample.condition === "normal" ? "ปกติ" : "ผิดปกติ"
+          },
+
+          // กลุ่มรายละเอียดตัวอย่าง
+          {
+            label: "🧪 รายละเอียดตัวอย่าง",
+            value: ""
+          },
+          { 
+            label: "จำนวนตัวอย่าง", 
+            value: Array.isArray(viewingSample.samples) ? viewingSample.samples.length : 0
+          },
+          ...((Array.isArray(viewingSample.samples) ? viewingSample.samples : [])?.map((sample, index) => ({
+            label: `ตัวอย่างที่ ${index + 1}`,
+            value: [
+              `🏷️ Sample No: ${sample.sampleNo}`,
+              `📋 Sample Name: ${sample.name}`,
+              `🔍 Id_No/Batch_No: ${sample.analysisRequest || "-"}`,
+              `📊 รายการทดสอบ:`,
+              sample.itemTests?.map((test: { itemTest: any; specification: any; unit: any; }) => 
+                `   • ${test.itemTest} (${test.specification || "-"}) ${test.unit || "-"}`
+              ).join("\n") || "-"
+            ].join("\n")
+          })) || [])
         ] : []}
       />
     </div>
   );
-} 
+}

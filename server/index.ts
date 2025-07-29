@@ -61,7 +61,7 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const PORT = Number(process.env.PORT) || 5000;
-  const HOST = process.env.HOST || '0.0.0.0'; // Use 0.0.0.0 for Replit accessibility
+  const HOST = process.env.HOST || '127.0.0.1'; // Use 0.0.0.0 for Replit accessibility
 
   app.listen(PORT, HOST, () => {
     console.log(`Server running at http://${HOST}:${PORT}`);
