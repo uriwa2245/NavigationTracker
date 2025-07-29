@@ -48,6 +48,8 @@ const responsibleOptions = [
   { value: "staff3", label: "นาย ค. รู้ดี" },
 ];
 
+const LOCAL_STORAGE_KEY = "toolFormData"; // Define a unique key for local storage
+
 export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalProps) {
   const { toast } = useToast();
   const isEditing = !!tool;
@@ -94,25 +96,48 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
         repairRemarks: tool.repairRemarks || "",
       });
     } else {
-      form.reset({
-        code: "",
-        name: "",
-        brand: "",
-        serialNumber: "",
-        range: "",
-        location: "",
-        lastCalibration: null,
-        nextCalibration: null,
-        calibrationStatus: "",
-        responsible: "",
-        notes: "",
-        status: "active",
-        repairDate: null,
-        expectedReturnDate: null,
-        repairRemarks: "",
-      });
+      // Load data from local storage if no tool is being edited
+      const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedData) {
+        try {
+          const parsedData = JSON.parse(savedData);
+          form.reset(parsedData);
+        } catch (error) {
+          console.error("Failed to parse stored form data:", error);
+          localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear invalid data
+        }
+      } else {
+        form.reset({
+          code: "",
+          name: "",
+          brand: "",
+          serialNumber: "",
+          range: "",
+          location: "",
+          lastCalibration: null,
+          nextCalibration: null,
+          calibrationStatus: "",
+          responsible: "",
+          notes: "",
+          status: "active",
+          repairDate: null,
+          expectedReturnDate: null,
+          repairRemarks: "",
+        });
+      }
     }
   }, [tool, form]);
+
+  // Save form data to local storage on change
+  useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      // Only save if the modal is open and not in editing mode
+      if (isOpen && !isEditing) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(value));
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, isOpen, isEditing]);
 
   const mutation = useMutation({
     mutationFn: async (data: InsertTool) => {
@@ -130,6 +155,7 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
       });
       onClose();
       form.reset();
+      localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear local storage on successful submission
     },
     onError: () => {
       toast({
@@ -167,6 +193,7 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
   const handleClose = () => {
     onClose();
     form.reset();
+    localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear local storage on modal close
   };
 
   return (

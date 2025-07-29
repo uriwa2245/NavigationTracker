@@ -59,6 +59,8 @@ const responsibleOptions = [
   { value: "staff5", label: "นาย จ. สมาร์ท" },
 ];
 
+const LOCAL_STORAGE_KEY = "taskFormData"; // Define a unique key for local storage
+
 // Form schema for frontend (using strings for dates)
 const formSchema = z.object({
   title: z.string().min(1, "กรุณากรอกชื่องาน"),
@@ -110,20 +112,43 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
         };
         form.reset(formData);
       } else {
-        form.reset({
-          title: "",
-          description: "",
-          responsible: "",
-          startDate: "",
-          dueDate: "",
-          status: "pending",
-          priority: "medium",
-          progress: 0,
-          subtasks: [],
-        });
+        // Load data from local storage if no task is being edited
+        const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (savedData) {
+          try {
+            const parsedData = JSON.parse(savedData);
+            form.reset(parsedData);
+          } catch (error) {
+            console.error("Failed to parse stored form data:", error);
+            localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear invalid data
+          }
+        } else {
+          form.reset({
+            title: "",
+            description: "",
+            responsible: "",
+            startDate: "",
+            dueDate: "",
+            status: "pending",
+            priority: "medium",
+            progress: 0,
+            subtasks: [],
+          });
+        }
       }
     }
   }, [task, isOpen, form]);
+
+  // Save form data to local storage on change
+  useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      // Only save if the modal is open and not in editing mode
+      if (isOpen && !isEditing) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(value));
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, isOpen, isEditing]);
 
   // เพิ่ม useFieldArray สำหรับ subtasks
   const { fields: subtaskFields, append, remove, update } = useFieldArray({
@@ -147,6 +172,7 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
       });
       onClose();
       form.reset();
+      localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear local storage on successful submission
     },
     onError: () => {
       toast({
@@ -180,6 +206,7 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
   const handleClose = () => {
     onClose();
     form.reset();
+    localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear local storage on modal close
   };
 
   const progressValue = form.watch("progress") || 0;

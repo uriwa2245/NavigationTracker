@@ -94,6 +94,8 @@ const testTypeOptions = [
   { value: "FormulaTest", label: "Formula Test" },
 ];
 
+const LOCAL_STORAGE_KEY = "qaTestResultFormData"; // Define a unique key for local storage
+
 export default function QaTestResultFormModal({ isOpen, onClose, testResult }: QaTestResultFormModalProps) {
   const { toast } = useToast();
   const isEditing = !!testResult;
@@ -249,21 +251,54 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
         };
         form.reset(formData);
       } else {
-        form.reset({
-          sampleNo: "",
-          requestNo: "",
-          product: "",
-          dueDate: "",
-          testItems: [{
-            testType: "Appearance" as const,
-            recordDate: format(new Date(), "yyyy-MM-dd"),
-            result: "",
-          }],
-          notes: "",
-        });
+        // Load data from local storage if no testResult is being edited
+        const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (savedData) {
+          try {
+            const parsedData = JSON.parse(savedData);
+            // Ensure dates are correctly re-instantiated or formatted as strings for date inputs
+            if (parsedData.dueDate) {
+              parsedData.dueDate = format(new Date(parsedData.dueDate), "yyyy-MM-dd");
+            }
+            if (parsedData.testItems) {
+              parsedData.testItems = parsedData.testItems.map((item: any) => ({
+                ...item,
+                recordDate: item.recordDate ? format(new Date(item.recordDate), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
+              }));
+            }
+            form.reset(parsedData);
+          } catch (error) {
+            console.error("Failed to parse stored form data:", error);
+            localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear invalid data
+          }
+        } else {
+          form.reset({
+            sampleNo: "",
+            requestNo: "",
+            product: "",
+            dueDate: "",
+            testItems: [{
+              testType: "Appearance" as const,
+              recordDate: format(new Date(), "yyyy-MM-dd"),
+              result: "",
+            }],
+            notes: "",
+          });
+        }
       }
     }
   }, [testResult, isOpen, form]);
+
+  // Save form data to local storage on change
+  useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      // Only save if the modal is open and not in editing mode
+      if (isOpen && !isEditing) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(value));
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, isOpen, isEditing]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -294,6 +329,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
         description: isEditing ? "อัปเดตผลการทดสอบเรียบร้อยแล้ว" : "เพิ่มผลการทดสอบเรียบร้อยแล้ว",
       });
       handleClose();
+      localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear local storage on successful submission
     },
     onError: () => {
       toast({
@@ -312,6 +348,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
     form.reset();
     setSelectedSampleNames([]);
     onClose();
+    localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear local storage on modal close
   };
 
   const addTestItem = () => {

@@ -94,6 +94,8 @@ const itemTestOptions = [
   { value: "FormulaTest", label: "Formula test" },
 ];
 
+const LOCAL_STORAGE_KEY = "qaSampleFormData"; // Define a unique key for local storage
+
 export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampleFormModalProps) {
   const { toast } = useToast();
   const isEditing = !!qaSample;
@@ -181,37 +183,53 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
         };
         form.reset(formData);
       } else {
-        const defaultFormSamples = [
-          {
-            sampleNo: "",
-            names: [""], // Changed from name to names
-            description: "",
-            analysisRequest: "",
-            itemTests: [{ itemTest: "", unit: "", specification: "", method: "", sampleName: "" }],
-          },
-        ];
-        
-        form.reset({
-          requestNo: "",
-          receivedTime: "",
-          receivedDate: new Date(),
-          dueDate: new Date(),
-          quotationNo: "",
-          contactPerson: "",
-          phone: "",
-          email: "",
-          companyName: "",
-          address: "",
-          deliveryMethod: "",
-          samples: defaultFormSamples,
-          storage: "",
-          postTesting: "",
-          condition: "",
-          status: "received",
-        });
+        // Load data from local storage if no qaSample is being edited
+        const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (savedData) {
+          try {
+            const parsedData = JSON.parse(savedData);
+            // Ensure dates are correctly re-instantiated as Date objects
+            parsedData.receivedDate = parsedData.receivedDate ? new Date(parsedData.receivedDate) : new Date();
+            parsedData.dueDate = parsedData.dueDate ? new Date(parsedData.dueDate) : new Date();
+            form.reset(parsedData);
+          } catch (error) {
+            console.error("Failed to parse stored form data:", error);
+            localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear invalid data
+          }
+        } else {
+          form.reset({
+            requestNo: "",
+            receivedTime: "",
+            receivedDate: new Date(),
+            dueDate: new Date(),
+            quotationNo: "",
+            contactPerson: "",
+            phone: "",
+            email: "",
+            companyName: "",
+            address: "",
+            deliveryMethod: "",
+            samples: defaultSamples,
+            storage: "",
+            postTesting: "",
+            condition: "",
+            status: "received",
+          });
+        }
       }
     }
   }, [qaSample, isOpen, form]);
+
+  // Save form data to local storage on change
+  useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      // Only save if the modal is open and not in editing mode
+      if (isOpen && !isEditing) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(value));
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, isOpen, isEditing]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -239,6 +257,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
       });
       onClose();
       form.reset();
+      localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear local storage on successful submission
     },
     onError: () => {
       toast({
@@ -256,6 +275,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
   const handleClose = () => {
     onClose();
     form.reset();
+    localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear local storage on modal close
   };
 
   const addSample = () => {
