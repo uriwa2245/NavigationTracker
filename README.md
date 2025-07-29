@@ -32,6 +32,13 @@ This project is configured for deployment on Vercel. The following files have be
    vercel --prod
    ```
 
+### Important Notes
+
+- The project uses Vercel version 3 configuration
+- Build process is handled by `vercel-build.sh` script
+- API routes are served through serverless functions in `/api` directory
+- Static files are served from the built client application
+
 ### Project Structure
 
 - `client/` - React frontend application
