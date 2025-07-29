@@ -34,8 +34,8 @@ This project is configured for deployment on Vercel. The following files have be
 
 ### Important Notes
 
-- The project uses Vercel version 3 configuration
-- Build process is handled by `vercel-build.sh` script
+- The project uses Vercel version 2 configuration
+- Build process is handled by Vercel's static build system
 - API routes are served through serverless functions in `/api` directory
 - Static files are served from the built client application
 
