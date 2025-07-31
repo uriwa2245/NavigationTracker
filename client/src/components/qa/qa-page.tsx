@@ -16,7 +16,7 @@ export default function QaPage() {
       </div>
 
       <Tabs defaultValue="sample-receiving" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-2 gap-4">
           <TabsTrigger
             value="sample-receiving"
             className="thai-font bg-green-50 hover:bg-green-100 data-[state=active]:bg-green-100 data-[state=active]:text-green-800 dark:bg-green-900/20 dark:hover:bg-green-800/30 dark:data-[state=active]:bg-green-800/30 dark:data-[state=active]:text-green-200 transition-colors"
@@ -39,6 +39,7 @@ export default function QaPage() {
           <QaTestResults />
         </TabsContent>
       </Tabs>
+
     </div>
   );
 }

@@ -33,6 +33,129 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import { z } from "zod";
 
+// Mockup ข้อมูลฐานข้อมูลสำหรับ Item Test details
+const itemTestDatabase = [
+  {
+    sampleName: "น้ำยา A",
+    itemTest: "Appearance",
+    specification: "Clear",
+    unit: "-",
+    method: "Visual"
+  },
+  {
+    sampleName: "น้ำยา A",
+    itemTest: "pH",
+    specification: "6.0-7.0",
+    unit: "",
+    method: "pH meter"
+  },
+  {
+    sampleName: "น้ำยา A",
+    itemTest: "Density",
+    specification: "1.00-1.05",
+    unit: "g/cm³",
+    method: "Hydrometer"
+  },
+  {
+    sampleName: "น้ำยา A",
+    itemTest: "Viscosity",
+    specification: "100-200",
+    unit: "cP",
+    method: "Brookfield"
+  },
+  {
+    sampleName: "น้ำยา A",
+    itemTest: "Moisture",
+    specification: "< 0.5",
+    unit: "%",
+    method: "Karl Fischer"
+  },
+  {
+    sampleName: "น้ำยา B",
+    itemTest: "Appearance",
+    specification: "Clear to slightly hazy",
+    unit: "-",
+    method: "Visual"
+  },
+  {
+    sampleName: "น้ำยา B",
+    itemTest: "ActiveIngredient",
+    specification: "95-105",
+    unit: "%",
+    method: "HPLC"
+  },
+  {
+    sampleName: "น้ำยา B",
+    itemTest: "pH",
+    specification: "5.5-6.5",
+    unit: "",
+    method: "pH meter"
+  },
+  {
+    sampleName: "น้ำยา B",
+    itemTest: "Density",
+    specification: "0.95-1.00",
+    unit: "g/cm³",
+    method: "Hydrometer"
+  },
+  {
+    sampleName: "น้ำยา C",
+    itemTest: "Appearance",
+    specification: "Yellow to brown liquid",
+    unit: "-",
+    method: "Visual"
+  },
+  {
+    sampleName: "น้ำยา C",
+    itemTest: "Reemulsification",
+    specification: "Pass",
+    unit: "-",
+    method: "Standard test"
+  },
+  {
+    sampleName: "น้ำยา C",
+    itemTest: "PersistanceFoaming",
+    specification: "< 10",
+    unit: "ml",
+    method: "Ross-Miles"
+  },
+  {
+    sampleName: "น้ำยา C",
+    itemTest: "AcceleratedStorage",
+    specification: "Stable",
+    unit: "-",
+    method: "40°C/3 months"
+  },
+  {
+    sampleName: "น้ำยา C",
+    itemTest: "FormulaTest",
+    specification: "Compatible",
+    unit: "-",
+    method: "Compatibility test"
+  }
+];
+
+// รายชื่อตัวอย่างที่มีในระบบ
+const sampleNameOptions = [
+  { value: "น้ำยา A", label: "น้ำยา A" },
+  { value: "น้ำยา B", label: "น้ำยา B" },
+  { value: "น้ำยา C", label: "น้ำยา C" },
+  { value: "น้ำยา D", label: "น้ำยา D" },
+  { value: "น้ำยา E", label: "น้ำยา E" },
+  { value: "สารเคมี A", label: "สารเคมี A" },
+  { value: "สารเคมี B", label: "สารเคมี B" },
+  { value: "น้ำมัน A", label: "น้ำมัน A" },
+  { value: "น้ำมัน B", label: "น้ำมัน B" },
+  { value: "อื่นๆ", label: "อื่นๆ" }
+];
+
+// ฟังก์ชันค้นหาข้อมูล Item Test details
+function getItemTestDetails(sampleName: string, itemTest: string) {
+  return itemTestDatabase.find(
+    (item) => item.sampleName === sampleName && item.itemTest === itemTest
+  );
+}
+
 interface QaSampleFormModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -538,6 +661,19 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                       key={field.id}
                       className="p-6 bg-white dark:bg-gray-900 rounded-xl border shadow-sm relative space-y-4"
                     >
+                      {/* Remove Sample Button - move to top right */}
+                      {fields.length > 1 && (
+                        <Button
+                          type="button"
+                          onClick={() => removeSample(index)}
+                          size="icon"
+                          variant="ghost"
+                          className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-50 z-10"
+                          aria-label="ลบตัวอย่าง"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </Button>
+                      )}
                       {/* Sample Header */}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <FormField
@@ -554,60 +690,96 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                           )}
                         />
 
-                        {/* Replace the single name FormField with this new implementation */}
+                        {/* Sample Name Dropdown */}
                         <div className="space-y-2">
                           <FormLabel className="thai-font">Sample Name *</FormLabel>
-                          {form.watch(`samples.${index}.names`)?.map((_, nameIdx) => (
-                            <div key={nameIdx} className="flex gap-2">
-                              <FormField
-                                control={form.control}
-                                name={`samples.${index}.names.${nameIdx}`}
-                                render={({ field }) => (
-                                  <FormItem className="flex-1">
-                                    <FormControl>
-                                      <Input placeholder="ชื่อตัวอย่าง" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                              <div className="flex gap-2">
-                                {/* Add name button */}
-                                {nameIdx === form.watch(`samples.${index}.names`).length - 1 && (
-                                  <Button
-                                    type="button"
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => {
-                                      const current = form.getValues(`samples.${index}.names`);
-                                      form.setValue(`samples.${index}.names`, [...current, ""]);
-                                    }}
-                                  >
-                                    <Plus className="w-4 h-4" />
-                                  </Button>
-                                )}
-                                {/* Remove name button */}
-                                {form.watch(`samples.${index}.names`).length > 1 && (
-                                  <Button
-                                    type="button"
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => {
-                                      const current = form.getValues(`samples.${index}.names`);
-                                      if (current.length > 1) {
-                                        form.setValue(
-                                          `samples.${index}.names`,
-                                          current.filter((_, i) => i !== nameIdx)
-                                        );
-                                      }
-                                    }}
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                )}
+                          <div className="space-y-2">
+                            {form.watch(`samples.${index}.names`)?.map((_, nameIdx) => (
+                              <div key={nameIdx} className="flex items-center gap-2">
+                                <FormField
+                                  control={form.control}
+                                  name={`samples.${index}.names.${nameIdx}`}
+                                  render={({ field }) => (
+                                    <FormItem className="flex-1">
+                                      <Select
+                                        onValueChange={(value) => {
+                                          field.onChange(value);
+                                          
+                                          // Auto-fill Item Test details เมื่อเปลี่ยน Sample Name
+                                          const itemTests = form.getValues(`samples.${index}.itemTests`);
+                                          
+                                          if (Array.isArray(itemTests)) {
+                                            itemTests.forEach((itemTest, testIdx) => {
+                                              if (itemTest.itemTest) {
+                                                const details = getItemTestDetails(value, itemTest.itemTest);
+                                                if (details) {
+                                                  form.setValue(`samples.${index}.itemTests.${testIdx}.specification`, details.specification || "");
+                                                  form.setValue(`samples.${index}.itemTests.${testIdx}.unit`, details.unit || "");
+                                                  form.setValue(`samples.${index}.itemTests.${testIdx}.method`, details.method || "");
+                                                }
+                                              }
+                                            });
+                                          }
+                                        }}
+                                        value={field.value || ""}
+                                      >
+                                        <FormControl>
+                                          <SelectTrigger>
+                                            <SelectValue placeholder="เลือกชื่อตัวอย่าง" />
+                                          </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                          {sampleNameOptions.map((option) => (
+                                            <SelectItem key={option.value} value={option.value}>
+                                              {option.label}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <div className="flex items-center gap-1">
+                                  {/* Add name button */}
+                                  {nameIdx === form.watch(`samples.${index}.names`).length - 1 && (
+                                    <Button
+                                      type="button"
+                                      size="icon"
+                                      variant="outline"
+                                      onClick={() => {
+                                        const current = form.getValues(`samples.${index}.names`);
+                                        form.setValue(`samples.${index}.names`, [...current, ""]);
+                                      }}
+                                      className="h-8 w-8"
+                                    >
+                                      <Plus className="w-4 h-4" />
+                                    </Button>
+                                  )}
+                                  {/* Remove name button */}
+                                  {form.watch(`samples.${index}.names`).length > 1 && (
+                                    <Button
+                                      type="button"
+                                      size="icon"
+                                      variant="ghost"
+                                      onClick={() => {
+                                        const current = form.getValues(`samples.${index}.names`);
+                                        if (current.length > 1) {
+                                          form.setValue(
+                                            `samples.${index}.names`,
+                                            current.filter((_, i) => i !== nameIdx)
+                                          );
+                                        }
+                                      }}
+                                      className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
 
                         <FormField
@@ -623,6 +795,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                             </FormItem>
                           )}
                         />
+                        
                       </div>
 
                       {/* Item Test Section */}
@@ -643,13 +816,36 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                         </div>
 
                         {form.watch(`samples.${index}.itemTests`)?.map((_, itemIdx) => (
-                          <div key={itemIdx} className="grid grid-cols-1 md:grid-cols-6 gap-4 mt-2">
+                          <div key={itemIdx} className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-2">
                             <FormField
                               control={form.control}
                               name={`samples.${index}.itemTests.${itemIdx}.itemTest`}
                               render={({ field }) => (
                                 <FormItem>
-                                  <Select onValueChange={field.onChange} value={field.value || ""}>
+                                  <Select
+                                    onValueChange={(value) => {
+                                      field.onChange(value);
+
+                                      // ดึง sampleName ที่เลือก (เอาอันแรกใน names array)
+                                      const sampleNames = form.getValues(`samples.${index}.names`);
+                                      const sampleName = Array.isArray(sampleNames) && sampleNames.length > 0 ? sampleNames[0] : "";
+
+                                      // ค้นหาข้อมูลในฐานข้อมูล
+                                      const details = getItemTestDetails(sampleName, value);
+
+                                      if (details) {
+                                        form.setValue(`samples.${index}.itemTests.${itemIdx}.specification`, details.specification || "");
+                                        form.setValue(`samples.${index}.itemTests.${itemIdx}.unit`, details.unit || "");
+                                        form.setValue(`samples.${index}.itemTests.${itemIdx}.method`, details.method || "");
+                                      } else {
+                                        // ถ้าไม่เจอ ให้เคลียร์ค่า
+                                        form.setValue(`samples.${index}.itemTests.${itemIdx}.specification`, "");
+                                        form.setValue(`samples.${index}.itemTests.${itemIdx}.unit`, "");
+                                        form.setValue(`samples.${index}.itemTests.${itemIdx}.method`, "");
+                                      }
+                                    }}
+                                    value={field.value || ""}
+                                  >
                                     <FormControl>
                                       <SelectTrigger>
                                         <SelectValue placeholder="เลือก Item Test" />
@@ -730,18 +926,6 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                         ))}
                       </div>
 
-                      {/* Remove Sample Button */}
-                      {fields.length > 1 && (
-                        <Button
-                          type="button"
-                          onClick={() => removeSample(index)}
-                          size="icon"
-                          variant="ghost"
-                          className="absolute top-4 right-4 text-red-500 hover:text-red-700"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </Button>
-                      )}
                     </div>
                   ))}
 
