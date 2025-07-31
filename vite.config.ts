@@ -29,14 +29,6 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-select'],
-        },
-      },
-    },
   },
   server: {
     hmr: process.env.DISABLE_HMR === 'true' ? false : {
@@ -47,9 +39,5 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
-  },
-  preview: {
-    port: 5000,
-    host: true,
   },
 });

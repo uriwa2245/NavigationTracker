@@ -63,28 +63,6 @@ class WebSocketManager {
 // Global WebSocket manager instance
 export const wsManager = new WebSocketManager();
 
-// WebSocket configuration for production deployment
-export const getWebSocketUrl = () => {
-  if (typeof window !== 'undefined') {
-    // Client-side: use WebSocket over HTTPS for production
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
-    return `${protocol}//${host}/ws`;
-  }
-  // Server-side: use environment variable or default
-  return process.env.VERCEL_URL ? `wss://${process.env.VERCEL_URL}/ws` : 'ws://localhost:5000/ws';
-};
-
-export const createWebSocket = () => {
-  try {
-    const wsUrl = getWebSocketUrl();
-    return new WebSocket(wsUrl);
-  } catch (error) {
-    console.error('WebSocket connection failed:', error);
-    return null;
-  }
-};
-
 // Utility function to safely create WebSocket URL
 export function createWebSocketURL(protocol: string, host: string, port?: string | number): string {
   const wsProtocol = protocol === 'https:' ? 'wss:' : 'ws:';

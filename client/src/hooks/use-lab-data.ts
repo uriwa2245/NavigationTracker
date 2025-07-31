@@ -135,7 +135,7 @@ export function useLabData() {
       queryKey: ["/api/chemicals", category],
       queryFn: () => {
         const url = category ? `/api/chemicals?category=${category}` : "/api/chemicals";
-        return fetch(url).then(res => res.json());
+        return apiRequest("GET", url);
       },
     });
   };
@@ -164,7 +164,7 @@ export function useLabData() {
         const url = category && category !== "all" 
           ? `/api/documents?category=${category}` 
           : "/api/documents";
-        return fetch(url).then(res => res.json());
+        return apiRequest("GET", url);
       },
     });
   };
@@ -188,6 +188,7 @@ export function useLabData() {
   const useTraining = () => {
     return useQuery<Training[]>({
       queryKey: ["/api/training"],
+      queryFn: () => apiRequest("GET", "/api/training"),
     });
   };
 
@@ -215,7 +216,7 @@ export function useLabData() {
         const url = category && category !== "all" 
           ? `/api/msds?category=${category}` 
           : "/api/msds";
-        return fetch(url).then(res => res.json());
+        return apiRequest("GET", url);
       },
     });
   };
@@ -239,6 +240,7 @@ export function useLabData() {
   const useTasks = () => {
     return useQuery<Task[]>({
       queryKey: ["/api/tasks"],
+      queryFn: () => apiRequest("GET", "/api/tasks"),
     });
   };
 
@@ -278,6 +280,7 @@ export function useLabData() {
   const useQaSamples = () => {
     return useQuery<QaSample[]>({
       queryKey: ["/api/qa-samples"],
+      queryFn: () => apiRequest("GET", "/api/qa-samples"),
     });
   };
 
