@@ -143,8 +143,11 @@ export class MemStorage implements IStorage {
       calibrationBy: tool.calibrationBy ?? null,
       calibrationMethod: tool.calibrationMethod ?? null,
       calibrationRemarks: tool.calibrationRemarks ?? null,
+      repairRemarks: tool.repairRemarks ?? null,
       responsible: tool.responsible ?? null,
-      notes: tool.notes ?? null
+      notes: tool.notes ?? null,
+      repairDate: tool.repairDate ?? null,
+      expectedReturnDate: tool.expectedReturnDate ?? null
     };
     this.tools.set(id, newTool);
     return newTool;
@@ -357,7 +360,8 @@ export class MemStorage implements IStorage {
       expiryDate: chemical.expiryDate ?? null,
       location: chemical.location ?? null,
       category: chemical.category ?? null,
-      notes: chemical.notes ?? null
+      notes: chemical.notes ?? null,
+      code: chemical.code ?? null
     };
     this.chemicals.set(id, newChemical);
     return newChemical;
@@ -519,7 +523,10 @@ export class MemStorage implements IStorage {
       status: task.status ?? null,
       priority: task.priority ?? null,
       progress: task.progress ?? null,
-      subtasks: task.subtasks ?? null
+      subtasks: task.subtasks ?? null,
+      approvedBy: task.approvedBy ?? null,
+      approvedDate: task.approvedDate ?? null,
+      approvalNotes: task.approvalNotes ?? null
     };
     this.tasks.set(id, newTask);
     return newTask;
@@ -549,14 +556,27 @@ export class MemStorage implements IStorage {
 
   async createQaSample(sample: InsertQaSample): Promise<QaSample> {
     const id = this.currentId++;
-    const newSample: QaSample = { 
-      ...sample, 
-      id,
+    const newSample: QaSample = {
+      id: id,
+      requestNo: sample.requestNo,
+      receivedTime: sample.receivedTime,
       receivedDate: sample.receivedDate ?? null,
-      registrationDate: sample.registrationDate ?? null,
-      storageLocation: sample.storageLocation ?? null,
-      sampleCondition: sample.sampleCondition ?? null,
-      notes: sample.notes ?? null
+      dueDate: sample.dueDate ?? null,
+      quotationNo: sample.quotationNo ?? null,
+      contactPerson: sample.contactPerson,
+      phone: sample.phone,
+      email: sample.email,
+      companyName: sample.companyName,
+      address: sample.address ?? null,
+      deliveryMethod: sample.deliveryMethod,
+      samples: sample.samples ?? null,
+      storage: sample.storage,
+      postTesting: sample.postTesting,
+      condition: sample.condition,
+      status: sample.status ?? null,
+      notes: sample.notes ?? null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     this.qaSamples.set(id, newSample);
     return newSample;
@@ -565,8 +585,29 @@ export class MemStorage implements IStorage {
   async updateQaSample(id: number, sample: Partial<InsertQaSample>): Promise<QaSample | undefined> {
     const existingSample = this.qaSamples.get(id);
     if (!existingSample) return undefined;
-    
-    const updatedSample = { ...existingSample, ...sample };
+
+    const updatedSample: QaSample = {
+      id: existingSample.id,
+      requestNo: sample.requestNo ?? existingSample.requestNo,
+      receivedTime: sample.receivedTime ?? existingSample.receivedTime,
+      receivedDate: sample.receivedDate ?? existingSample.receivedDate ?? null,
+      dueDate: sample.dueDate ?? existingSample.dueDate ?? null,
+      quotationNo: sample.quotationNo ?? existingSample.quotationNo ?? null,
+      contactPerson: sample.contactPerson ?? existingSample.contactPerson,
+      phone: sample.phone ?? existingSample.phone,
+      email: sample.email ?? existingSample.email,
+      companyName: sample.companyName ?? existingSample.companyName,
+      address: sample.address ?? existingSample.address ?? null,
+      deliveryMethod: sample.deliveryMethod ?? existingSample.deliveryMethod,
+      samples: sample.samples ?? existingSample.samples ?? null,
+      storage: sample.storage ?? existingSample.storage,
+      postTesting: sample.postTesting ?? existingSample.postTesting,
+      condition: sample.condition ?? existingSample.condition,
+      status: sample.status ?? existingSample.status ?? null,
+      notes: sample.notes ?? existingSample.notes ?? null,
+      createdAt: existingSample.createdAt,
+      updatedAt: new Date(),
+    };
     this.qaSamples.set(id, updatedSample);
     return updatedSample;
   }
@@ -590,16 +631,21 @@ export class MemStorage implements IStorage {
 
   async createQaTestResult(testResult: InsertQaTestResult): Promise<QaTestResult> {
     const id = this.currentId++;
-    const newTestResult: QaTestResult = { 
-      ...testResult, 
-      id,
+    const newTestResult: QaTestResult = {
+      id: id,
+      sampleId: testResult.sampleId ?? null,
+      sampleNo: testResult.sampleNo,
+      requestNo: testResult.requestNo,
+      product: testResult.product,
+      dueDate: testResult.dueDate ?? null,
+      testItems: testResult.testItems ?? null,
+      status: testResult.status ?? null,
+      notes: testResult.notes ?? null,
       method: testResult.method ?? null,
       result: testResult.result ?? null,
       unit: testResult.unit ?? null,
       specification: testResult.specification ?? null,
       recordDate: testResult.recordDate ?? null,
-      status: testResult.status ?? null,
-      notes: testResult.notes ?? null
     };
     this.qaTestResults.set(id, newTestResult);
     return newTestResult;
@@ -608,8 +654,23 @@ export class MemStorage implements IStorage {
   async updateQaTestResult(id: number, testResult: InsertQaTestResult): Promise<QaTestResult | undefined> {
     const existingTestResult = this.qaTestResults.get(id);
     if (!existingTestResult) return undefined;
-    
-    const updatedTestResult = { ...existingTestResult, ...testResult };
+
+    const updatedTestResult: QaTestResult = {
+      id: existingTestResult.id,
+      sampleId: testResult.sampleId ?? existingTestResult.sampleId ?? null,
+      sampleNo: testResult.sampleNo ?? existingTestResult.sampleNo,
+      requestNo: testResult.requestNo ?? existingTestResult.requestNo,
+      product: testResult.product ?? existingTestResult.product,
+      dueDate: testResult.dueDate ?? existingTestResult.dueDate ?? null,
+      testItems: testResult.testItems ?? existingTestResult.testItems ?? null,
+      status: testResult.status ?? existingTestResult.status ?? null,
+      notes: testResult.notes ?? existingTestResult.notes ?? null,
+      method: testResult.method ?? existingTestResult.method ?? null,
+      result: testResult.result ?? existingTestResult.result ?? null,
+      unit: testResult.unit ?? existingTestResult.unit ?? null,
+      specification: testResult.specification ?? existingTestResult.specification ?? null,
+      recordDate: testResult.recordDate ?? existingTestResult.recordDate ?? null,
+    };
     this.qaTestResults.set(id, updatedTestResult);
     return updatedTestResult;
   }

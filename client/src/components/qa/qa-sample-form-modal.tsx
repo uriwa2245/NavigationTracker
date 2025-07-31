@@ -345,7 +345,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
 
   // Save form data to local storage on change
   useEffect(() => {
-    const subscription = form.watch((value, { name, type }) => {
+    const subscription = form.watch((value: any, { name, type }: any) => {
       // Only save if the modal is open and not in editing mode
       if (isOpen && !isEditing) {
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(value));
@@ -694,7 +694,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                         <div className="space-y-2">
                           <FormLabel className="thai-font">Sample Name *</FormLabel>
                           <div className="space-y-2">
-                            {form.watch(`samples.${index}.names`)?.map((_, nameIdx) => (
+                            {form.watch(`samples.${index}.names`)?.map((_: string, nameIdx: number) => (
                               <div key={nameIdx} className="flex items-center gap-2">
                                 <FormField
                                   control={form.control}
@@ -767,7 +767,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                                         if (current.length > 1) {
                                           form.setValue(
                                             `samples.${index}.names`,
-                                            current.filter((_, i) => i !== nameIdx)
+                                            current.filter((_: string, i: number) => i !== nameIdx)
                                           );
                                         }
                                       }}
@@ -815,7 +815,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                           </Button>
                         </div>
 
-                        {form.watch(`samples.${index}.itemTests`)?.map((_, itemIdx) => (
+                        {form.watch(`samples.${index}.itemTests`)?.map((_: any, itemIdx: number) => (
                           <div key={itemIdx} className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-2">
                             <FormField
                               control={form.control}
@@ -914,7 +914,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                                   const current = form.getValues(`samples.${index}.itemTests`);
                                   form.setValue(
                                     `samples.${index}.itemTests`,
-                                    current.filter((_, i) => i !== itemIdx)
+                                    current.filter((_: any, i: number) => i !== itemIdx)
                                   );
                                 }}
                                 className="text-red-500 hover:text-red-700"

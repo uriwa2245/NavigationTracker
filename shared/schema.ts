@@ -159,8 +159,8 @@ export const qaSamples = pgTable("qa_samples", {
   id: serial("id").primaryKey(),
   requestNo: text("request_no").notNull().unique(),
   receivedTime: text("received_time").notNull(),
-  receivedDate: timestamp("received_date").notNull(),
-  dueDate: timestamp("due_date").notNull(),
+  receivedDate: timestamp("received_date"),
+  dueDate: timestamp("due_date"),
   quotationNo: text("quotation_no"),
   contactPerson: text("contact_person").notNull(),
   phone: text("phone").notNull(),
@@ -168,11 +168,12 @@ export const qaSamples = pgTable("qa_samples", {
   companyName: text("company_name").notNull(),
   address: text("address"),
   deliveryMethod: text("delivery_method").notNull(),
-  samples: json("samples"), // Array of sample objects
-  storage: text("storage").notNull(), // "room_temp", "chilled", "frozen"
-  postTesting: text("post_testing").notNull(), // "return", "dispose"
-  condition: text("condition").notNull(), // "normal", "abnormal"
-  status: text("status").default("received"), // "received", "testing", "completed", "delivered"
+  samples: json("samples"),
+  storage: text("storage").notNull(),
+  postTesting: text("post_testing").notNull(),
+  condition: text("condition").notNull(),
+  status: text("status").default("received"),
+  notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -180,13 +181,19 @@ export const qaSamples = pgTable("qa_samples", {
 // QA Test Results
 export const qaTestResults = pgTable("qa_test_results", {
   id: serial("id").primaryKey(),
+  sampleId: integer("sample_id"),
   sampleNo: text("sample_no").notNull(),
   requestNo: text("request_no").notNull(),
   product: text("product").notNull(),
-  dueDate: timestamp("due_date").notNull(),
-  testItems: json("test_items"), // Array of test item objects with results
-  status: text("status").default("pending"), // "pending", "in_progress", "completed"
+  dueDate: timestamp("due_date"),
+  testItems: json("test_items"),
+  status: text("status").default("pending"),
   notes: text("notes"),
+  method: text("method"),
+  result: text("result"),
+  unit: text("unit"),
+  specification: text("specification"),
+  recordDate: timestamp("record_date"),
 });
 
 // Insert schemas with custom transformations for timestamps
@@ -239,12 +246,23 @@ export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true }).ext
     return new Date(val);
   }).optional().nullable(),
 });
-export const insertQaSampleSchema = createInsertSchema(qaSamples).omit({ id: true }).extend({
+export const insertQaSampleSchema = createInsertSchema(qaSamples).omit({ id: true, createdAt: true, updatedAt: true }).extend({
   receivedDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
   dueDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  quotationNo: z.string().nullable(),
+  address: z.string().nullable(),
+  samples: z.any().nullable(),
+  status: z.string().optional(), // Removed .nullable() if default handles it
+  notes: z.string().nullable(),
 });
 export const insertQaTestResultSchema = createInsertSchema(qaTestResults).omit({ id: true }).extend({
-  dueDate: z.union([z.date(), z.string().datetime()]).transform(val => new Date(val)),
+  dueDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  sampleId: z.number().nullable(),
+  method: z.string().nullable(),
+  result: z.string().nullable(),
+  unit: z.string().nullable(),
+  specification: z.string().nullable(),
+  recordDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
 });
 
 
