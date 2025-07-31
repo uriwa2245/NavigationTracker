@@ -99,7 +99,7 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
           responsible: glassware.responsible || "",
           notes: glassware.notes || "",
         };
-        form.reset(formData);
+        form.reset(formData as InsertGlassware);
       } else {
         form.reset({
           code: "",

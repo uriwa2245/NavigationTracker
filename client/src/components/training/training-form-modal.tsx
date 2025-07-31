@@ -100,7 +100,7 @@ export default function TrainingFormModal({ isOpen, onClose, training }: Trainin
           trainer: training.trainer || "",
           notes: training.notes || "",
         };
-        form.reset(formData);
+        form.reset(formData as InsertTraining);
       } else {
         form.reset({
           sequence: "",

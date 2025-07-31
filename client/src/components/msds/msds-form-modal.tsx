@@ -74,7 +74,7 @@ export default function MsdsFormModal({ isOpen, onClose, msds }: MsdsFormModalPr
           filePath: msds.filePath || "",
           notes: msds.notes || "",
         };
-        form.reset(formData);
+        form.reset(formData as InsertMsds);
       } else {
         form.reset({
           sequence: "",

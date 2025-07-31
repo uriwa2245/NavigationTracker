@@ -112,7 +112,7 @@ export default function ChemicalFormModal({
           category: chemical.category || defaultCategory,
           notes: chemical.notes || "",
         };
-        form.reset(formData);
+        form.reset(formData as InsertChemical);
       } else {
         form.reset({
           chemicalNo: "",
@@ -180,7 +180,7 @@ export default function ChemicalFormModal({
       notes: data.notes || null,
     };
     
-    mutation.mutate(cleanedData);
+    mutation.mutate(cleanedData as InsertChemical);
   };
 
   const handleClose = () => {
