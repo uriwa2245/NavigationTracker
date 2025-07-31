@@ -59,27 +59,31 @@ export default function ToolsPage() {
     return "ปกติ";
   };
 
-  const getStatusBadge = (status: string) => {
+  const getCalibrationStatusBadge = (tool: Tool) => {
+    const status = getCalibrationStatus(tool);
     switch (status) {
       case "เลยกำหนด":
-        return <Badge className="lab-badge-error">{status}</Badge>;
+        return <Badge className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">เลยกำหนด</Badge>;
       case "ใกล้ครบกำหนด":
-        return <Badge className="lab-badge-warning">{status}</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800">ใกล้ครบกำหนด</Badge>;
       case "ปกติ":
-        return <Badge className="lab-badge-success">{status}</Badge>;
+        return <Badge className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">ปกติ</Badge>;
       default:
-        return <Badge className="lab-badge-info">{status}</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800">ไม่ระบุ</Badge>;
     }
   };
 
-  const getToolStatus = (tool: Tool) => {
-    if (tool.status === "repair") {
-      return <Badge className="lab-badge-error">ส่งซ่อม</Badge>;
+  const getToolStatusBadge = (tool: Tool) => {
+    switch (tool.status) {
+      case "repair":
+        return <Badge className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">ส่งซ่อม</Badge>;
+      case "active":
+        return <Badge className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">ใช้งานได้</Badge>;
+      case "inactive":
+        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800">ไม่ใช้งาน</Badge>;
+      default:
+        return <Badge className="bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800">{tool.status || "ไม่ระบุ"}</Badge>;
     }
-    if (tool.status === "active") {
-      return <Badge className="lab-badge-success">ใช้งานได้</Badge>;
-    }
-    return <Badge className="lab-badge-info">{tool.status || "ไม่ระบุ"}</Badge>;
   };
 
   const columns = [
@@ -112,14 +116,7 @@ export default function ToolsPage() {
     {
       key: "status",
       label: "สถานะเครื่องมือ",
-      render: (value: string, tool: Tool) => {
-        const statusBadges = {
-          "active": <Badge className="lab-badge-success">ใช้งานได้</Badge>,
-          "inactive": <Badge className="lab-badge-warning">ไม่ใช้งาน</Badge>,
-          "repair": <Badge className="lab-badge-error">ซ่อมแซม</Badge>
-        };
-        return statusBadges[tool.status as keyof typeof statusBadges] || <Badge className="lab-badge-info">{tool.status}</Badge>;
-      },
+      render: (value: string, tool: Tool) => getToolStatusBadge(tool),
     },
   ];
 
@@ -211,7 +208,7 @@ export default function ToolsPage() {
           { label: "สถานที่ตั้ง", value: viewingTool.location || "-" },
           { label: "ผู้รับผิดชอบ", value: viewingTool.responsible || "-" },
           { label: "หมายเหตุ", value: viewingTool.notes || "-" },
-          { label: "สถานะเครื่องมือ", value: getToolStatus(viewingTool), highlight: true },
+          { label: "สถานะเครื่องมือ", value: getToolStatusBadge(viewingTool), highlight: true },
           // Add repair information if status is repair
           ...(viewingTool.status === "repair" ? [
             { label: "วันที่ส่งซ่อม", value: viewingTool.repairDate ? format(new Date(viewingTool.repairDate), "dd/MM/yyyy") : "-", highlight: true },

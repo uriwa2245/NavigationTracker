@@ -42,12 +42,6 @@ const locationOptions = [
   { value: "lab-c-301", label: "ห้องแลป C-301" },
 ];
 
-const responsibleOptions = [
-  { value: "staff1", label: "นาย ก. ใจดี" },
-  { value: "staff2", label: "นาง ข. มานะ" },
-  { value: "staff3", label: "นาย ค. รู้ดี" },
-];
-
 const LOCAL_STORAGE_KEY = "toolFormData"; // Define a unique key for local storage
 
 export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalProps) {
@@ -66,6 +60,7 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
       lastCalibration: null,
       nextCalibration: null,
       calibrationStatus: "",
+      calibrationResult: "",
       responsible: "",
       notes: "",
       status: "active",
@@ -88,6 +83,7 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
         lastCalibration: tool.lastCalibration || null,
         nextCalibration: tool.nextCalibration || null,
         calibrationStatus: tool.calibrationStatus || "",
+        calibrationResult: tool.calibrationResult || "",
         responsible: tool.responsible || "",
         notes: tool.notes || "",
         status: tool.status || "active",
@@ -117,6 +113,7 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
           lastCalibration: null,
           nextCalibration: null,
           calibrationStatus: "",
+          calibrationResult: "",
           responsible: "",
           notes: "",
           status: "active",
@@ -176,10 +173,6 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
       notes: (data.notes && data.notes !== "-") ? data.notes : null,
       calibrationStatus: (data.calibrationStatus && data.calibrationStatus !== "-") ? data.calibrationStatus : null,
       calibrationResult: (data.calibrationResult && data.calibrationResult !== "-") ? data.calibrationResult : null,
-      calibrationCertificate: (data.calibrationCertificate && data.calibrationCertificate !== "-") ? data.calibrationCertificate : null,
-      calibrationBy: (data.calibrationBy && data.calibrationBy !== "-") ? data.calibrationBy : null,
-      calibrationMethod: (data.calibrationMethod && data.calibrationMethod !== "-") ? data.calibrationMethod : null,
-      calibrationRemarks: (data.calibrationRemarks && data.calibrationRemarks !== "-") ? data.calibrationRemarks : null,
       lastCalibration: data.lastCalibration || null,
       nextCalibration: data.nextCalibration || null,
       repairRemarks: (data.repairRemarks && data.repairRemarks !== "-") ? data.repairRemarks : null,
@@ -370,20 +363,9 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
                   render={({ field }) => (
                     <FormItem >
                       <FormLabel className="thai-font">ผู้รับผิดชอบ</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value || ""}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="เลือกผู้รับผิดชอบ" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {responsibleOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Input placeholder="ชื่อผู้รับผิดชอบ" {...field} value={field.value ?? ""} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
