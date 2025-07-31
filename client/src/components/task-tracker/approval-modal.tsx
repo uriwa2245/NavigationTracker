@@ -241,7 +241,7 @@ export default function ApprovalModal({ isOpen, onClose, task, onApprove }: Appr
                             {/* Completion Status */}
                             <div className={`px-2 py-1 rounded text-xs thai-font ${
                               subtask.completed 
-                                ? "bg-green-100 text-green-800 border border-green-200" 
+                                ? "bg-emerald-100 text-emerald-800 border border-emerald-200" 
                                 : "bg-gray-100 text-gray-600 border border-gray-200"
                             }`}>
                               {subtask.completed ? "ทำแล้ว" : "ยังไม่ทำ"}

@@ -70,28 +70,28 @@ export default function TaskTrackerPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return <Badge className="lab-badge-warning">รอดำเนินการ</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-200">รอดำเนินการ</Badge>;
       case "in_progress":
-        return <Badge className="lab-badge-info">กำลังดำเนินการ</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 border border-blue-200">กำลังดำเนินการ</Badge>;
       case "completed":
-        return <Badge className="lab-badge-success">เสร็จสิ้น</Badge>;
+        return <Badge className="bg-purple-100 text-purple-800 border border-purple-200">เสร็จสิ้น</Badge>;
       case "cancelled":
-        return <Badge className="lab-badge-error">ยกเลิก</Badge>;
+        return <Badge className="bg-red-100 text-red-800 border border-red-200">ยกเลิก</Badge>;
       default:
-        return <Badge className="lab-badge-info">{status}</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800 border border-gray-200">{status}</Badge>;
     }
   };
 
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case "high":
-        return <Badge className="lab-badge-error">สูง</Badge>;
+        return <Badge className="bg-red-100 text-red-800 border border-red-200">สูง</Badge>;
       case "medium":
-        return <Badge className="lab-badge-warning">กลาง</Badge>;
+        return <Badge className="bg-amber-100 text-amber-800 border border-amber-200">กลาง</Badge>;
       case "low":
-        return <Badge className="lab-badge-success">ต่ำ</Badge>;
+        return <Badge className="bg-cyan-100 text-cyan-800 border border-cyan-200">ต่ำ</Badge>;
       default:
-        return <Badge className="lab-badge-info">{priority}</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800 border border-gray-200">{priority}</Badge>;
     }
   };
 
@@ -142,10 +142,10 @@ export default function TaskTrackerPage() {
       label: "สถานะ",
       render: (value: string, task: Task) => {
         const statusBadges = {
-          "pending": <Badge className="lab-badge-warning">รอดำเนินการ</Badge>,
-          "in_progress": <Badge className="lab-badge-info">กำลังดำเนินการ</Badge>,
-          "completed": <Badge className="lab-badge-success">เสร็จแล้ว</Badge>,
-          "cancelled": <Badge className="lab-badge-error">ยกเลิก</Badge>
+          "pending": <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-200">รอดำเนินการ</Badge>,
+          "in_progress": <Badge className="bg-blue-100 text-blue-800 border border-blue-200">กำลังดำเนินการ</Badge>,
+          "completed": <Badge className="bg-purple-100 text-purple-800 border border-purple-200">เสร็จแล้ว</Badge>,
+          "cancelled": <Badge className="bg-red-100 text-red-800 border border-red-200">ยกเลิก</Badge>
         };
         
         const subtasks = task.subtasks && Array.isArray(task.subtasks) ? task.subtasks : [];
@@ -154,7 +154,7 @@ export default function TaskTrackerPage() {
         
         return (
           <div className="space-y-1">
-            {statusBadges[value as keyof typeof statusBadges] || <Badge className="lab-badge-info">{value}</Badge>}
+            {statusBadges[value as keyof typeof statusBadges] || <Badge className="bg-gray-100 text-gray-800 border border-gray-200">{value}</Badge>}
             {totalSubtasks > 0 && (
               <div className="text-xs text-gray-500">
                 อนุมัติแล้ว: {approvedSubtasks}/{totalSubtasks} ขั้นตอน
@@ -346,11 +346,11 @@ export default function TaskTrackerPage() {
                       {(() => {
                         // Determine approval status
                         if (subtask.approved === true) {
-                          return <Badge className="lab-badge-success thai-font">อนุมัติแล้ว</Badge>;
+                          return <Badge className="bg-green-100 text-green-800 border border-green-200 thai-font">อนุมัติแล้ว</Badge>;
                         } else if (subtask.approved === false && subtask.approvedBy) {
-                          return <Badge className="lab-badge-error thai-font">ไม่อนุมัติ</Badge>;
+                          return <Badge className="bg-red-100 text-red-800 border border-red-200 thai-font">ไม่อนุมัติ</Badge>;
                         } else {
-                          return <Badge className="lab-badge-warning thai-font">รออนุมัติ</Badge>;
+                          return <Badge className="bg-orange-100 text-orange-800 border border-orange-200 thai-font">รออนุมัติ</Badge>;
                         }
                       })()}
                     </div>
