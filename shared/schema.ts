@@ -123,6 +123,9 @@ export const tasks = pgTable("tasks", {
   priority: text("priority").default("medium"), // "low", "medium", "high"
   progress: integer("progress").default(0),
   subtasks: json("subtasks"), // Array of subtask objects
+  approvedBy: text("approved_by"), // ผู้อนุมัติ
+  approvedDate: timestamp("approved_date"), // วันที่อนุมัติ
+  approvalNotes: text("approval_notes"), // หมายเหตุการอนุมัติ
 });
 
 // Tool Calibration History
@@ -228,6 +231,10 @@ export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true }).ext
     return new Date(val);
   }).optional().nullable(),
   dueDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => {
+    if (!val) return null;
+    return new Date(val);
+  }).optional().nullable(),
+  approvedDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => {
     if (!val) return null;
     return new Date(val);
   }).optional().nullable(),

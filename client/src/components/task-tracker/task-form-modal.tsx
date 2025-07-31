@@ -38,25 +38,10 @@ interface TaskFormModalProps {
   task?: Task | null;
 }
 
-const statusOptions = [
-  { value: "pending", label: "รอดำเนินการ" },
-  { value: "in_progress", label: "กำลังดำเนินการ" },
-  { value: "completed", label: "เสร็จสิ้น" },
-  { value: "cancelled", label: "ยกเลิก" },
-];
-
 const priorityOptions = [
   { value: "low", label: "ต่ำ" },
   { value: "medium", label: "กลาง" },
   { value: "high", label: "สูง" },
-];
-
-const responsibleOptions = [
-  { value: "staff1", label: "นาย ก. ใจดี" },
-  { value: "staff2", label: "นาง ข. มานะ" },
-  { value: "staff3", label: "นาย ค. รู้ดี" },
-  { value: "staff4", label: "นาง ง. ขยัน" },
-  { value: "staff5", label: "นาย จ. สมาร์ท" },
 ];
 
 const LOCAL_STORAGE_KEY = "taskFormData"; // Define a unique key for local storage
@@ -71,7 +56,11 @@ const formSchema = z.object({
   status: z.string().default("pending"),
   priority: z.string().default("medium"),
   progress: z.number().min(0).max(100).default(0),
-  subtasks: z.array(z.any()).optional().nullable(),
+  subtasks: z.array(z.object({
+    title: z.string().min(1, "กรุณากรอกชื่องานย่อย"),
+    completed: z.boolean().default(false),
+    approved: z.boolean().default(false), // Add new approved field
+  })).optional().nullable(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -108,7 +97,11 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
           status: task.status ?? "pending",
           priority: task.priority ?? "medium",
           progress: task.progress ?? 0,
-          subtasks: Array.isArray(task.subtasks) ? task.subtasks : [],
+          subtasks: Array.isArray(task.subtasks) ? task.subtasks.map(sub => ({
+            ...sub,
+            completed: sub.completed ?? false,
+            approved: sub.approved ?? false, // Initialize approved field
+          })) : [],
         };
         form.reset(formData);
       } else {
@@ -155,6 +148,34 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
     control: form.control,
     name: "subtasks",
   });
+
+  const calculateProgress = () => {
+    const subtasks = form.getValues("subtasks");
+    if (!subtasks || subtasks.length === 0) {
+      return 0;
+    }
+    const completedSubtasks = subtasks.filter(sub => sub.completed).length;
+    return Math.round((completedSubtasks / subtasks.length) * 100);
+  };
+
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name?.startsWith("subtasks") || name === "subtasks") {
+        form.setValue("progress", calculateProgress(), { shouldDirty: true, shouldValidate: true });
+        
+        // Update status based on progress
+        const newProgress = calculateProgress();
+        let newStatus = "pending";
+        if (newProgress === 100) {
+          newStatus = "completed";
+        } else if (newProgress > 0) {
+          newStatus = "in_progress";
+        }
+        form.setValue("status", newStatus, { shouldDirty: true, shouldValidate: true });
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, calculateProgress]);
 
   const mutation = useMutation({
     mutationFn: async (data: InsertTask) => {
@@ -211,6 +232,11 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
 
   const progressValue = form.watch("progress") || 0;
 
+  const subtasks = form.watch("subtasks");
+  const stepTotal = subtasks ? subtasks.length : 0;
+  const stepDone = subtasks ? subtasks.filter(sub => sub.completed).length : 0;
+  const stepPercent = stepTotal === 0 ? 0 : Math.round((stepDone / stepTotal) * 100);
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-screen overflow-y-auto">
@@ -262,20 +288,13 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="thai-font">ผู้รับผิดชอบ *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="เลือกผู้รับผิดชอบ" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {responsibleOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input
+                        placeholder="กรอกชื่อผู้รับผิดชอบ"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -350,20 +369,20 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="thai-font">สถานะ</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || "pending"}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="เลือกสถานะ" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {statusOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <div className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100 flex items-center justify-center text-gray-600 thai-font">
+                        {stepPercent === 0 ? "รอดำเนินการ" : 
+                         stepPercent === 100 ? "เสร็จสิ้น" : 
+                         stepPercent > 0 ? "กำลังดำเนินการ" : "รอดำเนินการ"}
+                      </div>
+                    </FormControl>
+                    <input
+                      type="hidden"
+                      {...field}
+                      value={stepPercent === 0 ? "pending" : 
+                             stepPercent === 100 ? "completed" : 
+                             stepPercent > 0 ? "in_progress" : "pending"}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -374,16 +393,19 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
                 name="progress"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="thai-font">ความคืบหน้า ({progressValue}%)</FormLabel>
+                    <FormLabel className="thai-font">ความคืบหน้า</FormLabel>
                     <FormControl>
                       <div className="px-3">
-                        <Slider
-                          min={0}
-                          max={100}
-                          step={5}
-                          value={[field.value || 0]}
-                          onValueChange={(value) => field.onChange(value[0])}
-                          className="w-full"
+                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                          <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${stepPercent}%` }}></div>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">{stepDone}/{stepTotal} ขั้นตอน</div>
+                        {/* Hidden slider to keep form data synchronized */}
+                        <Input
+                          type="hidden"
+                          {...field}
+                          value={field.value || 0}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
                         />
                       </div>
                     </FormControl>
@@ -400,7 +422,7 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
                     type="button"
                     size="sm"
                     variant="outline"
-                    onClick={() => append({ title: "", approved: false })}
+                    onClick={() => append({ title: "", completed: false, approved: false })}
                   >
                     เพิ่มขั้นตอน
                   </Button>
@@ -411,6 +433,38 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
                 <div className="space-y-3">
                   {subtaskFields.map((subtask, idx) => (
                     <div key={subtask.id} className="flex items-center gap-2">
+                      
+                      <FormField
+                        control={form.control}
+                        name={`subtasks.${idx}.completed`}
+                        render={({ field }) => (
+                          <FormItem className="flex items-center space-x-2">
+                            <FormControl>
+                              <input
+                                type="checkbox"
+                                checked={field.value}
+                                onChange={(e) => {
+                                  field.onChange(e.target.checked);
+                                  form.trigger("progress"); // Trigger validation for progress after checkbox change
+                                }}
+                                className="form-checkbox h-4 w-4 text-blue-600"
+                              />
+                            </FormControl>
+                            <FormLabel className="thai-font text-sm font-normal">สำเร็จ</FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`subtasks.${idx}.approved`}
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-1">
+                            <div className="w-28 h-8 text-xs border border-gray-300 rounded-lg px-3 py-1.5 bg-gray-100 flex items-center justify-center text-gray-600">
+                              {field.value ? "อนุมัติแล้ว" : "รออนุมัติ"}
+                            </div>
+                          </FormItem>
+                        )}
+                      />
                       <FormField
                         control={form.control}
                         name={`subtasks.${idx}.title`}
@@ -423,29 +477,6 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
                                 value={field.value ?? ""}
                               />
                             </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name={`subtasks.${idx}.approved`}
-                        render={({ field }) => (
-                          <FormItem className="flex items-center gap-1">
-                            <FormLabel className="thai-font text-xs">อนุมัติ</FormLabel>
-                            <Select
-                              value={field.value === true ? "approved" : field.value === false ? "not_approved" : ""}
-                              onValueChange={(val) => field.onChange(val === "approved")}
-                            >
-                              <FormControl>
-                                <SelectTrigger className="w-24 h-8 text-xs">
-                                  <SelectValue placeholder="เลือก" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="approved">อนุมัติ</SelectItem>
-                                <SelectItem value="not_approved">ไม่อนุมัติ</SelectItem>
-                              </SelectContent>
-                            </Select>
                           </FormItem>
                         )}
                       />

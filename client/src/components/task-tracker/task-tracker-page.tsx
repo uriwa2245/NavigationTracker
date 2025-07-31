@@ -5,6 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import DataTable from "@/components/ui/data-table";
 import TaskFormModal from "./task-form-modal";
 import ViewDetailsModal from "@/components/ui/view-details-modal";
+import ApprovalModal from "./approval-modal";
 import { Task } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,8 @@ export default function TaskTrackerPage() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [viewDetailsModalOpen, setViewDetailsModalOpen] = useState(false);
   const [viewingTask, setViewingTask] = useState<Task | null>(null);
+  const [approvalModalOpen, setApprovalModalOpen] = useState(false);
+  const [approvingTask, setApprovingTask] = useState<Task | null>(null);
   const { toast } = useToast();
 
   const { data: tasks = [], isLoading } = useQuery<Task[]>({
@@ -137,14 +140,28 @@ export default function TaskTrackerPage() {
     {
       key: "status",
       label: "สถานะ",
-      render: (value: string) => {
+      render: (value: string, task: Task) => {
         const statusBadges = {
           "pending": <Badge className="lab-badge-warning">รอดำเนินการ</Badge>,
           "in_progress": <Badge className="lab-badge-info">กำลังดำเนินการ</Badge>,
           "completed": <Badge className="lab-badge-success">เสร็จแล้ว</Badge>,
           "cancelled": <Badge className="lab-badge-error">ยกเลิก</Badge>
         };
-        return statusBadges[value as keyof typeof statusBadges] || <Badge className="lab-badge-info">{value}</Badge>;
+        
+        const subtasks = task.subtasks && Array.isArray(task.subtasks) ? task.subtasks : [];
+        const approvedSubtasks = subtasks.filter((subtask: any) => subtask.approved).length;
+        const totalSubtasks = subtasks.length;
+        
+        return (
+          <div className="space-y-1">
+            {statusBadges[value as keyof typeof statusBadges] || <Badge className="lab-badge-info">{value}</Badge>}
+            {totalSubtasks > 0 && (
+              <div className="text-xs text-gray-500">
+                อนุมัติแล้ว: {approvedSubtasks}/{totalSubtasks} ขั้นตอน
+              </div>
+            )}
+          </div>
+        );
       },
     },
     {
@@ -192,10 +209,8 @@ export default function TaskTrackerPage() {
   };
 
   const handleApprove = (task: Task) => {
-    updateTaskMutation.mutate({
-      id: task.id,
-      data: { status: "in_progress" }
-    });
+    setApprovingTask(task);
+    setApprovalModalOpen(true);
   };
 
   // Dashboard stats
@@ -276,6 +291,7 @@ export default function TaskTrackerPage() {
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onApprove={handleApprove}
         isLoading={isLoading}
         statusFilters={[
           { key: "pending", label: "รอดำเนินการ", count: tasks?.filter((task: Task) => task.status === "pending").length || 0 },
@@ -304,6 +320,9 @@ export default function TaskTrackerPage() {
           { label: "ความคืบหน้า", value: `${viewingTask.progress || 0}%` },
           { label: "วันที่เริ่มต้น", value: viewingTask.startDate ? format(new Date(viewingTask.startDate), "dd/MM/yyyy") : "-" },
           { label: "กำหนดส่ง", value: viewingTask.dueDate ? format(new Date(viewingTask.dueDate), "dd/MM/yyyy") : "-" },
+          { label: "ผู้อนุมัติ/ไม่อนุมัติ", value: viewingTask.approvedBy || "-" },
+          { label: "วันที่อนุมัติ/ไม่อนุมัติ", value: viewingTask.approvedDate ? format(new Date(viewingTask.approvedDate), "dd/MM/yyyy HH:mm") : "-" },
+          { label: "หมายเหตุการอนุมัติ/ไม่อนุมัติ", value: viewingTask.approvalNotes || "-" },
           { label: "คำอธิบาย", value: viewingTask.description || "-" },
         ] : []}
         additionalContent={viewingTask?.subtasks && Array.isArray(viewingTask.subtasks) && viewingTask.subtasks.length > 0 ? (
@@ -314,41 +333,37 @@ export default function TaskTrackerPage() {
             <div className="space-y-3">
               {viewingTask.subtasks.map((subtask: any, index: number) => (
                 <div key={index} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100 thai-font">
-                      {subtask.title}
-                    </h4>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <Badge variant="outline" className="thai-font">
+                        ขั้นตอน {index + 1}
+                      </Badge>
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100 thai-font">
+                        {subtask.title}
+                      </h4>
+                    </div>
                     <div className="flex items-center gap-2">
-                      {subtask.approved ? (
-                        <Badge className="lab-badge-success">อนุมัติแล้ว</Badge>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="thai-font"
-                          onClick={() => {
-                            const updatedSubtasks = [...(viewingTask.subtasks as any[])];
-                            updatedSubtasks[index] = { ...subtask, approved: true, approvedDate: new Date() };
-                            updateTaskMutation.mutate({
-                              id: viewingTask.id,
-                              data: { subtasks: updatedSubtasks }
-                            });
-                          }}
-                        >
-                          อนุมัติ
-                        </Button>
-                      )}
+                      {(() => {
+                        // Determine approval status
+                        if (subtask.approved === true) {
+                          return <Badge className="lab-badge-success thai-font">อนุมัติแล้ว</Badge>;
+                        } else if (subtask.approved === false && subtask.approvedBy) {
+                          return <Badge className="lab-badge-error thai-font">ไม่อนุมัติ</Badge>;
+                        } else {
+                          return <Badge className="lab-badge-warning thai-font">รออนุมัติ</Badge>;
+                        }
+                      })()}
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 thai-font mb-2">
-                    {subtask.description || "ไม่มีคำอธิบาย"}
-                  </p>
-                  <div className="text-xs text-gray-500 dark:text-gray-500 thai-font">
-                    ผู้รับผิดชอบ: {subtask.responsible || "ยังไม่ระบุ"}
-                    {subtask.approved && subtask.approvedDate && (
-                      <span className="ml-3">
-                        อนุมัติเมื่อ: {format(new Date(subtask.approvedDate), "dd/MM/yyyy HH:mm")}
-                      </span>
+                  <div className="text-xs text-gray-500 dark:text-gray-500 thai-font space-y-1">
+                    {subtask.approvedBy && (
+                      <div>ผู้อนุมัติ/ไม่อนุมัติ: {subtask.approvedBy}</div>
+                    )}
+                    {subtask.approvedDate && (
+                      <div>อนุมัติ/ไม่อนุมัติเมื่อ: {format(new Date(subtask.approvedDate), "dd/MM/yyyy HH:mm")}</div>
+                    )}
+                    {subtask.approvalNotes && (
+                      <div>หมายเหตุ: {subtask.approvalNotes}</div>
                     )}
                   </div>
                 </div>
@@ -356,6 +371,77 @@ export default function TaskTrackerPage() {
             </div>
           </div>
         ) : null}
+      />
+
+      <ApprovalModal
+        isOpen={approvalModalOpen}
+        onClose={() => setApprovalModalOpen(false)}
+        task={approvingTask}
+        onApprove={(approvalData: { approvedBy: string; notes?: string; subtaskIndex?: number; action?: 'approve' | 'reject'; approvals?: Array<{ subtaskIndex: number; action: 'approve' | 'reject'; notes: string; }> }) => {
+          if (approvalData.approvals && approvalData.approvals.length > 0) {
+            // Handle batch approvals for multiple subtasks
+            const updatedSubtasks = [...(approvingTask!.subtasks as any[] || [])];
+            
+            approvalData.approvals.forEach(approval => {
+              updatedSubtasks[approval.subtaskIndex] = {
+                ...updatedSubtasks[approval.subtaskIndex],
+                approved: approval.action === 'approve',
+                approvedBy: approvalData.approvedBy,
+                approvedDate: new Date(),
+                approvalNotes: approval.notes
+              };
+            });
+            
+            updateTaskMutation.mutate({
+              id: approvingTask!.id,
+              data: { subtasks: updatedSubtasks }
+            });
+            setApprovalModalOpen(false);
+            setApprovingTask(null);
+          } else if (approvalData.action === 'reject') {
+            // Reject task
+            updateTaskMutation.mutate({
+              id: approvingTask!.id,
+              data: { 
+                status: "cancelled",
+                approvedBy: approvalData.approvedBy,
+                approvedDate: new Date(),
+                approvalNotes: approvalData.notes || ""
+              }
+            });
+            setApprovalModalOpen(false);
+            setApprovingTask(null);
+          } else if (approvalData.subtaskIndex !== undefined) {
+            // Approve specific subtask (legacy support)
+            const updatedSubtasks = [...(approvingTask!.subtasks as any[] || [])];
+            updatedSubtasks[approvalData.subtaskIndex] = {
+              ...updatedSubtasks[approvalData.subtaskIndex],
+              approved: approvalData.action === 'approve',
+              approvedBy: approvalData.approvedBy,
+              approvedDate: new Date(),
+              approvalNotes: approvalData.notes || ""
+            };
+            
+            updateTaskMutation.mutate({
+              id: approvingTask!.id,
+              data: { subtasks: updatedSubtasks }
+            });
+          } else {
+            // Approve entire task
+            const newStatus = approvingTask!.status === "cancelled" ? "pending" : "in_progress";
+            updateTaskMutation.mutate({
+              id: approvingTask!.id,
+              data: { 
+                status: newStatus,
+                approvedBy: approvalData.approvedBy,
+                approvedDate: new Date(),
+                approvalNotes: approvalData.notes || ""
+              }
+            });
+            setApprovalModalOpen(false);
+            setApprovingTask(null);
+          }
+        }}
       />
     </div>
   );

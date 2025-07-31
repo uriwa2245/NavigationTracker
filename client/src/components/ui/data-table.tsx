@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Plus, Download, Edit, Eye, Trash2 } from "lucide-react";
+import { Search, Plus, Download, Edit, Eye, Trash2, CheckCircle } from "lucide-react";
 
 interface Column {
   key: string;
@@ -33,6 +33,7 @@ interface DataTableProps {
   onEdit?: (item: any) => void;
   onView?: (item: any) => void;
   onDelete?: (item: any) => void;
+  onApprove?: (item: any) => void;
   onExport?: () => void;
   isLoading?: boolean;
   customActions?: (item: any) => React.ReactNode;
@@ -121,6 +122,7 @@ export default function DataTable({
   onEdit,
   onView,
   onDelete,
+  onApprove,
   onExport,
   isLoading = false,
   customActions,
@@ -296,7 +298,7 @@ export default function DataTable({
                           : item[column.key]}
                       </TableCell>
                     ))}
-                    {(onEdit || onView || onDelete || customActions) && (
+                    {(onEdit || onView || onDelete || onApprove || customActions) && (
                       <TableCell>
                         <div className="flex space-x-2">
                           {onView && (
@@ -319,6 +321,17 @@ export default function DataTable({
                               className="hover:bg-green-50 dark:hover:bg-green-900/20"
                             >
                               <Edit className="w-4 h-4 text-green-600 dark:text-green-400" />
+                            </Button>
+                          )}
+                          {onApprove && (item.status === "pending" || item.status === "in_progress" || item.status === "cancelled" || item.status === "completed") && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onApprove(item)}
+                              title={item.status === "cancelled" ? "อนุมัติงานใหม่" : "อนุมัติงาน"}
+                              className="hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                            >
+                              <CheckCircle className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                             </Button>
                           )}
                           {onDelete && (
