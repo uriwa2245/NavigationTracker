@@ -1,128 +1,159 @@
 # Navigation Tracker - Laboratory Management System
 
-ระบบจัดการห้องปฏิบัติการที่ครอบคลุมการจัดการเครื่องมือ อุปกรณ์ สารเคมี และกระบวนการ QA
+A comprehensive laboratory management system built with React, TypeScript, and Express.js.
 
-## ฟีเจอร์หลัก
+## Features
 
-### 1. การจัดการเครื่องมือ (Tools)
-- ระบบติดตามการสอบเทียบเครื่องมือ
-- ประวัติการสอบเทียบ
-- การแจ้งเตือนการสอบเทียบที่ใกล้ครบกำหนด
+- **Dashboard**: Overview of laboratory statistics and pending tasks
+- **Tools Management**: Track tools, calibration history, and maintenance schedules
+- **Glassware Management**: Manage glassware inventory and calibration
+- **Chemical Management**: Track chemical inventory and safety information
+- **Document Management**: Organize laboratory documents and procedures
+- **Training Management**: Track staff training and certifications
+- **MSDS Management**: Material Safety Data Sheet management
+- **Task Tracker**: Task assignment and approval workflow
+- **QA Sample Management**: Quality assurance sample tracking
+- **QA Test Results**: Test result recording and analysis
 
-### 2. การจัดการอุปกรณ์ (Glassware)
-- ระบบติดตามการสอบเทียบอุปกรณ์แก้ว
-- ประวัติการสอบเทียบ
-- การจัดการตำแหน่งที่เก็บ
+## Tech Stack
 
-### 3. การจัดการสารเคมี (Chemicals)
-- ระบบติดตามวันหมดอายุ
-- การแจ้งเตือนสารเคมีที่ใกล้หมดอายุ
-- การจัดการตามหมวดหมู่
+- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, Radix UI
+- **Backend**: Express.js, TypeScript
+- **State Management**: TanStack Query (React Query)
+- **Form Handling**: React Hook Form with Zod validation
+- **Database**: In-memory storage (can be extended to use external databases)
 
-### 4. ระบบ QA (Quality Assurance)
+## Getting Started
 
-#### 4.1 การรับตัวอย่าง (QA Sample Receiving)
-- **ฟีเจอร์ใหม่**: สามารถเพิ่มชื่อตัวอย่างได้หลายชื่อในแต่ละ Sample No
-- ระบบจัดการข้อมูลผู้ใช้บริการ
-- การกำหนดรายการทดสอบ (Item Tests)
-- **ฟีเจอร์ใหม่**: รองรับ Active Ingredient ที่แยกตามชื่อตัวอย่าง
+### Prerequisites
 
-#### 4.2 การลงผลการทดสอบ (QA Test Results)
-- **ฟีเจอร์ใหม่**: ดึงข้อมูลจากระบบรับตัวอย่างอัตโนมัติ
-- **ฟีเจอร์ใหม่**: แยก Active Ingredient ตามชื่อตัวอย่าง
-- ระบบคำนวณค่าเฉลี่ยอัตโนมัติ
-- การจัดการผลการทดสอบแบบละเอียด
+- Node.js 18+ 
+- npm or yarn
 
-### 5. ระบบอื่นๆ
-- การจัดการเอกสาร (Documents)
-- การจัดการการฝึกอบรม (Training)
-- การจัดการ MSDS
-- การจัดการงาน (Tasks)
+### Installation
 
-## การใช้งานฟีเจอร์ใหม่
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd NavigationTracker
+```
 
-### การรับตัวอย่างหลายชื่อ
-1. ไปที่หน้า "รับตัวอย่าง"
-2. คลิก "เพิ่มตัวอย่าง"
-3. กรอกข้อมูลพื้นฐาน
-4. ในส่วน "รายละเอียดตัวอย่าง":
-   - กรอก Sample No
-   - กรอกชื่อตัวอย่าง
-   - เพิ่มรายการทดสอบ
-   - **สำหรับ Active Ingredient**: กรอกชื่อตัวอย่างเฉพาะในฟิลด์ "ชื่อตัวอย่าง"
-
-### การลงผลการทดสอบ
-1. ไปที่หน้า "ผลการทดสอบ"
-2. คลิก "เพิ่มผลการทดสอบ"
-3. เลือก Sample No จาก dropdown
-4. ระบบจะแสดงข้อมูลอัตโนมัติ:
-   - Request No
-   - Product (ชื่อตัวอย่าง)
-   - Due Date
-   - ข้อมูลบริษัทและผู้ติดต่อ
-5. **สำหรับ Active Ingredient**: ระบบจะแยกการทดสอบตามชื่อตัวอย่างที่กำหนดไว้
-
-## การติดตั้ง
-
+2. Install dependencies:
 ```bash
 npm install
+```
+
+3. Copy environment variables:
+```bash
+cp env.example .env
+```
+
+4. Start the development server:
+```bash
 npm run dev
 ```
 
-## เทคโนโลยีที่ใช้
+The application will be available at `http://localhost:5000`
 
-- **Frontend**: React + TypeScript + Vite
-- **Backend**: Node.js + Express
-- **Database**: PostgreSQL + Drizzle ORM
-- **UI**: Tailwind CSS + shadcn/ui
-- **State Management**: TanStack Query
-- **Form Management**: React Hook Form + Zod
+## Development
 
-## โครงสร้างโปรเจค
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run check` - Type checking
+- `npm run vercel-build` - Build for Vercel deployment
+
+### Project Structure
 
 ```
-NavigationTracker/
-├── client/                 # Frontend React app
+├── client/                 # Frontend React application
 │   ├── src/
 │   │   ├── components/     # React components
-│   │   ├── hooks/         # Custom hooks
-│   │   ├── lib/           # Utilities
+│   │   ├── hooks/         # Custom React hooks
+│   │   ├── lib/           # Utility libraries
 │   │   └── pages/         # Page components
-├── server/                # Backend Express app
+│   └── index.html
+├── server/                # Backend Express application
 │   ├── routes.ts          # API routes
-│   └── storage.ts         # Data storage
-├── shared/                # Shared schemas
-└── package.json
+│   ├── storage.ts         # Data storage layer
+│   └── vite.ts           # Vite development setup
+├── shared/               # Shared TypeScript schemas
+├── api/                  # Vercel API functions
+└── dist/                 # Build output
 ```
 
-## การพัฒนา
+## Deployment
 
-### การเพิ่มฟีเจอร์ใหม่
-1. อัปเดต schema ใน `shared/schema.ts`
-2. เพิ่ม API routes ใน `server/routes.ts`
-3. อัปเดต storage ใน `server/storage.ts`
-4. สร้าง components ใน `client/src/components/`
-5. อัปเดต pages ใน `client/src/pages/`
+### Vercel Deployment
 
-### การทดสอบ
-```bash
-npm run test
-```
+This application is configured for deployment on Vercel:
 
-## การ Deploy
+1. **Connect to Vercel**:
+   - Install Vercel CLI: `npm i -g vercel`
+   - Login: `vercel login`
+   - Deploy: `vercel`
 
-### Vercel
+2. **Environment Variables**:
+   - Set `NODE_ENV=production` in Vercel dashboard
+   - Add any additional environment variables as needed
+
+3. **Build Configuration**:
+   - The `vercel.json` file is configured for both API and static file serving
+   - API routes are served from `/api/*`
+   - Static files are served from the root
+
+4. **Automatic Deployment**:
+   - Connect your GitHub repository to Vercel
+   - Push to main branch triggers automatic deployment
+
+### Manual Deployment
+
+1. Build the application:
 ```bash
 npm run build
-vercel --prod
 ```
 
-### Docker
+2. Start the production server:
 ```bash
-docker build -t navigation-tracker .
-docker run -p 3000:3000 navigation-tracker
+npm start
 ```
 
-## การสนับสนุน
+## API Endpoints
 
-สำหรับคำถามหรือปัญหาการใช้งาน กรุณาติดต่อทีมพัฒนา 
+### Dashboard
+- `GET /api/dashboard/stats` - Get dashboard statistics
+
+### Tools
+- `GET /api/tools` - Get all tools
+- `POST /api/tools` - Create new tool
+- `GET /api/tools/:id` - Get specific tool
+- `PATCH /api/tools/:id` - Update tool
+- `DELETE /api/tools/:id` - Delete tool
+
+### QA Samples
+- `GET /api/qa-samples` - Get all QA samples
+- `POST /api/qa-samples` - Create new QA sample
+- `GET /api/qa-samples/:id` - Get specific QA sample
+- `PATCH /api/qa-samples/:id` - Update QA sample
+- `DELETE /api/qa-samples/:id` - Delete QA sample
+
+### QA Test Results
+- `GET /api/qa-test-results` - Get all test results
+- `POST /api/qa-test-results` - Create new test result
+- `GET /api/qa-test-results/:id` - Get specific test result
+- `PUT /api/qa-test-results/:id` - Update test result
+- `DELETE /api/qa-test-results/:id` - Delete test result
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details 
