@@ -76,13 +76,13 @@ export default function ChemicalsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "หมดอายุ":
-        return <Badge className="lab-badge-error">{status}</Badge>;
+        return <Badge className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">{status}</Badge>;
       case "ใกล้หมดอายุ":
-        return <Badge className="lab-badge-warning">{status}</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800">{status}</Badge>;
       case "ปกติ":
-        return <Badge className="lab-badge-success">{status}</Badge>;
+        return <Badge className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">{status}</Badge>;
       default:
-        return <Badge className="lab-badge-info">{status}</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800">{status}</Badge>;
     }
   };
 
@@ -127,11 +127,11 @@ export default function ChemicalsPage() {
       render: (_value: string, chemical: Chemical) => {
         const status = getExpiryStatus(typeof chemical.expiryDate === "string" ? chemical.expiryDate : (chemical.expiryDate ? chemical.expiryDate.toISOString() : null));
         const statusBadges = {
-          "ปกติ": <Badge className="lab-badge-success">ปกติ</Badge>,
-          "ใกล้หมดอายุ": <Badge className="lab-badge-warning">ใกล้หมดอายุ</Badge>,
-          "หมดอายุ": <Badge className="lab-badge-error">หมดอายุ</Badge>
+          "ปกติ": <Badge className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">ปกติ</Badge>,
+          "ใกล้หมดอายุ": <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800">ใกล้หมดอายุ</Badge>,
+          "หมดอายุ": <Badge className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">หมดอายุ</Badge>
         };
-        return statusBadges[status as keyof typeof statusBadges] || <Badge className="lab-badge-info">{status}</Badge>;
+        return statusBadges[status as keyof typeof statusBadges] || <Badge className="bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800">{status}</Badge>;
       },
     },
   ];

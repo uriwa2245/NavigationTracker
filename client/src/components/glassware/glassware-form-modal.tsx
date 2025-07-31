@@ -375,7 +375,6 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
                         <SelectContent>
                           <SelectItem value="ผ่าน">ผ่าน</SelectItem>
                           <SelectItem value="ไม่ผ่าน">ไม่ผ่าน</SelectItem>
-                          <SelectItem value="ปรับเทียบ">ปรับเทียบ</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

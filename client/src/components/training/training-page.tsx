@@ -146,7 +146,7 @@ export default function TrainingPage() {
       </div>
 
       {/* Dashboard Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="lab-card">
           <div className="p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 thai-font">
@@ -191,21 +191,6 @@ export default function TrainingPage() {
           </div>
         </div>
 
-        <div className="lab-card">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 thai-font">
-              การดำเนินการด่วน
-            </h3>
-            <div className="space-y-2">
-              <button
-                onClick={handleAdd}
-                className="w-full px-4 py-2 text-sm lab-button-primary rounded-lg transition-colors thai-font"
-              >
-                เพิ่มการฝึกอบรมใหม่
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
 
       <DataTable

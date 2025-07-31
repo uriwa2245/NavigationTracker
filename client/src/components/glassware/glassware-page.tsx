@@ -106,21 +106,20 @@ export default function GlasswarePage() {
         const result = item.calibrationResult;
         if (result) {
           const resultBadges = {
-            "ผ่าน": <Badge className="lab-badge-success">ผ่าน</Badge>,
-            "ไม่ผ่าน": <Badge className="lab-badge-error">ไม่ผ่าน</Badge>,
-            "ปรับเทียบ": <Badge className="lab-badge-warning">ปรับเทียบ</Badge>
+            "ผ่าน": <Badge className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">ผ่าน</Badge>,
+            "ไม่ผ่าน": <Badge className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">ไม่ผ่าน</Badge>
           };
-          return resultBadges[result as keyof typeof resultBadges] || <Badge className="lab-badge-info">{result}</Badge>;
+          return resultBadges[result as keyof typeof resultBadges] || <Badge className="bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800">{result}</Badge>;
         }
         
         // Fallback to calibration status
         const status = getCalibrationStatus(item);
         const statusBadges = {
-          "ปกติ": <Badge className="lab-badge-success">ปกติ</Badge>,
-          "ใกล้ครบกำหนด": <Badge className="lab-badge-warning">ใกล้ครบกำหนด</Badge>,
-          "เลยกำหนด": <Badge className="lab-badge-error">เลยกำหนด</Badge>
+          "ปกติ": <Badge className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">ปกติ</Badge>,
+          "ใกล้ครบกำหนด": <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800">ใกล้ครบกำหนด</Badge>,
+          "เลยกำหนด": <Badge className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">เลยกำหนด</Badge>
         };
-        return statusBadges[status as keyof typeof statusBadges] || <Badge className="lab-badge-info">{status}</Badge>;
+        return statusBadges[status as keyof typeof statusBadges] || <Badge className="bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800">{status}</Badge>;
       },
     },
   ];
@@ -170,14 +169,12 @@ export default function GlasswarePage() {
         statusFilters={[
           { key: "ผ่าน", label: "ผ่าน", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => item.calibrationResult === "ผ่าน").length : 0 },
           { key: "ไม่ผ่าน", label: "ไม่ผ่าน", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => item.calibrationResult === "ไม่ผ่าน").length : 0 },
-          { key: "ปรับเทียบ", label: "ปรับเทียบ", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => item.calibrationResult === "ปรับเทียบ").length : 0 },
           { key: "เลยกำหนด", label: "เลยกำหนด", count: Array.isArray(glassware) ? glassware.filter((item: Glassware) => getCalibrationStatus(item) === "เลยกำหนด").length : 0 },
         ]}
         getItemStatus={(item: Glassware) => {
           // Check calibration result first
           if (item.calibrationResult === "ไม่ผ่าน") return "ไม่ผ่าน";
           if (item.calibrationResult === "ผ่าน") return "ผ่าน";
-          if (item.calibrationResult === "ปรับเทียบ") return "ปรับเทียบ";
           
           // Fallback to calibration status
           const calibrationStatus = getCalibrationStatus(item);
