@@ -552,13 +552,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/qa-test-results", async (req, res) => {
     try {
+      console.log("Received payload:", JSON.stringify(req.body, null, 2));
       const result = insertQaTestResultSchema.safeParse(req.body);
       if (!result.success) {
+        console.log("Validation errors:", JSON.stringify(result.error.issues, null, 2));
         return res.status(400).json({ message: "Invalid QA test result data", errors: result.error.issues });
       }
       const testResult = await storage.createQaTestResult(result.data);
       res.status(201).json(testResult);
     } catch (error) {
+      console.error("Server error:", error);
       res.status(500).json({ message: "Failed to create QA test result" });
     }
   });
@@ -581,12 +584,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/qa-test-results/:id", async (req, res) => {
     try {
+      console.log("DELETE /api/qa-test-results/:id called with ID:", req.params.id);
       const success = await storage.deleteQaTestResult(parseInt(req.params.id));
+      console.log("deleteQaTestResult result:", success);
       if (!success) {
+        console.log("QA test result not found, returning 404");
         return res.status(404).json({ message: "QA test result not found" });
       }
+      console.log("QA test result deleted successfully, returning 204");
       res.status(204).send();
     } catch (error) {
+      console.error("Error deleting QA test result:", error);
       res.status(500).json({ message: "Failed to delete QA test result" });
     }
   });

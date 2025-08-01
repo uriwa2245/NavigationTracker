@@ -36,117 +36,106 @@ import { z } from "zod";
 // Mockup ข้อมูลฐานข้อมูลสำหรับ Item Test details
 const itemTestDatabase = [
   {
-    sampleName: "น้ำยา A",
+    sampleName: "Xylene",
     itemTest: "Appearance",
-    specification: "Clear",
+    specification: "Clear to pale off-white transparent liquid",
     unit: "-",
-    method: "Visual"
+    method: "In house method : W-QA-13"
   },
   {
-    sampleName: "น้ำยา A",
+    sampleName: "Xylene",
     itemTest: "pH",
-    specification: "6.0-7.0",
-    unit: "",
-    method: "pH meter"
+    specification: "5.0-8.0",
+    unit: "-",
+    method: "In house method : W-QA-09 based on Collaborative International Pesticide Analytical Council, CIPAC, F(MT-75), page 205-206	"
   },
   {
-    sampleName: "น้ำยา A",
-    itemTest: "Density",
-    specification: "1.00-1.05",
-    unit: "g/cm³",
-    method: "Hydrometer"
-  },
-  {
-    sampleName: "น้ำยา A",
-    itemTest: "Viscosity",
-    specification: "100-200",
-    unit: "cP",
-    method: "Brookfield"
-  },
-  {
-    sampleName: "น้ำยา A",
+    sampleName: "Xylene",
     itemTest: "Moisture",
-    specification: "< 0.5",
+    specification: "-",
     unit: "%",
-    method: "Karl Fischer"
+    method: "In house method : W-QA-25"
   },
   {
-    sampleName: "น้ำยา B",
+    sampleName: "Imidacloprid 10%EC",
     itemTest: "Appearance",
-    specification: "Clear to slightly hazy",
+    specification: "Sulphur yellow /Butter cup/ sundae transparent liquid",
     unit: "-",
-    method: "Visual"
+    method: "In house method : W-QA-13"
   },
   {
-    sampleName: "น้ำยา B",
+    sampleName: "Imidacloprid 10%EC",
     itemTest: "ActiveIngredient",
-    specification: "95-105",
-    unit: "%",
-    method: "HPLC"
+    specification: "9.00-11.00",
+    unit: "%w/w",
+    method: "In house method : W-QA-07 based on Collaborative International Pesticide Analytical Council, CIPAC, Vol.K, page 70-76"
   },
   {
-    sampleName: "น้ำยา B",
+    sampleName: "Imidacloprid 10%EC",
     itemTest: "pH",
-    specification: "5.5-6.5",
+    specification: "4.0-9.0",
     unit: "",
-    method: "pH meter"
+    method: "In house method : W-QA-09 based on Collaborative International Pesticide Analytical Council, CIPAC, F(MT-75), page 205-206"
   },
   {
-    sampleName: "น้ำยา B",
-    itemTest: "Density",
-    specification: "0.95-1.00",
-    unit: "g/cm³",
-    method: "Hydrometer"
-  },
-  {
-    sampleName: "น้ำยา C",
-    itemTest: "Appearance",
-    specification: "Yellow to brown liquid",
-    unit: "-",
-    method: "Visual"
-  },
-  {
-    sampleName: "น้ำยา C",
-    itemTest: "Reemulsification",
+    sampleName: "Imidacloprid 10%EC",
+    itemTest: "Accelerated storage",
     specification: "Pass",
     unit: "-",
-    method: "Standard test"
+    method: "In house method : W-QA-10 based on Collaborative International Pesticide Analytical Council,CIPAC,Vol. J(MT-46.3),page 128-130"
   },
   {
-    sampleName: "น้ำยา C",
-    itemTest: "PersistanceFoaming",
-    specification: "< 10",
-    unit: "ml",
-    method: "Ross-Miles"
+    sampleName: "Imidacloprid 10%EC",
+    itemTest: "Moisture",
+    specification: "Pass",
+    unit: "%",
+    method: "In house method : W-QA-25"
   },
   {
-    sampleName: "น้ำยา C",
+    sampleName: "Cypermethrin 3.0%WP",
+    itemTest: "Appearance",
+    specification: "Pearl white powder",
+    unit: "-",
+    method: "In house method : W-QA-13"
+  },
+  {
+    sampleName: "Cypermethrin 3.0%WP",
+    itemTest: "ActiveIngredient",
+    specification: "2.70-3.30",
+    unit: "%w/w",
+    method: "In house method : W-QA-03 based on Collaborative International Pesticide Analytical Council, CIPAC, Vol.1C, page 2052-2059"
+  },
+  {
+    sampleName: "Cypermethrin 3.0%WP",
+    itemTest: "pH",
+    specification: "4.0-9.0",
+    unit: "-",
+    method: "In house method : W-QA-09 based on Collaborative International Pesticide Analytical Council, CIPAC, F(MT-75), page 205-206"
+  },
+  {
+    sampleName: "Cypermethrin 3.0%WP",
     itemTest: "AcceleratedStorage",
-    specification: "Stable",
+    specification: "Pass",
     unit: "-",
-    method: "40°C/3 months"
+    method: "In house method : W-QA-10 based on Collaborative International Pesticide Analytical Council,CIPAC,Vol. J(MT-46.3),page 128-130"
   },
   {
-    sampleName: "น้ำยา C",
-    itemTest: "FormulaTest",
-    specification: "Compatible",
-    unit: "-",
-    method: "Compatibility test"
+    sampleName: "Cypermethrin 3.0%WP",
+    itemTest: "Moisture",
+    specification: "Pass",
+    unit: "%",
+    method: "In house method : W-QA-25"
   }
 ];
 
 // รายชื่อตัวอย่างที่มีในระบบ
 const sampleNameOptions = [
-  { value: "น้ำยา A", label: "น้ำยา A" },
-  { value: "น้ำยา B", label: "น้ำยา B" },
-  { value: "น้ำยา C", label: "น้ำยา C" },
-  { value: "น้ำยา D", label: "น้ำยา D" },
-  { value: "น้ำยา E", label: "น้ำยา E" },
-  { value: "สารเคมี A", label: "สารเคมี A" },
-  { value: "สารเคมี B", label: "สารเคมี B" },
-  { value: "น้ำมัน A", label: "น้ำมัน A" },
-  { value: "น้ำมัน B", label: "น้ำมัน B" },
-  { value: "อื่นๆ", label: "อื่นๆ" }
+  { value: "Xylene", label: "Xylene" },
+  { value: "Imidacloprid 10%EC", label: "Imidacloprid 10%EC" },
+  { value: "Cypermethrin 3.0%WP", label: "Cypermethrin 3.0%WP" },
+  { value: "Deltamethrin 5%", label: "Deltamethrin 5%" },
+  { value: "Jasoxx A26", label: "Jasoxx A26" },
+  { value: "Fipronil 25%", label: "Fipronil 25%" }
 ];
 
 // ฟังก์ชันค้นหาข้อมูล Item Test details
@@ -162,11 +151,22 @@ interface QaSampleFormModalProps {
   qaSample?: QaSample | null;
 }
 
-// Enhanced schema for form validation with samples array
-const qaSampleFormSchema = insertQaSampleSchema.extend({
+// Form validation schema (separate from server schema)
+const qaSampleFormSchema = z.object({
+  requestNo: z.string().min(1, "Request No จำเป็นต้องระบุ"),
+  receivedTime: z.string().min(1, "Time จำเป็นต้องระบุ"),
+  receivedDate: z.date(),
+  dueDate: z.date(),
+  quotationNo: z.string().optional(),
+  contactPerson: z.string().min(1, "ผู้ติดต่อจำเป็นต้องระบุ"),
+  phone: z.string().min(1, "เบอร์โทรศัพท์จำเป็นต้องระบุ"),
+  email: z.string().email("รูปแบบอีเมลไม่ถูกต้อง").min(1, "อีเมลจำเป็นต้องระบุ"),
+  companyName: z.string().min(1, "ชื่อบริษัทจำเป็นต้องระบุ"),
+  address: z.string().optional(),
+  deliveryMethod: z.string().min(1, "การจัดส่งจำเป็นต้องเลือก"),
   samples: z.array(z.object({
     sampleNo: z.string().min(1, "Sample No จำเป็นต้องระบุ"),
-    names: z.array(z.string()).min(1, "ต้องระบุชื่อตัวอย่างอย่างน้อย 1 ชื่อ"), // Changed from name to names
+    names: z.array(z.string().min(1, "ชื่อตัวอย่างไม่สามารถเป็นค่าว่างได้")).min(1, "ต้องระบุชื่อตัวอย่างอย่างน้อย 1 ชื่อ"),
     description: z.string().optional(),
     analysisRequest: z.string().optional(),
     itemTests: z.array(z.object({
@@ -177,6 +177,11 @@ const qaSampleFormSchema = insertQaSampleSchema.extend({
       sampleName: z.string().optional(),
     })).min(1, "ต้องมี Item Test อย่างน้อย 1 รายการ"),
   })).min(1, "ต้องมีตัวอย่างอย่างน้อย 1 รายการ"),
+  storage: z.string().min(1, "Sample storage จำเป็นต้องเลือก"),
+  postTesting: z.string().min(1, "ตัวอย่างหลังการทดสอบจำเป็นต้องเลือก"),
+  condition: z.string().min(1, "สภาพตัวอย่างจำเป็นต้องเลือก"),
+  status: z.string().optional(),
+  notes: z.string().optional(),
 });
 
 type QaSampleFormData = z.infer<typeof qaSampleFormSchema>;
@@ -226,7 +231,9 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
   const defaultSamples = Array.isArray(qaSample?.samples) && qaSample?.samples.length > 0
     ? qaSample.samples.map((sample: any) => ({
       ...sample,
-      names: Array.isArray(sample.names) ? sample.names : [sample.name || ""], // Convert old name to names array
+      names: Array.isArray(sample.names) && sample.names.length > 0 && sample.names.some((name: string) => name.trim() !== "") 
+        ? sample.names.filter((name: string) => name.trim() !== "")
+        : [sample.name || ""].filter((name: string) => name.trim() !== ""),
       itemTests: sample.itemTests && Array.isArray(sample.itemTests) && sample.itemTests.length > 0
         ? sample.itemTests
         : [{ itemTest: "", unit: "", specification: "", method: "", sampleName: "" }],
@@ -234,7 +241,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
     : [
       {
         sampleNo: "",
-        names: [""], // Initialize with empty array containing one empty string
+        names: [], // Initialize with empty array - will be handled by form validation
         description: "",
         analysisRequest: "",
         itemTests: [{ itemTest: "", unit: "", specification: "", method: "", sampleName: "" }],
@@ -243,6 +250,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
 
   const form = useForm<QaSampleFormData>({
     resolver: zodResolver(qaSampleFormSchema),
+    mode: "onChange",
     defaultValues: {
       requestNo: "",
       receivedTime: "",
@@ -270,6 +278,9 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
         const formSamples = Array.isArray(qaSample?.samples) && qaSample?.samples.length > 0
           ? qaSample.samples.map((sample: any) => ({
               ...sample,
+              names: Array.isArray(sample.names) && sample.names.length > 0 && sample.names.some((name: string) => name.trim() !== "") 
+                ? sample.names.filter((name: string) => name.trim() !== "")
+                : [sample.name || ""].filter((name: string) => name.trim() !== ""),
               itemTests: sample.itemTests && Array.isArray(sample.itemTests) && sample.itemTests.length > 0
                 ? sample.itemTests
                 : [{ itemTest: "", unit: "", specification: "", method: "", sampleName: "" }],
@@ -277,21 +288,18 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
           : [
               {
                 sampleNo: "",
-                names: [""], // Changed from name to names
+                names: [], // Initialize with empty array
                 description: "",
                 analysisRequest: "",
                 itemTests: [{ itemTest: "", unit: "", specification: "", method: "", sampleName: "" }],
               },
             ];
         
-        const formData = {
-          ...qaSample,
-          receivedDate: qaSample.receivedDate ? new Date(qaSample.receivedDate) : new Date(),
-          dueDate: qaSample.dueDate ? new Date(qaSample.dueDate) : new Date(),
-          samples: formSamples,
-          // Ensure string fields are not null
+        const formData: QaSampleFormData = {
           requestNo: qaSample.requestNo || "",
           receivedTime: qaSample.receivedTime || "",
+          receivedDate: qaSample.receivedDate ? new Date(qaSample.receivedDate) : new Date(),
+          dueDate: qaSample.dueDate ? new Date(qaSample.dueDate) : new Date(),
           quotationNo: qaSample.quotationNo || "",
           contactPerson: qaSample.contactPerson || "",
           phone: qaSample.phone || "",
@@ -299,10 +307,12 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
           companyName: qaSample.companyName || "",
           address: qaSample.address || "",
           deliveryMethod: qaSample.deliveryMethod || "",
+          samples: formSamples,
           storage: qaSample.storage || "",
           postTesting: qaSample.postTesting || "",
           condition: qaSample.condition || "",
           status: qaSample.status || "received",
+          notes: qaSample.notes || "",
         };
         form.reset(formData);
       } else {
@@ -361,9 +371,25 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
 
   const mutation = useMutation({
     mutationFn: async (data: QaSampleFormData) => {
+      // Transform form data to match server schema
       const submitData: InsertQaSample = {
-        ...data,
-        samples: data.samples,
+        requestNo: data.requestNo,
+        receivedTime: data.receivedTime,
+        receivedDate: data.receivedDate,
+        dueDate: data.dueDate,
+        quotationNo: data.quotationNo || null,
+        contactPerson: data.contactPerson,
+        phone: data.phone,
+        email: data.email,
+        companyName: data.companyName,
+        address: data.address || null,
+        deliveryMethod: data.deliveryMethod,
+        samples: data.samples, // This will be stored as JSON
+        storage: data.storage,
+        postTesting: data.postTesting,
+        condition: data.condition,
+        status: data.status || "received",
+        notes: data.notes || null,
       };
 
       if (isEditing) {
@@ -382,7 +408,8 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
       form.reset();
       localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear local storage on successful submission
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Mutation error:", error);
       toast({
         title: "เกิดข้อผิดพลาด",
         description: "ไม่สามารถบันทึกข้อมูลได้",
@@ -392,7 +419,12 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
   });
 
   const onSubmit = (data: QaSampleFormData) => {
+
     mutation.mutate(data);
+  };
+
+  const onError = (errors: any) => {
+    console.error("Form validation errors:", errors);
   };
 
   const handleClose = () => {
@@ -404,7 +436,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
   const addSample = () => {
     append({
       sampleNo: "",
-      names: [""], // Changed from name to names
+      names: [], // Start with empty array
       description: "",
       analysisRequest: "",
       itemTests: [{ itemTest: "", unit: "", specification: "", method: "", sampleName: "" }],
@@ -427,7 +459,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-8">
             {/* Staff Information */}
             <Card>
               <CardHeader>
@@ -604,8 +636,8 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {deliveryMethodOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
+                            {deliveryMethodOptions.map((option, optionIndex) => (
+                              <SelectItem key={`delivery-method-${optionIndex}-${option.value}`} value={option.value}>
                                 {option.label}
                               </SelectItem>
                             ))}
@@ -658,7 +690,7 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                 <div className="space-y-4">
                   {fields.map((field, index) => (
                     <div
-                      key={field.id}
+                      key={`sample-${index}-${field.id}`}
                       className="p-6 bg-white dark:bg-gray-900 rounded-xl border shadow-sm relative space-y-4"
                     >
                       {/* Remove Sample Button - move to top right */}
@@ -694,8 +726,22 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                         <div className="space-y-2">
                           <FormLabel className="thai-font">Sample Name *</FormLabel>
                           <div className="space-y-2">
-                            {form.watch(`samples.${index}.names`)?.map((_: string, nameIdx: number) => (
-                              <div key={nameIdx} className="flex items-center gap-2">
+                            {(form.watch(`samples.${index}.names`) || []).length === 0 && (
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  form.setValue(`samples.${index}.names`, [""]);
+                                }}
+                                className="w-full"
+                              >
+                                <Plus className="w-4 h-4 mr-2" />
+                                เพิ่มชื่อตัวอย่าง
+                              </Button>
+                            )}
+                            {(form.watch(`samples.${index}.names`) || []).map((_: string, nameIdx: number) => (
+                              <div key={`sample-name-${index}-${nameIdx}`} className="flex items-center gap-2">
                                 <FormField
                                   control={form.control}
                                   name={`samples.${index}.names.${nameIdx}`}
@@ -729,8 +775,8 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                                           </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                          {sampleNameOptions.map((option) => (
-                                            <SelectItem key={option.value} value={option.value}>
+                                          {sampleNameOptions.map((option, optionIndex) => (
+                                            <SelectItem key={`sample-name-option-${optionIndex}-${option.value}`} value={option.value}>
                                               {option.label}
                                             </SelectItem>
                                           ))}
@@ -742,13 +788,13 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                                 />
                                 <div className="flex items-center gap-1">
                                   {/* Add name button */}
-                                  {nameIdx === form.watch(`samples.${index}.names`).length - 1 && (
+                                  {nameIdx === (form.watch(`samples.${index}.names`) || []).length - 1 && (
                                     <Button
                                       type="button"
                                       size="icon"
                                       variant="outline"
                                       onClick={() => {
-                                        const current = form.getValues(`samples.${index}.names`);
+                                        const current = form.getValues(`samples.${index}.names`) || [];
                                         form.setValue(`samples.${index}.names`, [...current, ""]);
                                       }}
                                       className="h-8 w-8"
@@ -757,13 +803,13 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                                     </Button>
                                   )}
                                   {/* Remove name button */}
-                                  {form.watch(`samples.${index}.names`).length > 1 && (
+                                  {(form.watch(`samples.${index}.names`) || []).length > 1 && (
                                     <Button
                                       type="button"
                                       size="icon"
                                       variant="ghost"
                                       onClick={() => {
-                                        const current = form.getValues(`samples.${index}.names`);
+                                        const current = form.getValues(`samples.${index}.names`) || [];
                                         if (current.length > 1) {
                                           form.setValue(
                                             `samples.${index}.names`,
@@ -799,9 +845,9 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                       </div>
 
                       {/* Item Test Section */}
-                      <div>
+                      <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <FormLabel className="thai-font">รายการทดสอบ (Item Test) *</FormLabel>
+                          <FormLabel className="thai-font text-lg font-semibold">รายการทดสอบ (Item Test) *</FormLabel>
                           <Button
                             type="button"
                             size="sm"
@@ -809,121 +855,147 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                               ...form.getValues(`samples.${index}.itemTests`),
                               { itemTest: "", unit: "", specification: "", method: "", sampleName: "" },
                             ])}
+                            className="lab-button-primary"
                           >
                             <Plus className="w-4 h-4 mr-1" />
                             เพิ่ม Item Test
                           </Button>
                         </div>
 
-                        {form.watch(`samples.${index}.itemTests`)?.map((_: any, itemIdx: number) => (
-                          <div key={itemIdx} className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-2">
-                            <FormField
-                              control={form.control}
-                              name={`samples.${index}.itemTests.${itemIdx}.itemTest`}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <Select
-                                    onValueChange={(value) => {
-                                      field.onChange(value);
-
-                                      // ดึง sampleName ที่เลือก (เอาอันแรกใน names array)
-                                      const sampleNames = form.getValues(`samples.${index}.names`);
-                                      const sampleName = Array.isArray(sampleNames) && sampleNames.length > 0 ? sampleNames[0] : "";
-
-                                      // ค้นหาข้อมูลในฐานข้อมูล
-                                      const details = getItemTestDetails(sampleName, value);
-
-                                      if (details) {
-                                        form.setValue(`samples.${index}.itemTests.${itemIdx}.specification`, details.specification || "");
-                                        form.setValue(`samples.${index}.itemTests.${itemIdx}.unit`, details.unit || "");
-                                        form.setValue(`samples.${index}.itemTests.${itemIdx}.method`, details.method || "");
-                                      } else {
-                                        // ถ้าไม่เจอ ให้เคลียร์ค่า
-                                        form.setValue(`samples.${index}.itemTests.${itemIdx}.specification`, "");
-                                        form.setValue(`samples.${index}.itemTests.${itemIdx}.unit`, "");
-                                        form.setValue(`samples.${index}.itemTests.${itemIdx}.method`, "");
-                                      }
+                        <div className="space-y-4">
+                          {form.watch(`samples.${index}.itemTests`)?.map((_: any, itemIdx: number) => (
+                            <div key={`item-test-${index}-${itemIdx}`} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="font-medium text-gray-700 dark:text-gray-300 thai-font">
+                                  Item Test {itemIdx + 1}
+                                </h4>
+                                {form.watch(`samples.${index}.itemTests`)?.length > 1 && (
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => {
+                                      const current = form.getValues(`samples.${index}.itemTests`);
+                                      form.setValue(
+                                        `samples.${index}.itemTests`,
+                                        current.filter((_: any, i: number) => i !== itemIdx)
+                                      );
                                     }}
-                                    value={field.value || ""}
+                                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
                                   >
-                                    <FormControl>
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="เลือก Item Test" />
-                                      </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                      {itemTestOptions.map((option) => (
-                                        <SelectItem key={option.value} value={option.value}>
-                                          {option.label}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                )}
+                              </div>
 
-                            <FormField
-                              control={form.control}
-                              name={`samples.${index}.itemTests.${itemIdx}.specification`}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input placeholder="Specification" {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                {/* Item Test Selection */}
+                                <FormField
+                                  control={form.control}
+                                  name={`samples.${index}.itemTests.${itemIdx}.itemTest`}
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel className="thai-font">Item Test *</FormLabel>
+                                      <Select
+                                        onValueChange={(value) => {
+                                          field.onChange(value);
 
-                            <FormField
-                              control={form.control}
-                              name={`samples.${index}.itemTests.${itemIdx}.unit`}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input placeholder="Unit" {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                                          // ดึง sampleName ที่เลือก (เอาอันแรกใน names array)
+                                          const sampleNames = form.getValues(`samples.${index}.names`);
+                                          const sampleName = Array.isArray(sampleNames) && sampleNames.length > 0 ? sampleNames[0] : "";
 
-                            <FormField
-                              control={form.control}
-                              name={`samples.${index}.itemTests.${itemIdx}.method`}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input placeholder="Method" {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                                          // ค้นหาข้อมูลในฐานข้อมูล
+                                          const details = getItemTestDetails(sampleName, value);
 
+                                          if (details) {
+                                            form.setValue(`samples.${index}.itemTests.${itemIdx}.specification`, details.specification || "");
+                                            form.setValue(`samples.${index}.itemTests.${itemIdx}.unit`, details.unit || "");
+                                            form.setValue(`samples.${index}.itemTests.${itemIdx}.method`, details.method || "");
+                                          } else {
+                                            // ถ้าไม่เจอ ให้เคลียร์ค่า
+                                            form.setValue(`samples.${index}.itemTests.${itemIdx}.specification`, "");
+                                            form.setValue(`samples.${index}.itemTests.${itemIdx}.unit`, "");
+                                            form.setValue(`samples.${index}.itemTests.${itemIdx}.method`, "");
+                                          }
+                                        }}
+                                        value={field.value || ""}
+                                      >
+                                        <FormControl>
+                                          <SelectTrigger>
+                                            <SelectValue placeholder="เลือก Item Test" />
+                                          </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                          {itemTestOptions.map((option, optionIndex) => (
+                                            <SelectItem key={`item-test-option-${optionIndex}-${option.value}`} value={option.value}>
+                                              {option.label}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
 
+                                {/* Unit */}
+                                <FormField
+                                  control={form.control}
+                                  name={`samples.${index}.itemTests.${itemIdx}.unit`}
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel className="thai-font">Unit *</FormLabel>
+                                      <FormControl>
+                                        <Input placeholder="Unit" {...field} />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
 
-                            {form.watch(`samples.${index}.itemTests`)?.length > 1 && (
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => {
-                                  const current = form.getValues(`samples.${index}.itemTests`);
-                                  form.setValue(
-                                    `samples.${index}.itemTests`,
-                                    current.filter((_: any, i: number) => i !== itemIdx)
-                                  );
-                                }}
-                                className="text-red-500 hover:text-red-700"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </div>
-                        ))}
+                                {/* Specification */}
+                                <FormField
+                                  control={form.control}
+                                  name={`samples.${index}.itemTests.${itemIdx}.specification`}
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel className="thai-font">Specification</FormLabel>
+                                      <FormControl>
+                                        <Textarea
+                                          placeholder="Specification"
+                                          rows={2}
+                                          className="resize-none"
+                                          {...field}
+                                        />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+
+                                {/* Method */}
+                                <FormField
+                                  control={form.control}
+                                  name={`samples.${index}.itemTests.${itemIdx}.method`}
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel className="thai-font">Method</FormLabel>
+                                      <FormControl>
+                                        <Textarea
+                                          placeholder="Method"
+                                          rows={3}
+                                          className="resize-none"
+                                          {...field}
+                                        />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
 
                     </div>
@@ -953,8 +1025,8 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {storageOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
+                            {storageOptions.map((option, optionIndex) => (
+                              <SelectItem key={`storage-${optionIndex}-${option.value}`} value={option.value}>
                                 {option.label}
                               </SelectItem>
                             ))}
@@ -978,8 +1050,8 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {postTestingOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
+                            {postTestingOptions.map((option, optionIndex) => (
+                              <SelectItem key={`post-testing-${optionIndex}-${option.value}`} value={option.value}>
                                 {option.label}
                               </SelectItem>
                             ))}
@@ -1003,8 +1075,8 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {conditionOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
+                            {conditionOptions.map((option, optionIndex) => (
+                              <SelectItem key={`condition-${optionIndex}-${option.value}`} value={option.value}>
                                 {option.label}
                               </SelectItem>
                             ))}

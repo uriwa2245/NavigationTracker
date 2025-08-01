@@ -255,14 +255,20 @@ export const insertQaSampleSchema = createInsertSchema(qaSamples).omit({ id: tru
   status: z.string().optional(), // Removed .nullable() if default handles it
   notes: z.string().nullable(),
 });
-export const insertQaTestResultSchema = createInsertSchema(qaTestResults).omit({ id: true }).extend({
+export const insertQaTestResultSchema = z.object({
+  sampleNo: z.string().min(1, "Sample No is required"),
+  requestNo: z.string().min(1, "Request No is required"),
+  product: z.string().min(1, "Product is required"),
   dueDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
-  sampleId: z.number().nullable(),
-  method: z.string().nullable(),
-  result: z.string().nullable(),
-  unit: z.string().nullable(),
-  specification: z.string().nullable(),
-  recordDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null),
+  sampleId: z.number().nullable().optional(),
+  testItems: z.union([z.string(), z.array(z.any()), z.any()]).nullable().optional(),
+  method: z.string().nullable().optional(),
+  result: z.string().nullable().optional(),
+  unit: z.string().nullable().optional(),
+  specification: z.string().nullable().optional(),
+  recordDate: z.union([z.date(), z.string().datetime(), z.null()]).transform(val => val ? new Date(val) : null).optional(),
+  status: z.string().optional(),
+  notes: z.string().nullable().optional(),
 });
 
 

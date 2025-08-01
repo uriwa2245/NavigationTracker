@@ -116,6 +116,244 @@ export class MemStorage implements IStorage {
   constructor() {
     // Start with empty data - users will add their own content
     this.currentId = 100;
+    
+    // Add some sample QA data for testing
+    this.addSampleQaData();
+    this.addSampleQaTestResults();
+  }
+
+  private addSampleQaData() {
+    // Add sample QA samples for testing
+    const sampleQaSamples = [
+      {
+        id: 101,
+        requestNo: "QA-2024-001",
+        quotationNo: "QT-2024-001",
+        receivedDate: "2024-01-15",
+        receivedTime: "09:30",
+        dueDate: "2024-01-25",
+        companyName: "บริษัท ตัวอย่าง จำกัด",
+        contactPerson: "คุณสมชาย ใจดี",
+        phone: "081-234-5678",
+        email: "somchai@example.com",
+        address: "123 ถนนตัวอย่าง แขวงตัวอย่าง เขตตัวอย่าง กรุงเทพฯ 10000",
+        deliveryMethod: "pickup",
+        storage: "room_temp",
+        postTesting: "return",
+        condition: "normal",
+        samples: [
+          {
+            sampleNo: "S001",
+            name: "น้ำตัวอย่าง A",
+            analysisRequest: "AR-001",
+            itemTests: [
+              {
+                itemTest: "pH",
+                specification: "6.5-8.5",
+                unit: "pH",
+                method: "pH meter"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: 102,
+        requestNo: "QA-2024-002",
+        quotationNo: "QT-2024-002",
+        receivedDate: "2024-01-16",
+        receivedTime: "14:15",
+        dueDate: "2024-01-26",
+        companyName: "บริษัท ทดสอบ จำกัด",
+        contactPerson: "คุณสมหญิง รักดี",
+        phone: "082-345-6789",
+        email: "somying@test.com",
+        address: "456 ถนนทดสอบ แขวงทดสอบ เขตทดสอบ กรุงเทพฯ 10001",
+        deliveryMethod: "address_report",
+        storage: "chilled",
+        postTesting: "return",
+        condition: "normal",
+        samples: [
+          {
+            sampleNo: "S002",
+            name: "ดินตัวอย่าง B",
+            analysisRequest: "AR-002",
+            itemTests: [
+              {
+                itemTest: "ความชื้น",
+                specification: "< 10%",
+                unit: "%",
+                method: "Oven drying"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: 103,
+        requestNo: "QA-2024-003",
+        quotationNo: "QT-2024-003",
+        receivedDate: "2024-01-17",
+        receivedTime: "10:00",
+        dueDate: "2024-01-27",
+        companyName: "บริษัท ทดสอบเพิ่มเติม จำกัด",
+        contactPerson: "คุณสมศักดิ์ ใจดี",
+        phone: "083-456-7890",
+        email: "somsak@testplus.com",
+        address: "789 ถนนทดสอบเพิ่มเติม แขวงทดสอบเพิ่มเติม เขตทดสอบเพิ่มเติม กรุงเทพฯ 10002",
+        deliveryMethod: "address_invoice",
+        storage: "frozen",
+        postTesting: "return",
+        condition: "normal",
+        samples: [
+          {
+            sampleNo: "S003",
+            name: "อาหารตัวอย่าง C",
+            analysisRequest: "AR-003",
+            itemTests: [
+              {
+                itemTest: "แบคทีเรีย",
+                specification: "< 1000 CFU/g",
+                unit: "CFU/g",
+                method: "Plate count"
+              }
+            ]
+          }
+        ]
+      }
+    ];
+
+    sampleQaSamples.forEach(sample => {
+      const qaSample: QaSample = {
+        ...sample,
+        receivedDate: new Date(sample.receivedDate),
+        dueDate: new Date(sample.dueDate),
+        notes: null,
+        status: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      this.qaSamples.set(sample.id, qaSample);
+    });
+  }
+
+  private addSampleQaTestResults() {
+    const sampleTestResults = [
+      {
+        id: 101,
+        sampleId: 101,
+        sampleNo: "S001",
+        requestNo: "QA-2024-001",
+        product: "น้ำตัวอย่าง A",
+        dueDate: new Date("2024-01-25"),
+        testItems: JSON.stringify([
+          {
+            testType: "pH",
+            recordDate: new Date("2024-01-20"),
+            ph1: "7.20",
+            ph2: "7.25",
+            phAverage: "7.23",
+            result: null, // No general result for pH
+            sampleName: null,
+            activeIngredient1: null,
+            activeIngredient2: null,
+            activeIngredient3: null,
+            activeIngredientAverage: null,
+          },
+          {
+            testType: "Appearance",
+            recordDate: new Date("2024-01-20"),
+            result: "ใส ไม่มีสี",
+            ph1: null,
+            ph2: null,
+            phAverage: null,
+            sampleName: null,
+            activeIngredient1: null,
+            activeIngredient2: null,
+            activeIngredient3: null,
+            activeIngredientAverage: null,
+          },
+        ]),
+        notes: "",
+        method: null,
+        result: null,
+        unit: null,
+        specification: null,
+        recordDate: new Date("2024-01-20"),
+        status: "completed",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 102,
+        sampleId: 102,
+        sampleNo: "S002",
+        requestNo: "QA-2024-002",
+        product: "ดินตัวอย่าง B",
+        dueDate: new Date("2024-01-26"),
+        testItems: JSON.stringify([
+          {
+            testType: "Moisture",
+            recordDate: new Date("2024-01-21"),
+            result: "5.2%",
+            ph1: null,
+            ph2: null,
+            phAverage: null,
+            sampleName: null,
+            activeIngredient1: null,
+            activeIngredient2: null,
+            activeIngredient3: null,
+            activeIngredientAverage: null,
+          },
+        ]),
+        notes: "",
+        method: null,
+        result: null,
+        unit: null,
+        specification: null,
+        recordDate: new Date("2024-01-21"),
+        status: "pending",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 103,
+        sampleId: 103,
+        sampleNo: "S003",
+        requestNo: "QA-2024-003",
+        product: "อาหารตัวอย่าง C",
+        dueDate: new Date("2024-01-27"),
+        testItems: JSON.stringify([
+          {
+            testType: "ActiveIngredient",
+            sampleName: "ตัวอย่าง 1",
+            recordDate: new Date("2024-01-22"),
+            activeIngredient1: "10.5",
+            activeIngredient2: "10.7",
+            activeIngredient3: "10.6",
+            activeIngredientAverage: "10.60",
+            result: null,
+            ph1: null,
+            ph2: null,
+            phAverage: null,
+          },
+        ]),
+        notes: "",
+        method: null,
+        result: null,
+        unit: null,
+        specification: null,
+        recordDate: new Date("2024-01-22"),
+        status: "pending",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    sampleTestResults.forEach(testResult => {
+      this.qaTestResults.set(testResult.id, testResult);
+    });
+    console.log("Added", sampleTestResults.length, "sample QA test results");
   }
 
   // Tools
@@ -676,7 +914,12 @@ export class MemStorage implements IStorage {
   }
 
   async deleteQaTestResult(id: number): Promise<boolean> {
-    return this.qaTestResults.delete(id);
+    console.log("storage.deleteQaTestResult called with ID:", id);
+    console.log("Current qaTestResults size before deletion:", this.qaTestResults.size);
+    const result = this.qaTestResults.delete(id);
+    console.log("delete() result:", result);
+    console.log("Current qaTestResults size after deletion:", this.qaTestResults.size);
+    return result;
   }
 
   // Dashboard stats

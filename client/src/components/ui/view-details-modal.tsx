@@ -19,7 +19,7 @@ interface ViewDetailsModalProps {
     label: string; 
     value: string | React.ReactNode; 
     highlight?: boolean;
-    type?: 'header' | 'field' | 'section';
+    type?: 'header' | 'field' | 'section' | 'subheader' | 'separator';
     icon?: React.ReactNode;
   }>;
   additionalContent?: React.ReactNode;
@@ -98,6 +98,25 @@ export default function ViewDetailsModal({
                       </CardTitle>
                     </CardHeader>
                   </Card>
+                );
+              }
+
+              // Handle subheaders
+              if (item.type === 'subheader') {
+                return (
+                  <div key={index} className="flex items-center gap-2 py-2">
+                    <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                    <h4 className="text-md font-semibold thai-font text-gray-800 dark:text-gray-200">
+                      {item.label}
+                    </h4>
+                  </div>
+                );
+              }
+
+              // Handle separators
+              if (item.type === 'separator') {
+                return (
+                  <Separator key={index} className="my-4" />
                 );
               }
 

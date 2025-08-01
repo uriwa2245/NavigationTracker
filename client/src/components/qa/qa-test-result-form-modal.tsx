@@ -222,33 +222,50 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
   useEffect(() => {
     if (isOpen) {
       if (testResult) {
+        let parsedTestItems = [];
+        if (testResult.testItems) {
+          try {
+            if (typeof testResult.testItems === 'string') {
+              parsedTestItems = JSON.parse(testResult.testItems);
+            } else if (Array.isArray(testResult.testItems)) {
+              parsedTestItems = testResult.testItems;
+            }
+          } catch (error) {
+            parsedTestItems = [];
+          }
+        }
+
         const formData = {
           sampleNo: testResult.sampleNo || "",
           requestNo: testResult.requestNo || "",
           product: testResult.product || "",
           dueDate: testResult.dueDate ? format(new Date(testResult.dueDate), "yyyy-MM-dd") : "",
-          testItems: testResult.testItems ? 
-            (testResult.testItems as any[]).map((item: any) => ({
-              testType: item.testType,
-              recordDate: item.recordDate ? format(new Date(item.recordDate), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
-              sampleName: item.sampleName || "",
-              ph1: item.ph1 || "",
-              ph2: item.ph2 || "",
-              phAverage: item.phAverage || "",
-              activeIngredient1: item.activeIngredient1 || "",
-              activeIngredient2: item.activeIngredient2 || "",
-              activeIngredient3: item.activeIngredient3 || "",
-              activeIngredientAverage: item.activeIngredientAverage || "",
-              result: item.result || "",
-            })) : [
-              {
-                testType: "Appearance" as const,
-                recordDate: format(new Date(), "yyyy-MM-dd"),
-                result: "",
-              }
-            ],
+          testItems: parsedTestItems.length > 0 ? parsedTestItems.map((item: any) => ({
+            testType: item.testType || "Appearance",
+            recordDate: item.recordDate ? 
+              (typeof item.recordDate === 'string' ? 
+                format(new Date(item.recordDate), "yyyy-MM-dd") : 
+                format(new Date(item.recordDate), "yyyy-MM-dd")) : 
+              format(new Date(), "yyyy-MM-dd"),
+            sampleName: item.sampleName || "",
+            ph1: item.ph1 || "",
+            ph2: item.ph2 || "",
+            phAverage: item.phAverage || "",
+            activeIngredient1: item.activeIngredient1 || "",
+            activeIngredient2: item.activeIngredient2 || "",
+            activeIngredient3: item.activeIngredient3 || "",
+            activeIngredientAverage: item.activeIngredientAverage || "",
+            result: item.result || "",
+          })) : [
+            {
+              testType: "Appearance" as const,
+              recordDate: format(new Date(), "yyyy-MM-dd"),
+              result: "",
+            }
+          ],
           notes: testResult.notes || "",
         };
+        
         form.reset(formData);
       } else {
         // Load data from local storage if no testResult is being edited
@@ -308,13 +325,26 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
   const mutation = useMutation({
     mutationFn: async (data: QaTestResultFormData) => {
       const payload = {
-        ...data,
+        sampleNo: data.sampleNo,
+        requestNo: data.requestNo,
+        product: data.product,
         dueDate: new Date(data.dueDate),
-        testItems: data.testItems.map(item => ({
+        testItems: JSON.stringify(data.testItems.map(item => ({
           ...item,
           recordDate: new Date(item.recordDate),
-        })),
+        }))),
+        notes: data.notes || null,
+        // Add default values for required fields that are not in the form
+        sampleId: null,
+        method: null,
+        result: null,
+        unit: null,
+        specification: null,
+        recordDate: new Date(),
+        status: "pending"
       };
+
+
 
       if (isEditing && testResult) {
         await apiRequest("PUT", `/api/qa-test-results/${testResult.id}`, payload);
@@ -411,15 +441,15 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="thai-font">Sample No</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="เลือก Sample No" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {availableSampleNos.map((sampleNo) => (
-                            <SelectItem key={sampleNo} value={sampleNo}>
+                          {availableSampleNos.map((sampleNo, sampleIndex) => (
+                            <SelectItem key={`sample-no-${sampleIndex}-${sampleNo}`} value={sampleNo}>
                               {sampleNo}
                             </SelectItem>
                           ))}
@@ -437,7 +467,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                     <FormItem>
                       <FormLabel className="thai-font">Request No</FormLabel>
                       <FormControl>
-                        <Input {...field} readOnly className="bg-gray-50" />
+                        <Input {...field} readOnly className="bg-gray-50" value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -451,7 +481,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                     <FormItem>
                       <FormLabel className="thai-font">Product</FormLabel>
                       <FormControl>
-                        <Input {...field} readOnly className="bg-gray-50" />
+                        <Input {...field} readOnly className="bg-gray-50" value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -465,7 +495,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                     <FormItem>
                       <FormLabel className="thai-font">Due Date</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} readOnly className="bg-gray-50" />
+                        <Input type="date" {...field} readOnly className="bg-gray-50" value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -502,7 +532,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                         <h5 className="font-medium text-blue-900 mb-2 thai-font">ชื่อตัวอย่าง:</h5>
                         <div className="flex flex-wrap gap-2">
                           {selectedSampleNames.map((name, index) => (
-                            <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
+                            <span key={`sample-name-${index}-${name}`} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
                               {name}
                             </span>
                           ))}
@@ -533,7 +563,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
               </CardHeader>
               <CardContent className="space-y-4">
                 {fields.map((field, index) => (
-                  <div key={field.id} className="border rounded-lg p-4 space-y-4">
+                  <div key={`test-item-${index}-${field.id}`} className="border rounded-lg p-4 space-y-4">
                     <div className="flex justify-between items-center">
                       <h4 className="font-medium thai-font">Test Item {index + 1}</h4>
                       <Button
@@ -554,15 +584,15 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="thai-font">Test Type</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <Select onValueChange={field.onChange} value={field.value || ""}>
                               <FormControl>
                                 <SelectTrigger>
                                   <SelectValue placeholder="เลือกประเภทการทดสอบ" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {testTypeOptions.map((option) => (
-                                  <SelectItem key={option.value} value={option.value}>
+                                {testTypeOptions.map((option, optionIndex) => (
+                                  <SelectItem key={`test-type-${optionIndex}-${option.value}`} value={option.value}>
                                     {option.label}
                                   </SelectItem>
                                 ))}
@@ -580,7 +610,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                           <FormItem>
                             <FormLabel className="thai-font">Record Date</FormLabel>
                             <FormControl>
-                              <Input type="date" {...field} />
+                              <Input type="date" {...field} value={field.value ?? ""} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -602,8 +632,8 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {selectedSampleNames.map((name) => (
-                                    <SelectItem key={name} value={name}>
+                                  {selectedSampleNames.map((name, nameIndex) => (
+                                    <SelectItem key={`select-name-${nameIndex}-${name}`} value={name}>
                                       {name}
                                     </SelectItem>
                                   ))}
@@ -636,6 +666,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                                     const average = calculatePhAverage(e.target.value, ph2);
                                     form.setValue(`testItems.${index}.phAverage`, average);
                                   }}
+                                  value={field.value ?? ""}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -660,6 +691,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                                     const average = calculatePhAverage(ph1, e.target.value);
                                     form.setValue(`testItems.${index}.phAverage`, average);
                                   }}
+                                  value={field.value ?? ""}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -677,7 +709,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                                 <Calculator className="h-4 w-4 text-blue-600" />
                               </FormLabel>
                               <FormControl>
-                                <Input {...field} readOnly className="bg-gray-50" />
+                                <Input {...field} readOnly className="bg-gray-50" value={field.value ?? ""} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -707,6 +739,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                                     const average = calculateActiveIngredientAverage(e.target.value, ai2, ai3);
                                     form.setValue(`testItems.${index}.activeIngredientAverage`, average);
                                   }}
+                                  value={field.value ?? ""}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -732,6 +765,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                                     const average = calculateActiveIngredientAverage(ai1, e.target.value, ai3);
                                     form.setValue(`testItems.${index}.activeIngredientAverage`, average);
                                   }}
+                                  value={field.value ?? ""}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -757,6 +791,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                                     const average = calculateActiveIngredientAverage(ai1, ai2, e.target.value);
                                     form.setValue(`testItems.${index}.activeIngredientAverage`, average);
                                   }}
+                                  value={field.value ?? ""}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -774,7 +809,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                                 <Calculator className="h-4 w-4 text-blue-600" />
                               </FormLabel>
                               <FormControl>
-                                <Input {...field} readOnly className="bg-gray-50" />
+                                <Input {...field} readOnly className="bg-gray-50" value={field.value ?? ""} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -793,7 +828,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                           <FormItem>
                             <FormLabel className="thai-font">ผลการทดสอบ</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} value={field.value ?? ""} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -813,7 +848,7 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
                 <FormItem>
                   <FormLabel className="thai-font">หมายเหตุ</FormLabel>
                   <FormControl>
-                    <Textarea {...field} rows={3} />
+                    <Textarea {...field} rows={3} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

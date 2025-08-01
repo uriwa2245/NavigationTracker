@@ -205,8 +205,6 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
   });
 
   const onSubmit = (data: FormData) => {
-    console.log("Form data received:", data);
-    
     // Transform form data to API format
     const apiData = {
       title: data.title,
@@ -220,7 +218,6 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
       subtasks: Array.isArray(data.subtasks) && data.subtasks.length > 0 ? data.subtasks : null,
     };
     
-    console.log("API data to send:", apiData);
     mutation.mutate(apiData as any);
   };
 

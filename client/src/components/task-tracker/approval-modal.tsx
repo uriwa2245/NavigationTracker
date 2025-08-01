@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Task } from "@shared/schema";
 import { format } from "date-fns";
@@ -32,7 +32,9 @@ export default function ApprovalModal({ isOpen, onClose, task, onApprove }: Appr
   const [approvedBy, setApprovedBy] = useState("");
   const [stepApprovals, setStepApprovals] = useState<StepApproval[]>([]);
 
-  const subtasks = task?.subtasks && Array.isArray(task.subtasks) ? task.subtasks : [];
+  const subtasks = useMemo(() => {
+    return task?.subtasks && Array.isArray(task.subtasks) ? task.subtasks : [];
+  }, [task?.subtasks]);
 
   // Get stored approver name for this task
   const getStoredApproverName = (taskId: number) => {
@@ -88,7 +90,7 @@ export default function ApprovalModal({ isOpen, onClose, task, onApprove }: Appr
     } else {
       setStepApprovals([]);
     }
-  }, [task, subtasks]);
+  }, [task?.id, subtasks]);
 
   const handleStepApprovalChange = (index: number, approval: 'pending' | 'approved' | 'rejected') => {
     setStepApprovals(prev => 
@@ -108,12 +110,8 @@ export default function ApprovalModal({ isOpen, onClose, task, onApprove }: Appr
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("handleSubmit called");
-    console.log("approvedBy:", approvedBy);
-    console.log("stepApprovals:", stepApprovals);
     
     if (!approvedBy.trim()) {
-      console.log("No approver name provided");
       return;
     }
 
@@ -127,11 +125,8 @@ export default function ApprovalModal({ isOpen, onClose, task, onApprove }: Appr
       stepApproval.approval !== 'pending'
     );
 
-    console.log("approvalsToProcess:", approvalsToProcess);
-
     if (approvalsToProcess.length === 0) {
       // No approvals to process, just close the modal
-      console.log("No approvals to process, closing modal");
       handleClose();
       return;
     }
@@ -145,8 +140,6 @@ export default function ApprovalModal({ isOpen, onClose, task, onApprove }: Appr
         notes: stepApproval.remarks
       }))
     };
-
-    console.log("approvalBatch:", approvalBatch);
 
     // Call onApprove with the batch
     onApprove(approvalBatch as any);

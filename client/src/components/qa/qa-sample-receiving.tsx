@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
+import { useQaSamples } from "@/hooks/use-persistent-data";
 import DataTable from "@/components/ui/data-table";
 import QaSampleFormModal from "./qa-sample-form-modal";
 import ViewDetailsModal from "@/components/ui/view-details-modal";
@@ -19,24 +20,35 @@ export default function QaSampleReceiving() {
   const [viewingSample, setViewingSample] = useState<QaSample | null>(null);
   const { toast } = useToast();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["/api/qa-samples"],
-    initialData: [],
-  });
-  const qaSamples: QaSample[] = Array.isArray(data) ? data : [];
+  const { 
+    data: qaSamples, 
+    isLoading, 
+    error, 
+    refetch,
+    removeFromCache 
+  } = useQaSamples();
+
+  // Force refresh data when component mounts to ensure we have the latest data
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/qa-samples/${id}`);
+      const response = await apiRequest("DELETE", `/api/qa-samples/${id}`);
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/qa-samples"] });
+      // Update local cache
+      removeFromCache(variables);
+      
       toast({
         title: "สำเร็จ",
         description: "ลบตัวอย่าง QA เรียบร้อยแล้ว",
       });
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: "เกิดข้อผิดพลาด",
         description: "ไม่สามารถลบตัวอย่าง QA ได้",
@@ -44,6 +56,34 @@ export default function QaSampleReceiving() {
       });
     },
   });
+
+  // Handle refresh manually
+  const handleRefresh = async () => {
+    try {
+      await refetch();
+      toast({
+        title: "สำเร็จ",
+        description: "อัปเดตข้อมูลเรียบร้อยแล้ว",
+      });
+    } catch (error) {
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถอัปเดตข้อมูลได้",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handle error display
+  const handleError = () => {
+    if (error) {
+      toast({
+        title: "คำเตือน",
+        description: "ไม่สามารถโหลดข้อมูลใหม่ได้ กำลังใช้ข้อมูลที่แคชไว้",
+        variant: "destructive",
+      });
+    }
+  };
 
   const getDeliveryMethodLabel = (method: string) => {
     switch (method) {
@@ -146,10 +186,38 @@ export default function QaSampleReceiving() {
       <div className="grid grid-cols-1 gap-6">
         <div className="lab-card">
           <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 thai-font">
-              ตัวอย่างทั้งหมด
-            </h3>
-            <p className="text-3xl font-bold text-blue-600">{totalSamples}</p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 thai-font">
+                  ตัวอย่างทั้งหมด
+                </h3>
+                <p className="text-3xl font-bold text-blue-600">{totalSamples}</p>
+              </div>
+              <Button
+                onClick={handleRefresh}
+                disabled={isLoading}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100"
+              >
+                {isLoading ? "กำลังโหลด..." : "🔄 รีเฟรช"}
+              </Button>
+            </div>
+            {error && (
+              <div className="mt-2">
+                <p className="text-sm text-red-500">
+                  เกิดข้อผิดพลาดในการโหลดข้อมูล
+                </p>
+                <Button
+                  onClick={handleError}
+                  variant="outline"
+                  size="sm"
+                  className="mt-1"
+                >
+                  แสดงรายละเอียด
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -281,18 +349,52 @@ export default function QaSampleReceiving() {
             value: `${Array.isArray(viewingSample.samples) ? viewingSample.samples.length : 0} รายการ`,
             highlight: true
           },
-          ...((Array.isArray(viewingSample.samples) ? viewingSample.samples : [])?.map((sample, index) => ({
-            label: `ตัวอย่างที่ ${index + 1}`,
-            value: [
-              `Sample No: ${sample.sampleNo}`,
-              `Sample Name: ${Array.isArray(sample.names) ? sample.names.join(", ") : sample.name || "-"}`,
-              `Id_No/Batch_No: ${sample.analysisRequest || "-"}`,
-              `รายการทดสอบ:`,
-              sample.itemTests?.map((test: { itemTest: any; specification: any; unit: any; method: any; }) => 
-                `   • ${test.itemTest}${test.specification ? ` (${test.specification})` : ""}${test.unit ? ` ${test.unit}` : ""}${test.method ? ` - ${test.method}` : ""}`
-              ).join("\n") || "-"
-            ].join("\n")
-          })) || [])
+          ...((Array.isArray(viewingSample.samples) ? viewingSample.samples : []).flatMap((sample, index) => [
+            // Sample header with better styling
+            {
+              label: `ตัวอย่างที่ ${index + 1}`,
+              value: "",
+              type: "subheader"
+            },
+            // Sample basic info in a more organized way
+            {
+              label: "Sample No",
+              value: sample.sampleNo || "-",
+              highlight: true
+            },
+            {
+              label: "Sample Name",
+              value: Array.isArray(sample.names) ? sample.names.join(", ") : sample.name || "-"
+            },
+            {
+              label: "Id_No/Batch_No",
+              value: sample.analysisRequest || "-"
+            },
+            // Item tests section
+            {
+              label: "รายการทดสอบ",
+              value: "",
+              type: "subheader"
+            },
+            // Item tests with better formatting
+            ...(Array.isArray(sample.itemTests) ? sample.itemTests.map((test: any, testIndex: number) => {
+              const testDetails = [];
+              if (test.specification) testDetails.push(`Specification: ${test.specification}`);
+              if (test.unit) testDetails.push(`Unit: ${test.unit}`);
+              if (test.method) testDetails.push(`Method: ${test.method}`);
+              
+              return {
+                label: `${testIndex + 1}. ${test.itemTest}`,
+                value: testDetails.length > 0 ? testDetails.join(" | ") : "-"
+              };
+            }) : []),
+            // Separator between samples (only if not the last sample)
+            ...(index < (Array.isArray(viewingSample.samples) ? viewingSample.samples.length : 0) - 1 ? [{
+              label: "",
+              value: "",
+              type: "separator"
+            }] : [])
+          ]) || [])
         ] : []}
       />
     </div>

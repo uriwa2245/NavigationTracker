@@ -8,7 +8,6 @@ import ViewDetailsModal from "@/components/ui/view-details-modal";
 import { QaTestResult } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Badge } from "@/components/ui/badge";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -27,16 +26,19 @@ export default function QaTestResults() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
+      console.log("deleteMutation.mutationFn called with ID:", id);
       await apiRequest("DELETE", `/api/qa-test-results/${id}`);
     },
     onSuccess: () => {
+      console.log("deleteMutation.onSuccess called.");
       queryClient.invalidateQueries({ queryKey: ["/api/qa-test-results"] });
       toast({
         title: "สำเร็จ",
         description: "ลบผลการทดสอบเรียบร้อยแล้ว",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("deleteMutation.onError called with error:", error);
       toast({
         title: "เกิดข้อผิดพลาด",
         description: "ไม่สามารถลบผลการทดสอบได้",
@@ -82,23 +84,8 @@ export default function QaTestResults() {
         );
       },
     },
-    {
-      key: "recordDate",
-      label: "วันที่บันทึก",
-      render: (value: string) => format(new Date(value), "dd/MM/yyyy"),
-    },
-    {
-      key: "status",
-      label: "สถานะ",
-      render: (value: string, result: QaTestResult) => {
-        const statusBadges = {
-          "pending": <Badge className="lab-badge-warning">รอดำเนินการ</Badge>,
-          "in_progress": <Badge className="lab-badge-info">กำลังดำเนินการ</Badge>,
-          "completed": <Badge className="lab-badge-success">เสร็จแล้ว</Badge>
-        };
-        return statusBadges[result.status as keyof typeof statusBadges] || <Badge className="lab-badge-info">{result.status}</Badge>;
-      },
-    },
+
+
   ];
 
   const handleAdd = () => {
@@ -112,6 +99,7 @@ export default function QaTestResults() {
   };
 
   const handleDelete = (testResult: QaTestResult) => {
+    console.log("Attempting to delete test result with ID:", testResult.id);
     if (confirm(`คุณต้องการลบผลการทดสอบ "${testResult.sampleNo}" หรือไม่?`)) {
       deleteMutation.mutate(testResult.id);
     }
@@ -156,12 +144,7 @@ export default function QaTestResults() {
         onDelete={handleDelete}
         onView={handleView}
         isLoading={isLoading}
-        statusFilters={[
-          { key: "pending", label: "รอดำเนินการ", count: testResults?.filter((result: QaTestResult) => result.status === "pending").length || 0 },
-          { key: "in_progress", label: "กำลังดำเนินการ", count: testResults?.filter((result: QaTestResult) => result.status === "in_progress").length || 0 },
-          { key: "completed", label: "เสร็จแล้ว", count: testResults?.filter((result: QaTestResult) => result.status === "completed").length || 0 },
-        ]}
-        getItemStatus={(result: QaTestResult) => result.status || "pending"}
+
         customActions={(item: QaTestResult) => (
           <Button
             variant="outline"
@@ -185,35 +168,66 @@ export default function QaTestResults() {
         isOpen={viewDetailsModalOpen}
         onClose={() => setViewDetailsModalOpen(false)}
         title="รายละเอียดผลการทดสอบ"
-        data={viewingResult ? [
-          // ข้อมูลพื้นฐาน
-          { label: "Sample No", value: viewingResult.sampleNo },
-          { label: "Request No", value: viewingResult.requestNo },
-          { label: "Product", value: viewingResult.product },
-          { label: "วันครบกำหนด", value: viewingResult.dueDate ? format(new Date(viewingResult.dueDate), "dd/MM/yyyy") : "-" },
+        data={viewingResult ? (() => {
+          // Parse testItems if it's a string
+          let testItems = [];
+          if (viewingResult.testItems) {
+            try {
+              if (typeof viewingResult.testItems === 'string') {
+                testItems = JSON.parse(viewingResult.testItems);
+              } else if (Array.isArray(viewingResult.testItems)) {
+                testItems = viewingResult.testItems;
+              }
+            } catch (error) {
+              testItems = [];
+            }
+          }
 
-          // รายการทดสอบ
-          { label: "จำนวนรายการทดสอบ", value: Array.isArray(viewingResult.testItems) ? viewingResult.testItems.length : 0 },
-          ...((Array.isArray(viewingResult.testItems) ? viewingResult.testItems : [])).map((item, index) => ({
-            label: `Test Item ${index + 1}`,
-            value: `ประเภท: ${item.testType}
-              วันที่ทดสอบ: ${item.recordDate ? format(new Date(item.recordDate), "dd/MM/yyyy") : "-"}
-              ${item.testType === "pH" ?
-                `pH1: ${item.ph1 || "-"}
-                 pH2: ${item.ph2 || "-"}
-                 pH Average: ${item.phAverage || "-"}` :
-                item.testType === "ActiveIngredient" ?
-                  `AI1: ${item.activeIngredient1 || "-"}
-                 AI2: ${item.activeIngredient2 || "-"}
-                 AI3: ${item.activeIngredient3 || "-"}
-                 AI Average: ${item.activeIngredientAverage || "-"}` :
-                  `ผลการทดสอบ: ${item.result || "-"}`}`,
-            multiline: true
-          })),
+          const baseData = [
+            // ข้อมูลพื้นฐาน
+            { label: "Sample No", value: viewingResult.sampleNo },
+            { label: "Request No", value: viewingResult.requestNo },
+            { label: "Product", value: viewingResult.product },
+            { label: "วันครบกำหนด", value: viewingResult.dueDate ? format(new Date(viewingResult.dueDate), "dd/MM/yyyy") : "-" },
+            { label: "หมายเหตุ", value: viewingResult.notes || "-" },
+            { label: "จำนวนรายการทดสอบ", value: testItems.length },
+          ];
 
-          // หมายเหตุ
-          { label: "หมายเหตุ", value: viewingResult.notes || "-" }
-        ] : []}
+          // Add test items details
+          const testItemsData = testItems.map((item: any, index: number) => {
+            let testDetails = `ประเภท: ${item.testType}\nวันที่ทดสอบ: ${item.recordDate ? format(new Date(item.recordDate), "dd/MM/yyyy") : "-"}`;
+            
+            if (item.testType === "pH") {
+              testDetails += `\n\npH1: ${item.ph1 || "-"}\npH2: ${item.ph2 || "-"}\npH Average: ${item.phAverage || "-"}`;
+            } else if (item.testType === "ActiveIngredient") {
+              testDetails += `\n\nSample Name: ${item.sampleName || "-"}\nActive Ingredient 1: ${item.activeIngredient1 || "-"}\nActive Ingredient 2: ${item.activeIngredient2 || "-"}\nActive Ingredient 3: ${item.activeIngredient3 || "-"}\nActive Ingredient Average: ${item.activeIngredientAverage || "-"}`;
+            } else if (item.testType === "Density") {
+              testDetails += `\n\nDensity: ${item.result || "-"} g/cm³`;
+            } else if (item.testType === "Reemulsification") {
+              testDetails += `\n\nRe-emulsification: ${item.result || "-"} cm³`;
+            } else if (item.testType === "PersistanceFoaming") {
+              testDetails += `\n\nPersistance foaming: ${item.result || "-"}`;
+            } else if (item.testType === "AgingTest") {
+              testDetails += `\n\nAging test: ${item.result || "-"}`;
+            } else if (item.testType === "Moisture") {
+              testDetails += `\n\nMoisture: ${item.result || "-"} %`;
+            } else if (item.testType === "Viscosity") {
+              testDetails += `\n\nViscosity: ${item.result || "-"} mPa.s`;
+            } else if (item.testType === "FormulaTest") {
+              testDetails += `\n\nFormula test: ${item.result || "-"}`;
+            } else {
+              testDetails += `\n\nผลการทดสอบ: ${item.result || "-"}`;
+            }
+            
+            return {
+              label: `Test Item ${index + 1}`,
+              value: testDetails,
+              multiline: true
+            };
+          });
+
+          return [...baseData, ...testItemsData];
+        })() : []}
       />
     </div>
   );

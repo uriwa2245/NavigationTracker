@@ -11,7 +11,6 @@ class WebSocketManager {
         this.ws = new WebSocket(url);
         
         this.ws.onopen = () => {
-          console.log('WebSocket connected successfully');
           this.reconnectAttempts = 0;
           resolve(this.ws!);
         };
@@ -22,7 +21,6 @@ class WebSocketManager {
         };
 
         this.ws.onclose = (event) => {
-          console.log('WebSocket connection closed:', event.code, event.reason);
           this.handleReconnect(url);
         };
 
@@ -36,7 +34,6 @@ class WebSocketManager {
   private handleReconnect(url: string) {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
-      console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
       
       setTimeout(() => {
         this.connect(url).catch((error) => {
@@ -78,7 +75,6 @@ export function createWebSocketURL(protocol: string, host: string, port?: string
 
 // Fallback function for when WebSocket is not available
 export function setupWebSocketFallback() {
-  console.log('WebSocket not available, using polling fallback');
   // Implement polling fallback if needed
   return setInterval(() => {
     // Poll for updates every 5 seconds
