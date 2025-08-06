@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -196,6 +197,9 @@ export default function ToolFormModal({ isOpen, onClose, tool }: ToolFormModalPr
           <DialogTitle className="thai-font">
             {isEditing ? "แก้ไขเครื่องมือ" : "เพิ่มเครื่องมือใหม่"}
           </DialogTitle>
+          <DialogDescription className="thai-font">
+            กรอกข้อมูลเครื่องมือเพื่อจัดการเครื่องมือในระบบ
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>

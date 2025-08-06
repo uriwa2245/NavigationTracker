@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -195,6 +196,9 @@ export default function ChemicalFormModal({
           <DialogTitle className="thai-font">
             {isEditing ? "แก้ไขสารเคมี" : "เพิ่มสารเคมีใหม่"}
           </DialogTitle>
+          <DialogDescription className="thai-font">
+            กรอกข้อมูลสารเคมีเพื่อจัดการสารเคมีในระบบ
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>

@@ -108,7 +108,7 @@ export default function MsdsPage() {
       ),
     },
     {
-      key: "category", 
+      key: "categoryBadge",
       label: "หมวดหมู่",
       render: (value: string, item: Msds) => {
         const categoryBadges = {

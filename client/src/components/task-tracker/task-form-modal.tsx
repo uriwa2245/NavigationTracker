@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -241,6 +242,9 @@ export default function TaskFormModal({ isOpen, onClose, task }: TaskFormModalPr
           <DialogTitle className="thai-font">
             {isEditing ? "แก้ไขงาน" : "เพิ่มงานใหม่"}
           </DialogTitle>
+          <DialogDescription className="thai-font">
+            กรอกข้อมูลงานเพื่อจัดการงานในระบบ
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>

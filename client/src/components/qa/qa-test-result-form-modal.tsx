@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -425,6 +426,9 @@ export default function QaTestResultFormModal({ isOpen, onClose, testResult }: Q
           <DialogTitle className="thai-font">
             {isEditing ? "แก้ไขผลการทดสอบ" : "เพิ่มผลการทดสอบ"}
           </DialogTitle>
+          <DialogDescription className="thai-font">
+            กรอกข้อมูลผลการทดสอบเพื่อจัดการบันทึกผลการทดสอบในระบบ
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>

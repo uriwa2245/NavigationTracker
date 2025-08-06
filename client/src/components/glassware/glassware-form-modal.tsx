@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -177,6 +178,9 @@ export default function GlasswareFormModal({ isOpen, onClose, glassware }: Glass
           <DialogTitle className="thai-font">
             {isEditing ? "แก้ไขเครื่องแก้ว" : "เพิ่มเครื่องแก้วใหม่"}
           </DialogTitle>
+          <DialogDescription className="thai-font">
+            กรอกข้อมูลเครื่องแก้วเพื่อจัดการเครื่องแก้วในระบบ
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>

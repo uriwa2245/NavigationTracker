@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -142,6 +143,9 @@ export default function MsdsFormModal({ isOpen, onClose, msds }: MsdsFormModalPr
           <DialogTitle className="thai-font">
             {isEditing ? "แก้ไข MSDS" : "เพิ่ม MSDS ใหม่"}
           </DialogTitle>
+          <DialogDescription className="thai-font">
+            กรอกข้อมูล MSDS เพื่อจัดการเอกสารความปลอดภัยในระบบ
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>

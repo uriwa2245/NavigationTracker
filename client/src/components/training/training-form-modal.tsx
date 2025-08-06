@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -175,6 +176,9 @@ export default function TrainingFormModal({ isOpen, onClose, training }: Trainin
           <DialogTitle className="thai-font">
             {isEditing ? "แก้ไขการฝึกอบรม" : "เพิ่มการฝึกอบรมใหม่"}
           </DialogTitle>
+          <DialogDescription className="thai-font">
+            กรอกข้อมูลการฝึกอบรมเพื่อจัดการบันทึกการฝึกอบรมในระบบ
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>

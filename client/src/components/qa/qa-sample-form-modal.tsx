@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -456,6 +457,9 @@ export default function QaSampleFormModal({ isOpen, onClose, qaSample }: QaSampl
           <DialogTitle className="thai-font">
             {isEditing ? "แก้ไขฟอร์มรับตัวอย่าง QA" : "ฟอร์มรับตัวอย่าง QA"}
           </DialogTitle>
+          <DialogDescription className="thai-font">
+            กรอกข้อมูลตัวอย่าง QA เพื่อจัดการบันทึกตัวอย่างในระบบ
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>

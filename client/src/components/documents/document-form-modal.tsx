@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -70,7 +71,7 @@ export default function DocumentFormModal({ isOpen, onClose, document }: Documen
         // Convert dates to strings for form inputs
         const formData = {
           ...document,
-          effectiveDate: document.effectiveDate ? new Date(document.effectiveDate).toISOString().split('T')[0] : null,
+          effectiveDate: document.effectiveDate ? new Date(document.effectiveDate) : null,
           // Ensure all fields have proper values
           sequence: document.sequence || "",
           revision: document.revision || 0,
@@ -80,7 +81,6 @@ export default function DocumentFormModal({ isOpen, onClose, document }: Documen
         form.reset(formData);
       } else {
         form.reset({
-          sequence: "",
           title: "",
           documentCode: "",
           effectiveDate: null,
@@ -91,7 +91,7 @@ export default function DocumentFormModal({ isOpen, onClose, document }: Documen
         });
       }
     }
-  }, [document, isOpen, form]);
+  }, [isOpen, document, form]);
 
   const mutation = useMutation({
     mutationFn: async (data: InsertDocument) => {
@@ -145,11 +145,16 @@ export default function DocumentFormModal({ isOpen, onClose, document }: Documen
           <DialogTitle className="thai-font">
             {isEditing ? "แก้ไขเอกสาร" : "เพิ่มเอกสารใหม่"}
           </DialogTitle>
+          <DialogDescription className="thai-font">
+            กรอกข้อมูลเอกสารเพื่อจัดการเอกสารในระบบ
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* ลบฟิลด์ลำดับ (sequence) ออก */}
+              
               <FormField
                 control={form.control}
                 name="sequence"
@@ -157,13 +162,13 @@ export default function DocumentFormModal({ isOpen, onClose, document }: Documen
                   <FormItem>
                     <FormLabel className="thai-font">ลำดับ</FormLabel>
                     <FormControl>
-                      <Input placeholder="เช่น 001" {...field} value={field.value ?? ""} />
+                      <Input placeholder="เช่น 001" {...field} value={field.value ?? ""} readOnly={true} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
+              
               <FormField
                 control={form.control}
                 name="documentCode"

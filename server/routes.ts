@@ -349,6 +349,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/documents/highest-sequence/:year", async (req, res) => {
+    try {
+      const year = parseInt(req.params.year);
+      if (isNaN(year)) {
+        return res.status(400).json({ message: "Invalid year provided." });
+      }
+      const highestSequence = await storage.getHighestDocumentSequence(year);
+      res.json({ highestSequence });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch highest document sequence." });
+    }
+  });
+
   // Training
   app.get("/api/training", async (req, res) => {
     try {
